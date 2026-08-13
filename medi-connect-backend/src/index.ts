@@ -11,9 +11,12 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 
 app.get("/", (_req: Request, res: Response) => {
-  res.send("Hello, World How are you?");
+  res.send("Hello, World How are you? I am fine");
 });
 
+app.get("/health", (_req: Request, res: Response) => {
+    res.status(200).json({ status: "App is running fine " });
+});
 // Connect to the database and start the server
 connectToDatabase()
   .then(() => {
