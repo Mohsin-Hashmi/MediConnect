@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts"
   },
@@ -13,17 +15,24 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jiti": "^2.7.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
     "tsx": "^4.23.12",
-    "typescript": "^7.0.2"
+    "typescript": "5.9",
+    "typescript-eslint": "^8.67.0"
   }
 }

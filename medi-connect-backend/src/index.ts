@@ -2,13 +2,15 @@ import express from "express";
 import type { Request, Response } from "express";
 import dotenv from "dotenv";
 dotenv.config();
+import { authRouter } from "./routes/auth.route.js";
 import { connectToDatabase } from "./config/db-connection.js";
 
 const PORT = process.env.PORT || 7000;
 const app = express();
 app.use(express.json());
+app.use("/api/auth", authRouter);
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   res.send("Hello, World How are you?");
 });
 
