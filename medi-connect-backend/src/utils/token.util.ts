@@ -13,10 +13,9 @@ export type AuthTokenPayload = UserTokenPayload & {
   tokenType: "access" | "refresh";
 };
 
-
 // Set token expiration times
-const ACCESS_TOKEN_EXPIRES_IN: SignOptions["expiresIn"] = "7d";
-const REFRESH_TOKEN_EXPIRES_IN: SignOptions["expiresIn"] = "15m";
+const ACCESS_TOKEN_EXPIRES_IN: SignOptions["expiresIn"] = "15m";
+const REFRESH_TOKEN_EXPIRES_IN: SignOptions["expiresIn"] = "7d";
 
 // Get JWT Secret from environment variables
 const getJwtSecret = () => {
@@ -40,7 +39,8 @@ export const generateAccessToken = (user: TokenUser) => {
 
   return jwt.sign(payload, getJwtSecret(), { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
 };
- // Generate Refresh Token
+
+// Generate Refresh Token
 export const generateRefreshToken = (user: TokenUser) => {
   const payload: AuthTokenPayload = {
     userId: user.id,
@@ -58,6 +58,7 @@ export const generateAuthTokens = (user: TokenUser) => ({
   refreshToken: generateRefreshToken(user),
 });
 
+// Verify Refresh Token
 export const verifyRefreshToken = (refreshToken: string) => {
   try {
     const payload = jwt.verify(refreshToken, getJwtSecret()) as AuthTokenPayload;
