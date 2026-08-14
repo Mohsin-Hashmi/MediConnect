@@ -10,6 +10,7 @@ import {
   loginUser,
   refreshAccessToken,
   registerUser,
+  logoutUser,
 } from "../services/auth.service.js";
 
 export const authRouter = Router();
@@ -21,3 +22,4 @@ authRouter.post(
   validateSchema(refreshTokenSchema),
   refreshAccessToken
 );
+authRouter.post("/logout", logoutUser);

@@ -79,3 +79,25 @@ export const verifyRefreshToken = (refreshToken: string) => {
     throw error;
   }
 };
+
+// Verify Access Token
+export const verifyAccessToken = (accessToken: string) => {
+  try {
+    const payload = jwt.verify(accessToken, getJwtSecret()) as AuthTokenPayload;
+
+    if (payload.tokenType !== "access") {
+      return null;
+    }
+
+    return payload;
+  } catch (error) {
+    if (
+      error instanceof jwt.JsonWebTokenError ||
+      error instanceof jwt.TokenExpiredError
+    ) {
+      return null;
+    }
+
+    throw error;
+  }
+};

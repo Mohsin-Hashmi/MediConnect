@@ -4,6 +4,7 @@ import type { IUser, UserRoleName } from "../types/user.js";
 export enum UserRole {
   PATIENT = "patient",
   DOCTOR = "doctor",
+  ADMIN = "admin",
 }
 
 export interface IUserDocument extends Omit<IUser, "_id" | "role">, Document {

@@ -2,11 +2,13 @@ import express from "express";
 import type { Request, Response } from "express";
 import dotenv from "dotenv";
 dotenv.config();
+import cookieParser from "cookie-parser";
 import { authRouter } from "./routes/auth.route.js";
 import { connectToDatabase } from "./config/db-connection.js";
 
 const PORT = process.env.PORT || 7000;
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 
@@ -17,6 +19,7 @@ app.get("/", (_req: Request, res: Response) => {
 app.get("/health", (_req: Request, res: Response) => {
     res.status(200).json({ status: "App is running fine " });
 });
+console.log("App is running fine");
 // Connect to the database and start the server
 connectToDatabase()
   .then(() => {

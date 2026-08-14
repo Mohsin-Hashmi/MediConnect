@@ -44,6 +44,13 @@ export const registerUser = async (req: Request, res: Response) => {
       role: user.role,
     });
 
+    res.cookie("token", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -54,7 +61,7 @@ export const registerUser = async (req: Request, res: Response) => {
           email: user.email,
           role: user.role,
         },
-        ...tokens,
+        accessToken: tokens.accessToken,
       },
     });
   } catch (error) {
@@ -97,6 +104,13 @@ export const loginUser = async (req: Request, res: Response) => {
       role: user.role,
     });
 
+    res.cookie("token", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
@@ -107,11 +121,52 @@ export const loginUser = async (req: Request, res: Response) => {
           email: user.email,
           role: user.role,
         },
-        ...tokens,
+        accessToken: tokens.accessToken,
       },
     });
   } catch (error) {
     console.error("Login request failed:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response) => {
+  try {
+    // Invalidate the refresh token on the client side by removing it from storage
+    const  refreshToken  = req.cookies.token
+    if (!refreshToken) {
+      res.status(401).json({
+        success: false,
+        message: "Refresh token is required for logout",
+      });
+      return;
+    }
+    const isValidRefreshToken = await verifyRefreshToken(refreshToken); // Verify the refresh token before logout
+
+    if (!isValidRefreshToken) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid refresh token",
+      });
+      return;
+    }
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout request failed:", error);
 
     res.status(500).json({
       success: false,
