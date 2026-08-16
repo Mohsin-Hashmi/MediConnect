@@ -38,6 +38,22 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, "Refresh token is required"),
 });
 
+export const profileUpdateSchema = z.object({
+  phone: z.string().trim().max(20, "Phone number must not exceed 20 characters").optional().nullable(),
+  profileImage: z
+    .union([
+      z.string().trim().url("Profile image must be a valid URL"),
+      z.literal(""),
+    ])
+    .optional()
+    .nullable()
+    .transform((value) => (value === "" ? null : value)),
+  dateOfBirth: z.coerce.date().optional().nullable(),
+  gender: z.string().trim().max(20, "Gender must not exceed 20 characters").optional().nullable(),
+  address: z.string().trim().max(255, "Address must not exceed 255 characters").optional().nullable(),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

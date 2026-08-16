@@ -11,4 +11,6 @@ export interface IUser {
   dateOfBirth?: Date;
   gender?: string;
   address?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
