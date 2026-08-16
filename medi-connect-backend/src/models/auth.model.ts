@@ -31,6 +31,30 @@ const userSchema = new Schema<IUserDocument>(
       required: true,
       minlength: 6,
     },
+    phone: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    profileImage: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    dateOfBirth: {
+      type: Date,
+      default: null,
+    },
+    gender: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    address: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     role: {
       type: String,
       enum: Object.values(UserRole),

@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import { UserModel } from "../models/auth.model.js";
 import type {
   LoginInput,
-  RefreshTokenInput,
   RegisterInput,
 } from "../schemas/auth.schema.js";
 import {
@@ -17,7 +16,7 @@ const BCRYPT_SALT_ROUNDS = 10;
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body as RegisterInput;
+    const { name, email, password, role, phone, profileImage, dateOfBirth, gender, address } = req.body as RegisterInput;
 
     const existingUser = await UserModel.findOne({ email });
 
@@ -35,6 +34,11 @@ export const registerUser = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
+      phone,
+      profileImage,
+      dateOfBirth,
+      gender,
+      address,
       role,
     });
 
@@ -137,7 +141,7 @@ export const loginUser = async (req: Request, res: Response) => {
 export const logoutUser = async (req: Request, res: Response) => {
   try {
     // Invalidate the refresh token on the client side by removing it from storage
-    const  refreshToken  = req.cookies.token
+    const refreshToken = req.cookies.token as string;
     if (!refreshToken) {
       res.status(401).json({
         success: false,
@@ -177,7 +181,7 @@ export const logoutUser = async (req: Request, res: Response) => {
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body as RefreshTokenInput;
+    const refreshToken = req.cookies.token as string;
     const refreshPayload = verifyRefreshToken(refreshToken);
 
     if (!refreshPayload) {

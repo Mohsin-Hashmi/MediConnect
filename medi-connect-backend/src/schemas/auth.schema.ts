@@ -17,6 +17,11 @@ export const registerSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters long")
     .max(72, "Password must not exceed 72 characters"),
+  phone: z.string().trim().max(20, "Phone number must not exceed 20 characters").optional(),
+  profileImage: z.string().trim().url("Profile image must be a valid URL").optional().or(z.literal("")),
+  dateOfBirth: z.coerce.date().optional(),
+  gender: z.string().trim().max(20, "Gender must not exceed 20 characters").optional(),
+  address: z.string().trim().max(255, "Address must not exceed 255 characters").optional(),
   role: z.enum(UserRole, "Role must be either patient or doctor"),
 });
 
