@@ -6,6 +6,7 @@ import { profileUpdateSchema } from "../schemas/auth.schema.js";
 import {
   fetchUserProfile,
   editUserProfile,
+  deleteUserProfile,
 } from "../services/profile.service.js";
 
 export const profileRouter = Router();
@@ -17,3 +18,4 @@ profileRouter.patch(
   validateSchema(profileUpdateSchema),
   editUserProfile
 );
+profileRouter.delete("/profile", authMiddleware, deleteUserProfile);
