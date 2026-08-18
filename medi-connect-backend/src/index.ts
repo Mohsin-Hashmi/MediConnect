@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import cookieParser from "cookie-parser";
 import { authRouter } from "./routes/auth.route.js";
+import { doctorRouter } from "./routes/doctor.route.js";
 import { profileRouter } from "./routes/profile.route.js";
 import { connectToDatabase } from "./config/db-connection.js";
 
@@ -13,6 +14,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/users", profileRouter);
+app.use("/api/doctors", doctorRouter);
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Hello, World How are you? I am fine");
