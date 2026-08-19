@@ -7,7 +7,9 @@ import {
   createDoctorProfile,
   deleteDoctorProfile,
   getDoctorById,
+  updateDoctorProfile,
 } from "../services/doctor.service.js";
+import { updateDoctorSchema } from "../schemas/doctor.schema.js";
 
 export const doctorRouter = Router();
 
@@ -19,3 +21,9 @@ doctorRouter.post(
 );
 doctorRouter.get("/:doctorId", getDoctorById);
 doctorRouter.delete("/me", authMiddleware, deleteDoctorProfile);
+doctorRouter.patch(
+  "/me",
+  authMiddleware,
+  validateSchema(updateDoctorSchema),
+  updateDoctorProfile
+);

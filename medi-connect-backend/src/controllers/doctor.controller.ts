@@ -2,7 +2,10 @@ import type { Request, Response } from "express";
 
 import { UserModel } from "../models/auth.model.js";
 import { DoctorModel } from "../models/doctor.model.js";
-import type { CreateDoctorInput } from "../schemas/doctor.schema.js";
+import type {
+  CreateDoctorInput,
+  UpdateDoctorInput,
+} from "../schemas/doctor.schema.js";
 
 
 ;
@@ -234,4 +237,95 @@ export const deleteDoctorProfile = async (req: Request, res: Response) => {
       message: "Internal server error",
     });
   }
-}
+};
+
+export const updateDoctorProfile = async (req: Request, res: Response) => {
+  try {
+    const authenticatedUserId = req.user?.id;
+
+    if (!authenticatedUserId) {
+      res.status(401).json({
+        success: false,
+        message: "User is not authenticated",
+      });
+      return;
+    }
+
+    const payload = req.body as UpdateDoctorInput;
+
+    if (!payload || Object.keys(payload).length === 0) {
+      res.status(400).json({
+        success: false,
+        message: "No doctor profile fields provided for update",
+      });
+      return;
+    }
+
+    const doctor = await DoctorModel.findOne({ userId: authenticatedUserId });
+
+    if (!doctor) {
+      res.status(404).json({
+        success: false,
+        message: "Doctor profile not found",
+      });
+      return;
+    }
+
+    if (payload.licenseNumber) {
+      const existingLicense = await DoctorModel.findOne({
+        licenseNumber: payload.licenseNumber,
+        _id: { $ne: doctor._id },
+      });
+
+      if (existingLicense) {
+        res.status(409).json({
+          success: false,
+          message: "This license number is already registered",
+        });
+        return;
+      }
+    }
+
+    const updatedDoctor = await DoctorModel.findByIdAndUpdate(
+      doctor._id,
+      { $set: payload },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedDoctor) {
+      res.status(404).json({
+        success: false,
+        message: "Doctor profile not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Doctor profile updated successfully",
+      data: {
+        doctor: {
+          id: updatedDoctor._id.toString(),
+          userId: updatedDoctor.userId.toString(),
+          specialization: updatedDoctor.specialization,
+          qualification: updatedDoctor.qualification,
+          licenseNumber: updatedDoctor.licenseNumber,
+          experience: updatedDoctor.experience,
+          hospitalName: updatedDoctor.hospitalName,
+          consultationFee: updatedDoctor.consultationFee,
+          bio: updatedDoctor.bio,
+          isVerified: updatedDoctor.isVerified,
+          createdAt: updatedDoctor.createdAt,
+          updatedAt: updatedDoctor.updatedAt,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Update doctor profile failed:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
