@@ -5,6 +5,7 @@ import { DoctorModel } from "../models/doctor.model.js";
 import type { CreateDoctorInput } from "../schemas/doctor.schema.js";
 
 
+;
 
 export const createDoctorProfile = async (req: Request, res: Response) => {
   try {
@@ -173,3 +174,64 @@ export const getDoctorById = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+
+export const deleteDoctorProfile = async (req: Request, res: Response) => {
+  try {
+    const authenticatedUserId = req.user?.id;
+
+    if (!authenticatedUserId) {
+      res.status(401).json({
+        success: false,
+        message: "User is not authenticated",
+      });
+      return;
+    }
+
+    const doctor = await DoctorModel.findOneAndDelete({ userId: authenticatedUserId });
+
+    if (!doctor) {
+      res.status(404).json({
+        success: false,
+        message: "Doctor profile not found",
+      });
+      return;
+    }
+
+    const user = await UserModel.findById(authenticatedUserId);
+
+    if (user && user.role === "doctor") {
+      user.role = "patient";
+      await user.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Doctor profile deleted successfully",
+      data: {
+        doctor: {
+          id: doctor._id.toString(),
+          userId: doctor.userId.toString(),
+          specialization: doctor.specialization,
+          qualification: doctor.qualification,
+          licenseNumber: doctor.licenseNumber,
+          experience: doctor.experience,
+          hospitalName: doctor.hospitalName,
+          consultationFee: doctor.consultationFee,
+          bio: doctor.bio,
+          isVerified: doctor.isVerified,
+          createdAt: doctor.createdAt,
+          updatedAt: doctor.updatedAt,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Delete doctor profile failed:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}

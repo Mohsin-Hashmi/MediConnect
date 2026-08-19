@@ -1,1 +1,5 @@
-export { createDoctorProfile, getDoctorById } from "../controllers/doctor.controller.js";
+export {
+  createDoctorProfile,
+  deleteDoctorProfile,
+  getDoctorById,
+} from "../controllers/doctor.controller.js";

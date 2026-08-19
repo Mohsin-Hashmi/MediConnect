@@ -5,11 +5,11 @@ import { validateSchema } from "../middlewares/validate-schema.mw.js";
 import { createDoctorSchema } from "../schemas/doctor.schema.js";
 import {
   createDoctorProfile,
+  deleteDoctorProfile,
   getDoctorById,
 } from "../services/doctor.service.js";
 
 export const doctorRouter = Router();
-
 
 doctorRouter.post(
   "/",
@@ -18,3 +18,4 @@ doctorRouter.post(
   createDoctorProfile
 );
 doctorRouter.get("/:doctorId", getDoctorById);
+doctorRouter.delete("/me", authMiddleware, deleteDoctorProfile);
