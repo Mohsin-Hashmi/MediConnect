@@ -6,6 +6,7 @@ import { createDoctorSchema } from "../schemas/doctor.schema.js";
 import {
   createDoctorProfile,
   deleteDoctorProfile,
+  getAllDoctors,
   getDoctorById,
   updateDoctorProfile,
 } from "../services/doctor.service.js";
@@ -13,6 +14,7 @@ import { updateDoctorSchema } from "../schemas/doctor.schema.js";
 
 export const doctorRouter = Router();
 
+doctorRouter.get("/", getAllDoctors);
 doctorRouter.post(
   "/",
   authMiddleware,

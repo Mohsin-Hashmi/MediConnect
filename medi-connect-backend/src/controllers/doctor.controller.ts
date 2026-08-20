@@ -178,6 +178,103 @@ export const getDoctorById = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllDoctors = async (req: Request, res: Response) => {
+  try {
+    const queryValue = (value: unknown): string | undefined =>
+      typeof value === "string" ? value : undefined;
+    const specialization = queryValue(req.query.specialization)?.trim();
+    const experienceValue = queryValue(req.query.experience);
+    const search = queryValue(req.query.search)?.trim();
+    const pageValue = queryValue(req.query.page) ?? "1";
+    const limitValue = queryValue(req.query.limit) ?? "10";
+    const page = Number(pageValue);
+    const limit = Number(limitValue);
+
+    if (
+      (experienceValue !== undefined &&
+        (!/^\d+(\.\d+)?$/.test(experienceValue) || Number(experienceValue) < 0)) ||
+      !Number.isInteger(page) ||
+      page < 1 ||
+      !Number.isInteger(limit) ||
+      limit < 1 ||
+      limit > 100
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid filter or pagination parameters",
+      });
+      return;
+    }
+
+    const filter: Record<string, unknown> = {};
+
+    if (specialization) {
+      filter.specialization = new RegExp(
+        specialization.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        "i"
+      );
+    }
+
+    if (experienceValue !== undefined) {
+      filter.experience = Number(experienceValue);
+    }
+
+    if (search) {
+      const searchRegex = new RegExp(
+        search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        "i"
+      );
+      filter.$or = [
+        { specialization: searchRegex },
+        { hospitalName: searchRegex },
+        { bio: searchRegex },
+        { "qualification.degree": searchRegex },
+        { "qualification.institute": searchRegex },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+    const [doctors, total] = await Promise.all([
+      DoctorModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      DoctorModel.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Doctor profiles retrieved successfully",
+      data: {
+        doctors: doctors.map((doctor) => ({
+          id: doctor._id.toString(),
+          userId: doctor.userId.toString(),
+          specialization: doctor.specialization,
+          qualification: doctor.qualification,
+          licenseNumber: doctor.licenseNumber,
+          experience: doctor.experience,
+          hospitalName: doctor.hospitalName,
+          consultationFee: doctor.consultationFee,
+          bio: doctor.bio,
+          isVerified: doctor.isVerified,
+          createdAt: doctor.createdAt,
+          updatedAt: doctor.updatedAt,
+        })),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get all doctors failed:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 
 
 export const deleteDoctorProfile = async (req: Request, res: Response) => {
