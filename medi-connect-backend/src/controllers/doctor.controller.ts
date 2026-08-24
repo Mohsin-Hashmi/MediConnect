@@ -7,9 +7,6 @@ import type {
   UpdateDoctorInput,
 } from "../schemas/doctor.schema.js";
 
-
-;
-
 export const createDoctorProfile = async (req: Request, res: Response) => {
   try {
     const authenticatedUserId = req.user?.id;
@@ -42,7 +39,9 @@ export const createDoctorProfile = async (req: Request, res: Response) => {
       return;
     }
 
-    const existingDoctor = await DoctorModel.findOne({ userId: authenticatedUserId });
+    const existingDoctor = await DoctorModel.findOne({
+      userId: authenticatedUserId,
+    });
 
     if (existingDoctor) {
       res.status(409).json({
@@ -114,7 +113,9 @@ export const createDoctorProfile = async (req: Request, res: Response) => {
 export const getDoctorById = async (req: Request, res: Response) => {
   try {
     const doctorIdParam = req.params.doctorId;
-    const doctorId = Array.isArray(doctorIdParam) ? doctorIdParam[0] : doctorIdParam;
+    const doctorId = Array.isArray(doctorIdParam)
+      ? doctorIdParam[0]
+      : doctorIdParam;
 
     if (!doctorId || !/^[a-fA-F0-9]{24}$/.test(doctorId)) {
       res.status(400).json({
@@ -135,7 +136,7 @@ export const getDoctorById = async (req: Request, res: Response) => {
     }
 
     const user = await UserModel.findById(doctor.userId).select(
-      "_id name email role phone profileImage"
+      "_id name email role phone profileImage",
     );
 
     res.status(200).json({
@@ -180,8 +181,7 @@ export const getDoctorById = async (req: Request, res: Response) => {
 
 export const getAllDoctors = async (req: Request, res: Response) => {
   try {
-    const queryValue = (value: unknown): string | undefined =>
-      typeof value === "string" ? value : undefined;
+    const queryValue = (value: unknown): string | undefined => typeof value === "string" ? value : undefined;
     const specialization = queryValue(req.query.specialization)?.trim();
     const experienceValue = queryValue(req.query.experience);
     const search = queryValue(req.query.search)?.trim();
@@ -191,13 +191,11 @@ export const getAllDoctors = async (req: Request, res: Response) => {
     const limit = Number(limitValue);
 
     if (
-      (experienceValue !== undefined &&
-        (!/^\d+(\.\d+)?$/.test(experienceValue) || Number(experienceValue) < 0)) ||
-      !Number.isInteger(page) ||
+      (experienceValue !== undefined && (!/^\d+(\.\d+)?$/.test(experienceValue) || Number(experienceValue) < 0)) || !Number.isInteger(page) ||
       page < 1 ||
       !Number.isInteger(limit) ||
       limit < 1 ||
-      limit > 100
+      limit > 10
     ) {
       res.status(400).json({
         success: false,
@@ -211,7 +209,7 @@ export const getAllDoctors = async (req: Request, res: Response) => {
     if (specialization) {
       filter.specialization = new RegExp(
         specialization.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "i"
+        "i",
       );
     }
 
@@ -222,7 +220,7 @@ export const getAllDoctors = async (req: Request, res: Response) => {
     if (search) {
       const searchRegex = new RegExp(
         search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "i"
+        "i",
       );
       filter.$or = [
         { specialization: searchRegex },
@@ -275,8 +273,6 @@ export const getAllDoctors = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const deleteDoctorProfile = async (req: Request, res: Response) => {
   try {
     const authenticatedUserId = req.user?.id;
@@ -289,7 +285,9 @@ export const deleteDoctorProfile = async (req: Request, res: Response) => {
       return;
     }
 
-    const doctor = await DoctorModel.findOneAndDelete({ userId: authenticatedUserId });
+    const doctor = await DoctorModel.findOneAndDelete({
+      userId: authenticatedUserId,
+    });
 
     if (!doctor) {
       res.status(404).json({
@@ -386,7 +384,7 @@ export const updateDoctorProfile = async (req: Request, res: Response) => {
     const updatedDoctor = await DoctorModel.findByIdAndUpdate(
       doctor._id,
       { $set: payload },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedDoctor) {

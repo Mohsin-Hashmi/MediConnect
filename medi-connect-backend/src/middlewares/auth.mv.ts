@@ -14,6 +14,8 @@ export const authMiddleware = async (
       ? authHeader.split(" ")[1]
       : null;
 
+    // const accessToken = req.cookies?.accessToken;
+
     if (!accessToken) {
       res.status(401).json({
         success: false,
