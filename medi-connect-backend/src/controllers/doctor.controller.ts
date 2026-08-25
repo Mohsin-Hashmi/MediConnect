@@ -424,3 +424,5 @@ export const updateDoctorProfile = async (req: Request, res: Response) => {
     });
   }
 };
+
+
