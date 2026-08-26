@@ -51,3 +51,55 @@ export const createAvailabilitySchema = z
   });
 
 export type CreateAvailabilityInput = z.infer<typeof createAvailabilitySchema>;
+
+export const updateAvailabilitySchema = z
+  .object({
+    date: z.coerce
+      .date()
+      .refine((date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return date >= today;
+      }, "Date cannot be in the past")
+      .optional(),
+    startTime: timeSchema.optional(),
+    endTime: timeSchema.optional(),
+    slotDuration: z.coerce
+      .number()
+      .int("Slot duration must be a whole number")
+      .min(5, "Slot duration must be at least 5 minutes")
+      .max(240, "Slot duration must not exceed 240 minutes")
+      .optional(),
+    isAvailable: z.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one availability field is required",
+  })
+  .superRefine((data, ctx) => {
+    if (!data.startTime || !data.endTime) {
+      return;
+    }
+
+    const startMinutes = timeToMinutes(data.startTime);
+    const endMinutes = timeToMinutes(data.endTime);
+
+    if (endMinutes <= startMinutes) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endTime"],
+        message: "End time must be after start time",
+      });
+      return;
+    }
+
+    if (data.slotDuration && data.slotDuration > endMinutes - startMinutes) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["slotDuration"],
+        message: "Slot duration must fit between start time and end time",
+      });
+    }
+  });
+
+export type UpdateAvailabilityInput = z.infer<typeof updateAvailabilitySchema>;
