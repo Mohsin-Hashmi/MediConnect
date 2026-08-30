@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { authMiddleware } from "../middlewares/auth.mv.js";
+import { getDoctorAvailability } from "../services/availability.service.js";
 import { validateSchema } from "../middlewares/validate-schema.mw.js";
 import { createDoctorSchema } from "../schemas/doctor.schema.js";
 import {
@@ -21,6 +22,7 @@ doctorRouter.post(
   validateSchema(createDoctorSchema),
   createDoctorProfile
 );
+doctorRouter.get("/:doctorId/availability", getDoctorAvailability);
 doctorRouter.get("/:doctorId", getDoctorById);
 doctorRouter.delete("/me", authMiddleware, deleteDoctorProfile);
 doctorRouter.patch(
