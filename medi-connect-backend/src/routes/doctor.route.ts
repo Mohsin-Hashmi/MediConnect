@@ -12,6 +12,7 @@ import {
   updateDoctorProfile,
 } from "../services/doctor.service.js";
 import { updateDoctorSchema } from "../schemas/doctor.schema.js";
+import { verifyPatientRole } from "../middlewares/roles.mv.js";
 
 export const doctorRouter = Router();
 
@@ -22,7 +23,7 @@ doctorRouter.post(
   validateSchema(createDoctorSchema),
   createDoctorProfile
 );
-doctorRouter.get("/:doctorId/availability", getDoctorAvailability);
+doctorRouter.get("/:doctorId/availability",authMiddleware, verifyPatientRole, getDoctorAvailability);
 doctorRouter.get("/:doctorId", getDoctorById);
 doctorRouter.delete("/me", authMiddleware, deleteDoctorProfile);
 doctorRouter.patch(

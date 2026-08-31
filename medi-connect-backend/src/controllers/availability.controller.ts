@@ -321,6 +321,10 @@ export const deleteAvailability = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * API function to get a doctor's availability by doctor ID
+ */
+
 export const getDoctorAvailability = async (req: Request, res: Response) => {
   try {
     const doctorIdParam = req.params.doctorId;
