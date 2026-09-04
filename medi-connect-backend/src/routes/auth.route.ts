@@ -7,7 +7,7 @@ import {
   refreshAccessToken,
   registerUser,
   logoutUser,
-} from "../services/auth.service.js";
+} from "../controllers/auth.controller.js";
 
 export const authRouter = Router();
 

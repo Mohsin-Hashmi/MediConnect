@@ -1,142 +1,116 @@
 import type { Request, Response } from "express";
 
-import { AppointmentModel, AppointmentStatusEnum } from "../models/appointment.model.js";
-import { AvailabilityModel } from "../models/availability.model.js";
 import type { CreateAppointmentInput } from "../schemas/appointment.schema.js";
 import {
-  generateAvailabilitySlots,
-  formatAvailability,
-  startOfDay,
-} from "../utils/availability.util.js";
+  createAppointment as createAppointmentService,
+  getAppointmentById as getAppointmentByIdService,
+  getDoctorAppointments as getDoctorAppointmentsService,
+  getMyAppointments as getMyAppointmentsService,
+} from "../services/appointment.service.js";
+import { sendControllerError } from "../utils/http-response.util.js";
+
+const objectIdRegex = /^[a-fA-F0-9]{24}$/;
 
 /**
- * API function to create a new appointment.
- * @param req - Express request object containing the appointment details in the body.
- * @param res - Express response object used to send back the response.
+ * - Reads appointment body data from the request.
+ * - Sends the created appointment response.
  */
-
 export const createAppointment = async (req: Request, res: Response) => {
   try {
-    const authenticatedUserId = req.user?.id;
-
-    if (!authenticatedUserId) {
-      res.status(401).json({
-        success: false,
-        message: "User is not authenticated",
-      });
-      return;
-    }
-
-    const payload = req.body as CreateAppointmentInput;
-    const availability = await AvailabilityModel.findById(payload.availabilityId);
-    const isValidDoctorAvailability = availability?.doctorId.toString() === payload.doctorId;
-    if (!availability) {
-      res.status(404).json({
-        success: false,
-        message: "Availability not found",
-      });
-      return;
-    }
-
-    if (!availability.isAvailable) {
-      res.status(400).json({
-        success: false,
-        message: "Availability is not active",
-      });
-      return;
-    }
-    if (!isValidDoctorAvailability) {
-      res.status(400).json({
-        success: false,
-        message: "Doctor ID does not match the availability",
-      });
-      return;
-    }
-
-    const appointmentDate = startOfDay(availability.date);
-
-    if (appointmentDate < startOfDay(new Date())) {
-      res.status(400).json({
-        success: false,
-        message: "Cannot book appointment for past availability",
-      });
-      return;
-    }
-
-    const availableSlots = generateAvailabilitySlots({
-      startTime: availability.startTime,
-      endTime: availability.endTime,
-      slotDuration: availability.slotDuration,
-    });
-    const selectedSlot = availableSlots.find(
-      (slot) =>
-        slot.startTime === payload.startTime && slot.endTime === payload.endTime
+    const appointment = await createAppointmentService(
+      req.user?.id,
+      req.body as CreateAppointmentInput
     );
-
-    if (!selectedSlot) {
-      res.status(400).json({
-        success: false,
-        message: "Selected slot is not available",
-      });
-      return;
-    }
-
-    const existingAppointment = await AppointmentModel.findOne({
-      availabilityId: availability._id,
-      doctorId: payload.doctorId,
-      startTime: payload.startTime,
-      endTime: payload.endTime,
-      status: { $ne: AppointmentStatusEnum.CANCELLED },
-    });
-
-    if (existingAppointment) {
-      res.status(409).json({
-        success: false,
-        message: "Selected slot is already booked",
-      });
-      return;
-    }
-
-    const appointment = await AppointmentModel.create({
-      patientId: authenticatedUserId,
-      doctorId: availability.doctorId,
-      availabilityId: availability._id,
-      date: appointmentDate,
-      startTime: payload.startTime,
-      endTime: payload.endTime,
-      reason: payload.reason,
-      notes: payload.notes,
-    });
 
     res.status(201).json({
       success: true,
       message: "Appointment created successfully",
       data: {
-        appointment: {
-          id: appointment._id.toString(),
-          patientId: appointment.patientId.toString(),
-          doctorId: appointment.doctorId.toString(),
-          availabilityId: appointment.availabilityId.toString(),
-          date: appointment.date,
-          startTime: appointment.startTime,
-          endTime: appointment.endTime,
-          status: appointment.status,
-          reason: appointment.reason,
-          notes: appointment.notes,
-          availability: formatAvailability(availability),
-          createdAt: appointment.createdAt,
-          updatedAt: appointment.updatedAt,
-        },
+        appointment,
       },
     });
   } catch (error) {
-    console.error("Create appointment failed:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    sendControllerError(res, error, "Create appointment failed:");
   }
 };
 
+/**
+ * - Reads the authenticated patient from the request.
+ * - Sends that patient's appointments.
+ */
+export const getMyAppointments = async (req: Request, res: Response) => {
+  try {
+    const appointments = await getMyAppointmentsService(req.user?.id);
 
+    res.status(200).json({
+      success: true,
+      message:
+        appointments.length === 0
+          ? "No appointments found"
+          : "Appointments retrieved successfully",
+      data: {
+        appointments,
+      },
+    });
+  } catch (error) {
+    sendControllerError(res, error, "Get my appointments failed:");
+  }
+};
+
+/**
+ * - Reads the authenticated doctor from the request.
+ * - Sends that doctor's appointments.
+ */
+export const getDoctorAppointments = async (req: Request, res: Response) => {
+  try {
+    const appointments = await getDoctorAppointmentsService(req.user?.id);
+
+    res.status(200).json({
+      success: true,
+      message:
+        appointments.length === 0
+          ? "No appointments found"
+          : "Appointments retrieved successfully",
+      data: {
+        appointments,
+      },
+    });
+  } catch (error) {
+    sendControllerError(res, error, "Get doctor appointments failed:");
+  }
+};
+
+/**
+ * - Validates the appointment ID route param.
+ * - Sends one appointment with role-specific details.
+ */
+export const getAppointmentById = async (req: Request, res: Response) => {
+  try {
+    const appointmentIdParam = req.params.appointmentId;
+    const appointmentId = Array.isArray(appointmentIdParam)
+      ? appointmentIdParam[0]
+      : appointmentIdParam;
+
+    if (!appointmentId || !objectIdRegex.test(appointmentId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid appointment ID",
+      });
+      return;
+    }
+
+    const data = await getAppointmentByIdService(
+      req.user?.id,
+      req.user?.role,
+      appointmentId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Appointment retrieved successfully",
+      data,
+    });
+  } catch (error) {
+    sendControllerError(res, error, "Get appointment failed:");
+  }
+};

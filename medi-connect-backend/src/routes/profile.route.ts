@@ -7,7 +7,7 @@ import {
   fetchUserProfile,
   editUserProfile,
   deleteUserProfile,
-} from "../services/profile.service.js";
+} from "../controllers/profile.controller.js";
 
 export const profileRouter = Router();
 

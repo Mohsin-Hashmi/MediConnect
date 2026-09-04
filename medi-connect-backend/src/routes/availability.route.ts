@@ -12,7 +12,7 @@ import {
   deleteAvailability,
   getMyAvailability,
   updateAvailability,
-} from "../services/availability.service.js";
+} from "../controllers/availability.controller.js";
 
 export const availabilityRouter = Router();
 
