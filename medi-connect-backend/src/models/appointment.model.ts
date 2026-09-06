@@ -10,7 +10,10 @@ export enum AppointmentStatusEnum {
 }
 
 export interface IAppointmentDocument
-  extends Omit<IAppointment, "_id" | "patientId" | "doctorId" | "availabilityId" | "status">,
+  extends Omit<
+      IAppointment,
+      "_id" | "patientId" | "doctorId" | "availabilityId" | "status"
+    >,
     Document {
   _id: mongoose.Types.ObjectId;
   patientId: mongoose.Types.ObjectId;
@@ -64,6 +67,21 @@ const appointmentSchema = new Schema<IAppointmentDocument>(
       type: String,
       trim: true,
       maxlength: 1000,
+    },
+    cancellationReason: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: null,
+    },
+    cancelledBy: {
+      type: String,
+      enum: ["patient", "doctor"],
+      default: null,
+    },
+    cancelledAt: {
+      type: Date,
+      default: null,
     },
   },
   {

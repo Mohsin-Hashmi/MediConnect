@@ -1,8 +1,12 @@
 import type { IAppointmentDocument } from "../models/appointment.model.js";
 import type { IAvailabilityDocument } from "../models/availability.model.js";
-import { IDoctorDocument } from "../models/doctor.model.js";
+import type { IDoctorDocument } from "../models/doctor.model.js";
 import { formatAvailability } from "./availability.util.js";
 
+/**
+ * - Converts an appointment document into API-safe data.
+ * - Includes availability and cancellation details when present.
+ */
 export const formatAppointment = (
   appointment: IAppointmentDocument,
   availability?: IAvailabilityDocument | null
@@ -17,6 +21,9 @@ export const formatAppointment = (
   status: appointment.status,
   reason: appointment.reason,
   notes: appointment.notes,
+  cancellationReason: appointment.cancellationReason,
+  cancelledBy: appointment.cancelledBy,
+  cancelledAt: appointment.cancelledAt,
   availability: availability ? formatAvailability(availability) : null,
   createdAt: appointment.createdAt,
   updatedAt: appointment.updatedAt,

@@ -3,8 +3,14 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.mv.js";
 import { verifyDoctorRole, verifyPatientRole } from "../middlewares/roles.mv.js";
 import { validateSchema } from "../middlewares/validate-schema.mw.js";
-import { createAppointmentSchema } from "../schemas/appointment.schema.js";
 import {
+  cancelAppointmentSchema,
+  createAppointmentSchema,
+} from "../schemas/appointment.schema.js";
+import {
+  cancelAppointment,
+  completeAppointment,
+  confirmAppointment,
   createAppointment,
   getAppointmentById,
   getDoctorAppointments,
@@ -19,6 +25,24 @@ appointmentRouter.get(
   authMiddleware,
   verifyDoctorRole,
   getDoctorAppointments
+);
+appointmentRouter.patch(
+  "/:appointmentId/cancel",
+  authMiddleware,
+  validateSchema(cancelAppointmentSchema),
+  cancelAppointment
+);
+appointmentRouter.patch(
+  "/:appointmentId/confirm",
+  authMiddleware,
+  verifyDoctorRole,
+  confirmAppointment
+);
+appointmentRouter.patch(
+  "/:appointmentId/complete",
+  authMiddleware,
+  verifyDoctorRole,
+  completeAppointment
 );
 appointmentRouter.get("/:appointmentId", authMiddleware, getAppointmentById);
 appointmentRouter.post(

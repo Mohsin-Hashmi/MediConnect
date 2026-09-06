@@ -15,6 +15,9 @@ export interface IAppointment {
   status: AppointmentStatus;
   reason?: string;
   notes?: string;
+  cancellationReason?: string;
+  cancelledBy?: "patient" | "doctor";
+  cancelledAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
