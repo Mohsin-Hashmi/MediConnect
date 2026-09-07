@@ -1,5 +1,6 @@
+'use client'
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
-
 export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -62,6 +63,15 @@ export default function Home() {
           >
             Documentation
           </a>
+          <Button
+            className="md:w-[158px]"
+            onClick={() => {
+              alert("You clicked the button!");
+            }}
+            variant="secondary"
+          >
+            Click Me
+          </Button>
         </div>
       </main>
     </div>
