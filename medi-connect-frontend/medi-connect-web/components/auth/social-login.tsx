@@ -1,5 +1,5 @@
-import { Apple } from "lucide-react";
-
+import { FcGoogle } from "react-icons/fc";
+import { FaApple } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -16,11 +16,11 @@ export function SocialLogin() {
 
       <div className="mt-5 grid grid-cols-2 gap-3">
         <Button type="button" variant="outline" className="h-11 text-sm">
-          <span className="font-bold text-primary" aria-hidden="true">G</span>
+          <FcGoogle className="size-4" aria-hidden="true" />
           Google SSO
         </Button>
         <Button type="button" variant="outline" className="h-11 text-sm">
-          <Apple className="size-4" aria-hidden="true" />
+          <FaApple className="size-4" aria-hidden="true" />
           Apple ID
         </Button>
       </div>
