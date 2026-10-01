@@ -78,7 +78,7 @@ export function RoleSelection() {
   };
 
   return (
-    <main className="relative min-h-svh overflow-x-hidden bg-[#f8f8ff] px-4 py-10 sm:px-6 sm:py-14">
+    <main className="relative flex min-h-svh items-center justify-center overflow-x-hidden bg-[#f8f8ff] px-4 py-10 sm:px-6 sm:py-14">
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(37,99,235,0.08),transparent_30%),linear-gradient(to_bottom,rgba(255,255,255,0.75),rgba(238,242,255,0.65))]"
