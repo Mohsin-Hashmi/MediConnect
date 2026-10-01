@@ -1,18 +1,21 @@
 "use client";
 
-import { Form, Formik } from "formik";
-import { ArrowRight, AtSign, ShieldCheck } from "lucide-react";
+import { Form, Formik, type FormikHelpers } from "formik";
+import { ArrowRight, AtSign, LoaderCircle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { AuthTabs } from "@/components/auth/auth-tabs";
+import { FormMessage } from "@/components/auth/form-message";
 import { PasswordInput } from "@/components/auth/password-input";
 import { SocialLogin } from "@/components/auth/social-login";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLogin } from "@/hooks/apis/auth/use-auth";
 import { loginSchema } from "@/schemas/auth.schema";
-import type { LoginFormValues } from "@/types/auth";
+import type { LoginFormValues, LoginPayload } from "@/types/auth";
 
 const initialValues: LoginFormValues = {
   email: "",
@@ -21,6 +24,35 @@ const initialValues: LoginFormValues = {
 };
 
 export function LoginForm() {
+  const router = useRouter();
+  const loginMutation = useLogin();
+
+  const handleSubmit = async (
+    values: LoginFormValues,
+    helpers: FormikHelpers<LoginFormValues>,
+  ) => {
+    loginMutation.reset();
+
+    const payload: LoginPayload = {
+      email: values.email.trim().toLowerCase(),
+      password: values.password,
+    };
+
+    try {
+      await loginMutation.mutateAsync(payload);
+      router.replace("/");
+    } catch {
+      // The mutation exposes the typed error for the form message below.
+    } finally {
+      helpers.setSubmitting(false);
+    }
+  };
+
+  const errorMessage = loginMutation.isError
+    ? (loginMutation.error.response?.data.message ??
+      "Unable to sign in. Please try again.")
+    : null;
+
   return (
     <>
       <AuthTabs active="login" />
@@ -28,9 +60,9 @@ export function LoginForm() {
       <Formik
         initialValues={initialValues}
         validationSchema={loginSchema}
-        onSubmit={(_, helpers) => helpers.setSubmitting(false)}
+        onSubmit={handleSubmit}
       >
-        {({ errors, touched, values, handleBlur, handleChange, setFieldValue }) => (
+        {({ errors, touched, values, handleBlur, handleChange, setFieldValue, isSubmitting }) => (
           <Form className="space-y-5" noValidate>
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-3">
@@ -102,9 +134,25 @@ export function LoginForm() {
               </span>
             </div>
 
-            <Button type="submit" size="lg" className="h-11.5 w-full text-sm shadow-sm">
-              Sign In
-              <ArrowRight aria-hidden="true" className="size-4" />
+            {errorMessage ? <FormMessage message={errorMessage} /> : null}
+            {loginMutation.isSuccess ? (
+              <FormMessage message={loginMutation.data.message} variant="success" />
+            ) : null}
+
+            <Button
+              type="submit"
+              size="lg"
+              className="h-11.5 w-full text-sm shadow-sm"
+              disabled={isSubmitting || loginMutation.isPending}
+            >
+              {loginMutation.isPending ? (
+                <LoaderCircle className="animate-spin" aria-hidden="true" />
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight aria-hidden="true" className="size-4" />
+                </>
+              )}
             </Button>
           </Form>
         )}

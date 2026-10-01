@@ -24,7 +24,7 @@ export interface RegisterPayload extends LoginPayload {
 }
 
 export interface AuthUser {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: UserRole;
@@ -40,6 +40,10 @@ export interface AuthResponse {
 }
 
 export interface ApiErrorResponse {
-  message?: string;
-  error?: string;
+  success: false;
+  message: string;
+  errors?: Array<{
+    field: string;
+    message: string;
+  }>;
 }

@@ -1,17 +1,19 @@
 "use client";
 
-import { Form, Formik } from "formik";
-import { AtSign, KeyRound, UserRoundPlus } from "lucide-react";
+import { Form, Formik, type FormikHelpers } from "formik";
+import { AtSign, KeyRound, LoaderCircle, UserRoundPlus } from "lucide-react";
 import Link from "next/link";
 
 import { AuthTabs } from "@/components/auth/auth-tabs";
+import { FormMessage } from "@/components/auth/form-message";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRegister } from "@/hooks/apis/auth/use-auth";
 import { registerSchema } from "@/schemas/auth.schema";
-import type { RegisterFormValues } from "@/types/auth";
+import type { RegisterFormValues, RegisterPayload } from "@/types/auth";
 
 const initialValues: RegisterFormValues = {
   name: "",
@@ -37,6 +39,36 @@ function getPasswordStrength(password: string) {
 }
 
 export function RegisterForm() {
+  const registerMutation = useRegister();
+
+  const handleSubmit = async (
+    values: RegisterFormValues,
+    helpers: FormikHelpers<RegisterFormValues>,
+  ) => {
+    registerMutation.reset();
+
+    const payload: RegisterPayload = {
+      name: values.name.trim(),
+      email: values.email.trim().toLowerCase(),
+      password: values.password,
+      role: "patient",
+    };
+
+    try {
+      await registerMutation.mutateAsync(payload);
+      helpers.resetForm();
+    } catch {
+      // The mutation exposes the typed error for the form message below.
+    } finally {
+      helpers.setSubmitting(false);
+    }
+  };
+
+  const errorMessage = registerMutation.isError
+    ? (registerMutation.error.response?.data.message ??
+      "Unable to create your account. Please try again.")
+    : null;
+
   return (
     <>
       <AuthTabs active="register" />
@@ -44,9 +76,9 @@ export function RegisterForm() {
       <Formik
         initialValues={initialValues}
         validationSchema={registerSchema}
-        onSubmit={(_, helpers) => helpers.setSubmitting(false)}
+        onSubmit={handleSubmit}
       >
-        {({ errors, touched, values, handleBlur, handleChange, setFieldValue }) => {
+        {({ errors, touched, values, handleBlur, handleChange, setFieldValue, isSubmitting }) => {
           const strength = getPasswordStrength(values.password);
 
           return (
@@ -152,9 +184,25 @@ export function RegisterForm() {
                 ) : null}
               </div>
 
-              <Button type="submit" size="lg" className="h-11.5 w-full text-sm shadow-sm">
-                <UserRoundPlus aria-hidden="true" />
-                Create Account
+              {errorMessage ? <FormMessage message={errorMessage} /> : null}
+              {registerMutation.isSuccess ? (
+                <FormMessage message={registerMutation.data.message} variant="success" />
+              ) : null}
+
+              <Button
+                type="submit"
+                size="lg"
+                className="h-11.5 w-full text-sm shadow-sm"
+                disabled={isSubmitting || registerMutation.isPending}
+              >
+                {registerMutation.isPending ? (
+                  <LoaderCircle className="animate-spin" aria-hidden="true" />
+                ) : (
+                  <>
+                    <UserRoundPlus aria-hidden="true" />
+                    Create Account
+                  </>
+                )}
               </Button>
 
               <p className="flex items-center justify-center gap-2 text-xs text-muted-foreground">

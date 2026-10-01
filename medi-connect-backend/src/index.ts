@@ -1,6 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 dotenv.config();
 import cookieParser from "cookie-parser";
 import { authRouter } from "./routes/auth.route.js";
@@ -11,7 +12,20 @@ import { profileRouter } from "./routes/profile.route.js";
 import { connectToDatabase } from "./config/db-connection.js";
 
 const PORT = process.env.PORT || 7000;
+const allowedOrigins = (process.env.FRONTEND_URL ?? "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const app = express();
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRouter);
