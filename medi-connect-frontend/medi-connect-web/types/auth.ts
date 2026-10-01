@@ -1,4 +1,5 @@
 export type UserRole = "patient" | "doctor" | "admin";
+export type OnboardingRole = Exclude<UserRole, "admin">;
 
 export interface LoginFormValues {
   email: string;

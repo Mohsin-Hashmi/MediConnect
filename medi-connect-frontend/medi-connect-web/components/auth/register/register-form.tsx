@@ -9,6 +9,7 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { AuthTabs } from "@/components/auth/auth-tabs";
 import { FormMessage } from "@/components/auth/form-message";
@@ -45,6 +46,7 @@ function getPasswordStrength(password: string) {
 }
 
 export function RegisterForm() {
+  const router = useRouter();
   const registerMutation = useRegister();
 
   const handleSubmit = async (
@@ -63,6 +65,7 @@ export function RegisterForm() {
     try {
       await registerMutation.mutateAsync(payload);
       helpers.resetForm();
+      router.replace("/onboarding/role");
     } catch {
       // The mutation exposes the typed error for the form message below.
     } finally {
