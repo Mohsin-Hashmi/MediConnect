@@ -120,14 +120,14 @@ export function LoginForm() {
             </div>
 
             <div className="flex items-center justify-between gap-3">
-              <label className="flex cursor-pointer items-center gap-2.5 text-xs text-muted-foreground">
+              <Label className="flex cursor-pointer items-center gap-2.5 text-xs font-normal text-muted-foreground">
                 <Checkbox
                   name="remember"
                   checked={values.remember}
                   onCheckedChange={(checked) => void setFieldValue("remember", checked)}
                 />
                 Remember for 30 days
-              </label>
+              </Label>
               <span className="inline-flex items-center gap-1.5 text-xs text-secondary">
                 <ShieldCheck className="size-3.5" aria-hidden="true" />
                 Auto-logout enabled

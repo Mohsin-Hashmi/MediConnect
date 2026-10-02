@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   BadgeCheck,
@@ -14,7 +15,16 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -43,7 +53,7 @@ const roleOptions: RoleOption[] = [
   {
     value: "doctor",
     eyebrow: "Clinical practice",
-    title: "I am a Licensed Doctor",
+    title: "I am a Doctor",
     description:
       "Manage your clinical schedule, patient flow, and secure telemedicine services.",
     icon: BriefcaseMedical,
@@ -65,6 +75,7 @@ const trustItems = [
 ];
 
 export function RoleSelection() {
+  const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<OnboardingRole>("patient");
   const [savedRole, setSavedRole] = useState<OnboardingRole | null>(null);
 
@@ -74,6 +85,12 @@ export function RoleSelection() {
 
   const handleContinue = () => {
     window.sessionStorage.setItem("mediconnect_onboarding_role", selectedRole);
+
+    if (selectedRole === "doctor") {
+      router.push("/onboarding/doctor/professional-info");
+      return;
+    }
+
     setSavedRole(selectedRole);
   };
 
@@ -115,7 +132,10 @@ export function RoleSelection() {
             const Icon = option.icon;
 
             return (
-              <label key={option.value} className="group cursor-pointer">
+              <Label
+                key={option.value}
+                className="group block h-full cursor-pointer text-left leading-normal font-normal"
+              >
                 <Card
                   className={cn(
                     "h-full gap-0 rounded-2xl bg-white p-6 transition-all duration-200 sm:p-7",
@@ -127,7 +147,7 @@ export function RoleSelection() {
                       : "ring-1 ring-border",
                   )}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <CardHeader className="flex items-start justify-between gap-4 px-0">
                     <span
                       className={cn(
                         "flex size-12 items-center justify-center rounded-xl",
@@ -147,50 +167,50 @@ export function RoleSelection() {
                           "data-checked:border-secondary data-checked:bg-secondary dark:data-checked:bg-secondary",
                       )}
                     />
-                  </div>
+                  </CardHeader>
 
-                  <div className="mt-6">
-                    <p
+                  <CardContent className="mt-6 flex flex-1 flex-col px-0">
+                    <Badge
                       className={cn(
-                        "text-[11px] font-bold tracking-[0.08em] uppercase",
+                        "h-auto border-0 bg-transparent p-0 text-[11px] font-bold tracking-[0.08em] uppercase hover:bg-transparent",
                         option.accent === "primary"
                           ? "text-primary"
                           : "text-secondary",
                       )}
                     >
                       {option.eyebrow}
-                    </p>
-                    <h2 className="mt-1.5 text-xl font-semibold tracking-tight">
+                    </Badge>
+                    <CardTitle className="mt-1.5 text-xl font-semibold tracking-tight">
                       {option.title}
-                    </h2>
-                    <p className="mt-2 min-h-12 text-sm leading-relaxed text-muted-foreground">
+                    </CardTitle>
+                    <CardDescription className="mt-2 min-h-12 text-sm leading-relaxed text-muted-foreground">
                       {option.description}
-                    </p>
-                  </div>
+                    </CardDescription>
+
+                    <Separator className="my-5" />
+
+                    <ul
+                      className="flex-1 space-y-3"
+                      aria-label={`${option.title} benefits`}
+                    >
+                      {option.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className="flex items-start gap-2.5 text-sm leading-snug text-foreground/85"
+                        >
+                          <CheckCircle2
+                            className="mt-0.5 size-4 shrink-0 text-secondary"
+                            aria-hidden="true"
+                          />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
 
                   <Separator className="my-5" />
 
-                  <ul
-                    className="flex-1 space-y-3"
-                    aria-label={`${option.title} benefits`}
-                  >
-                    {option.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2.5 text-sm leading-snug text-foreground/85"
-                      >
-                        <CheckCircle2
-                          className="mt-0.5 size-4 shrink-0 text-secondary"
-                          aria-hidden="true"
-                        />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Separator className="my-5" />
-
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <CardFooter className="flex flex-wrap items-center justify-between gap-2 border-0 bg-transparent p-0 pb-6 text-xs sm:pb-7">
                     <span className="text-muted-foreground">
                       {option.recommendation}
                     </span>
@@ -205,9 +225,9 @@ export function RoleSelection() {
                       Select {option.value}
                       <ArrowRight className="size-3.5" aria-hidden="true" />
                     </span>
-                  </div>
+                  </CardFooter>
                 </Card>
-              </label>
+              </Label>
             );
           })}
         </RadioGroup>

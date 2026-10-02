@@ -213,7 +213,7 @@ export function RegisterForm() {
               </div>
 
               <div>
-                <label className="flex cursor-pointer items-start gap-3 rounded-xl border bg-muted/35 p-3.5 text-[13px] leading-relaxed text-muted-foreground">
+                <Label className="flex cursor-pointer items-start gap-3 rounded-xl border bg-muted/35 p-3.5 text-[13px] leading-relaxed font-normal text-muted-foreground">
                   <Checkbox
                     name="acceptTerms"
                     checked={values.acceptTerms}
@@ -241,7 +241,7 @@ export function RegisterForm() {
                       HIPAA Data Processing
                     </Link>
                   </span>
-                </label>
+                </Label>
                 {touched.acceptTerms && errors.acceptTerms ? (
                   <p className="mt-2 text-xs text-destructive">
                     {errors.acceptTerms}
