@@ -1,7 +1,11 @@
 import * as Yup from "yup";
 
 import { DOCTOR_SPECIALTIES } from "@/constants/onboarding";
-import { PRACTICE_BIOGRAPHY_MAX_LENGTH } from "@/constants/practice-profile";
+import {
+  PRACTICE_BIOGRAPHY_MAX_LENGTH,
+  PROFILE_IMAGE_ACCEPTED_TYPES,
+  PROFILE_IMAGE_MAX_SIZE,
+} from "@/constants/practice-profile";
 import { GRADUATION_YEARS } from "@/constants/qualification";
 
 export const professionalInfoSchema = Yup.object({
@@ -60,6 +64,20 @@ export const practiceProfileSchema = Yup.object({
         value !== "" &&
         Number.isFinite(Number(value)) &&
         Number(value) > 0,
+    ),
+  profileImage: Yup.mixed<File>()
+    .nullable()
+    .test(
+      "profile-image-type",
+      "Use a JPEG, PNG, or WebP image",
+      (file) => !file || PROFILE_IMAGE_ACCEPTED_TYPES.includes(
+        file.type as (typeof PROFILE_IMAGE_ACCEPTED_TYPES)[number],
+      ),
+    )
+    .test(
+      "profile-image-size",
+      "Profile image must be 5 MB or smaller",
+      (file) => !file || file.size <= PROFILE_IMAGE_MAX_SIZE,
     ),
   biography: Yup.string()
     .trim()

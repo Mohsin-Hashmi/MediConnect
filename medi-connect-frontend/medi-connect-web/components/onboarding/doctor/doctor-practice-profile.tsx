@@ -1,16 +1,24 @@
 "use client";
 
+import { useRef } from "react";
 import { Form, FormikProvider } from "formik";
 import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
   Building2,
+  Camera,
   ShieldCheck,
+  Trash2,
 } from "lucide-react";
 
 import { DoctorOnboardingStepper } from "@/components/onboarding/doctor/doctor-onboarding-stepper";
 import { Badge } from "@/components/ui/badge";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,12 +53,21 @@ function OptionalBadge() {
 }
 
 export function DoctorPracticeProfile() {
-  const { formik, profile, message, updateProfile } =
-    useDoctorPracticeProfile();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    formik,
+    profile,
+    message,
+    profileImagePreview,
+    updateProfile,
+    updateProfileImage,
+  } = useDoctorPracticeProfile();
   const hospitalError =
     formik.touched.hospitalAffiliation && formik.errors.hospitalAffiliation;
   const feeError =
     formik.touched.consultationFee && formik.errors.consultationFee;
+  const profileImageError =
+    formik.touched.profileImage && formik.errors.profileImage;
 
   return (
     <main className="flex min-h-svh flex-col bg-[#f8f8ff]">
@@ -130,6 +147,82 @@ export function DoctorPracticeProfile() {
                   The primary clinical facility where you conduct in-person
                   consultations.
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Label htmlFor="profile-image" className="text-[15px]">
+                    Profile Image
+                  </Label>
+                  <OptionalBadge />
+                </div>
+                <div className="flex flex-col gap-5 rounded-xl border border-dashed border-primary/25 bg-primary/2.5 p-5 sm:flex-row sm:items-center">
+                  <Avatar className="size-24 bg-white shadow-sm ring-4 ring-white">
+                    {profileImagePreview ? (
+                      <AvatarImage
+                        src={profileImagePreview}
+                        alt="Selected doctor profile preview"
+                      />
+                    ) : null}
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <Camera className="size-8" aria-hidden="true" />
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <Input
+                      ref={fileInputRef}
+                      id="profile-image"
+                      name="profileImage"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(event) =>
+                        updateProfileImage(event.currentTarget.files?.[0] ?? null)
+                      }
+                      onBlur={formik.handleBlur}
+                      aria-invalid={Boolean(profileImageError)}
+                      aria-describedby={
+                        profileImageError
+                          ? "profile-image-error"
+                          : "profile-image-help"
+                      }
+                      className="h-12 cursor-pointer bg-white py-1.5 text-sm leading-8 file:mr-3 file:inline-flex file:h-8 file:items-center file:justify-center file:rounded-md file:bg-primary/10 file:px-4 file:py-0 file:leading-none file:text-primary"
+                    />
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p
+                        id="profile-image-help"
+                        className="text-sm leading-relaxed text-muted-foreground"
+                      >
+                        JPEG, PNG, or WebP. Maximum file size is 5 MB.
+                      </p>
+                      {profile.profileImage ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => {
+                            updateProfileImage(null);
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = "";
+                            }
+                          }}
+                        >
+                          <Trash2 aria-hidden="true" />
+                          Remove
+                        </Button>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+                {profileImageError ? (
+                  <p
+                    id="profile-image-error"
+                    className="text-sm font-medium text-destructive"
+                  >
+                    {profileImageError}
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-2">
