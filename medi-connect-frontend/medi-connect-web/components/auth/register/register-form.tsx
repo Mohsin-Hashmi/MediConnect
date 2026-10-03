@@ -1,6 +1,7 @@
 "use client";
 
 import { Form, Formik, type FormikHelpers } from "formik";
+import { isAxiosError } from "axios";
 import {
   AtSign,
   KeyRound,
@@ -10,17 +11,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { AuthTabs } from "@/components/auth/auth-tabs";
-import { FormMessage } from "@/components/auth/form-message";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRegister } from "@/hooks/apis/auth/use-auth";
 import { registerSchema } from "@/schemas/auth.schema";
-import type { RegisterFormValues, RegisterPayload } from "@/types/auth";
+import type {
+  ApiErrorResponse,
+  RegisterFormValues,
+  RegisterPayload,
+} from "@/types/auth";
 
 const initialValues: RegisterFormValues = {
   name: "",
@@ -63,24 +68,48 @@ export function RegisterForm() {
     };
 
     try {
-      await registerMutation.mutateAsync(payload);
+      const response = await registerMutation.mutateAsync(payload);
+      toast.success(response.message || "Account created successfully.");
       helpers.resetForm();
       router.replace("/onboarding/role");
-    } catch {
-      // The mutation exposes the typed error for the form message below.
+    } catch (error) {
+      const message = isAxiosError<ApiErrorResponse>(error)
+        ? (error.response?.data.message ??
+          "Unable to create your account. Please try again.")
+        : "Unable to create your account. Please try again.";
+      toast.error(message);
     } finally {
       helpers.setSubmitting(false);
     }
   };
 
-  const errorMessage = registerMutation.isError
-    ? (registerMutation.error.response?.data.message ??
-      "Unable to create your account. Please try again.")
-    : null;
-
   return (
     <>
-      <AuthTabs active="register" />
+      <Tabs
+        value="register"
+        onValueChange={(value) => {
+          if (value === "login") router.push("/login");
+        }}
+        className="mb-6 gap-0"
+      >
+        <TabsList
+          aria-label="Authentication"
+          className="grid w-full grid-cols-2 rounded-xl bg-primary/8 p-1.5 group-data-horizontal/tabs:h-13"
+        >
+          <TabsTrigger
+            value="login"
+            className="h-10 rounded-lg px-3 py-2.5 text-sm font-semibold"
+          >
+            Sign In
+          </TabsTrigger>
+          <TabsTrigger
+            value="register"
+            className="h-10 rounded-lg px-3 py-2.5 text-sm font-semibold data-active:bg-white data-active:text-primary data-active:shadow-sm data-active:ring-1 data-active:ring-black/5"
+          >
+            Create Account
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <Formik
         initialValues={initialValues}
@@ -248,14 +277,6 @@ export function RegisterForm() {
                   </p>
                 ) : null}
               </div>
-
-              {errorMessage ? <FormMessage message={errorMessage} /> : null}
-              {registerMutation.isSuccess ? (
-                <FormMessage
-                  message={registerMutation.data.message}
-                  variant="success"
-                />
-              ) : null}
 
               <Button
                 type="submit"

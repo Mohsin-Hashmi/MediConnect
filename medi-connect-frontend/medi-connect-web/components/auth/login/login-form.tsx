@@ -1,21 +1,26 @@
 "use client";
 
 import { Form, Formik, type FormikHelpers } from "formik";
+import { isAxiosError } from "axios";
 import { ArrowRight, AtSign, LoaderCircle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { AuthTabs } from "@/components/auth/auth-tabs";
-import { FormMessage } from "@/components/auth/form-message";
 import { PasswordInput } from "@/components/auth/password-input";
 import { SocialLogin } from "@/components/auth/social-login";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLogin } from "@/hooks/apis/auth/use-auth";
 import { loginSchema } from "@/schemas/auth.schema";
-import type { LoginFormValues, LoginPayload } from "@/types/auth";
+import type {
+  ApiErrorResponse,
+  LoginFormValues,
+  LoginPayload,
+} from "@/types/auth";
 
 const initialValues: LoginFormValues = {
   email: "",
@@ -39,23 +44,47 @@ export function LoginForm() {
     };
 
     try {
-      await loginMutation.mutateAsync(payload);
+      const response = await loginMutation.mutateAsync(payload);
+      toast.success(response.message || "Signed in successfully.");
       router.replace("/");
-    } catch {
-      // The mutation exposes the typed error for the form message below.
+    } catch (error) {
+      const message = isAxiosError<ApiErrorResponse>(error)
+        ? (error.response?.data.message ??
+          "Unable to sign in. Please try again.")
+        : "Unable to sign in. Please try again.";
+      toast.error(message);
     } finally {
       helpers.setSubmitting(false);
     }
   };
 
-  const errorMessage = loginMutation.isError
-    ? (loginMutation.error.response?.data.message ??
-      "Unable to sign in. Please try again.")
-    : null;
-
   return (
     <>
-      <AuthTabs active="login" />
+      <Tabs
+        value="login"
+        onValueChange={(value) => {
+          if (value === "register") router.push("/register");
+        }}
+        className="mb-6 gap-0"
+      >
+        <TabsList
+          aria-label="Authentication"
+          className="grid w-full grid-cols-2 rounded-xl bg-primary/8 p-1.5 group-data-horizontal/tabs:h-13"
+        >
+          <TabsTrigger
+            value="login"
+            className="h-10 rounded-lg px-3 py-2.5 text-sm font-semibold data-active:bg-white data-active:text-primary data-active:shadow-sm data-active:ring-1 data-active:ring-black/5"
+          >
+            Sign In
+          </TabsTrigger>
+          <TabsTrigger
+            value="register"
+            className="h-10 rounded-lg px-3 py-2.5 text-sm font-semibold"
+          >
+            Create Account
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <Formik
         initialValues={initialValues}
@@ -133,11 +162,6 @@ export function LoginForm() {
                 Auto-logout enabled
               </span>
             </div>
-
-            {errorMessage ? <FormMessage message={errorMessage} /> : null}
-            {loginMutation.isSuccess ? (
-              <FormMessage message={loginMutation.data.message} variant="success" />
-            ) : null}
 
             <Button
               type="submit"
