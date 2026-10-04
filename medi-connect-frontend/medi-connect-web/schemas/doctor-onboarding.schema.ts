@@ -86,3 +86,9 @@ export const practiceProfileSchema = Yup.object({
       `Biography must be ${PRACTICE_BIOGRAPHY_MAX_LENGTH} characters or fewer`,
     ),
 });
+
+export const reviewSubmitSchema = Yup.object({
+  confirmed: Yup.boolean()
+    .oneOf([true], "Confirm that the reviewed information is accurate")
+    .required("Confirm that the reviewed information is accurate"),
+});

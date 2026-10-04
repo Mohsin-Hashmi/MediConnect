@@ -7,14 +7,42 @@ import {
   QUALIFICATIONS_STORAGE_KEY,
 } from "@/constants/qualification";
 import { qualificationsSchema } from "@/schemas/doctor-onboarding.schema";
+import { useSessionStorageValue } from "@/hooks/use-session-storage-value";
+import { writeSessionStorage } from "@/lib/session-storage";
 import type {
   DoctorQualificationsFormValues,
   Qualification,
 } from "@/types/qualification";
 
+function isStoredQualificationList(value: unknown): value is Qualification[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (qualification) =>
+        typeof qualification === "object" &&
+        qualification !== null &&
+        typeof qualification.id === "string" &&
+        typeof qualification.heading === "string" &&
+        typeof qualification.tier === "string" &&
+        typeof qualification.degree === "string" &&
+        typeof qualification.institution === "string" &&
+        typeof qualification.graduationYear === "string" &&
+        ["indexed", "pending", "new"].includes(qualification.status),
+    )
+  );
+}
+
 export function useDoctorQualifications(onSuccess: () => void) {
+  const savedQualifications =
+    useSessionStorageValue<unknown>(QUALIFICATIONS_STORAGE_KEY);
+  const restoredQualifications = isStoredQualificationList(
+    savedQualifications,
+  )
+    ? savedQualifications
+    : [...INITIAL_QUALIFICATIONS];
   const formik = useFormik<DoctorQualificationsFormValues>({
-    initialValues: { qualifications: [...INITIAL_QUALIFICATIONS] },
+    initialValues: { qualifications: restoredQualifications },
+    enableReinitialize: true,
     validationSchema: qualificationsSchema,
     onSubmit: (values, helpers) => {
       saveQualifications(values.qualifications);
@@ -27,10 +55,7 @@ export function useDoctorQualifications(onSuccess: () => void) {
   const saveQualifications = (
     qualifications = formik.values.qualifications,
   ) => {
-    window.sessionStorage.setItem(
-      QUALIFICATIONS_STORAGE_KEY,
-      JSON.stringify(qualifications),
-    );
+    writeSessionStorage(QUALIFICATIONS_STORAGE_KEY, qualifications);
   };
 
   const updateQualification = <Field extends keyof Qualification>(

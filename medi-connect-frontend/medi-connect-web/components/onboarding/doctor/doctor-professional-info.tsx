@@ -42,20 +42,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DOCTOR_SPECIALTIES } from "@/constants/onboarding";
+import {
+  DOCTOR_SPECIALTIES,
+  PROFESSIONAL_INFO_STORAGE_KEY,
+} from "@/constants/onboarding";
 import { professionalInfoSchema } from "@/schemas/doctor-onboarding.schema";
+import { useSessionStorageValue } from "@/hooks/use-session-storage-value";
+import { writeSessionStorage } from "@/lib/session-storage";
 import type { DoctorProfessionalInfoFormValues } from "@/types/professional-info";
 
 const licensePattern = /^PMDC-\d{4,6}-[A-Z]$/i;
+const initialProfessionalInfo: DoctorProfessionalInfoFormValues = {
+  specialization: DOCTOR_SPECIALTIES[0],
+  licenseNumber: "PMDC-84291-P",
+  yearsOfExperience: 8,
+};
 
 export function DoctorProfessionalInfo() {
   const router = useRouter();
+  const savedProfessionalInfo =
+    useSessionStorageValue<DoctorProfessionalInfoFormValues>(
+      PROFESSIONAL_INFO_STORAGE_KEY,
+    );
+  const restoredProfessionalInfo =
+    savedProfessionalInfo &&
+    professionalInfoSchema.isValidSync(savedProfessionalInfo)
+      ? savedProfessionalInfo
+      : initialProfessionalInfo;
   const formik = useFormik<DoctorProfessionalInfoFormValues>({
-    initialValues: {
-      specialization: DOCTOR_SPECIALTIES[0],
-      licenseNumber: "PMDC-84291-P",
-      yearsOfExperience: 8,
-    },
+    initialValues: restoredProfessionalInfo,
+    enableReinitialize: true,
     validationSchema: professionalInfoSchema,
     onSubmit: (values, helpers) => {
       saveProgress(values);
@@ -68,13 +84,13 @@ export function DoctorProfessionalInfo() {
   const licenseIsValid = licensePattern.test(licenseNumber.trim());
 
   const saveProgress = (values: DoctorProfessionalInfoFormValues) => {
-    window.sessionStorage.setItem(
-      "mediconnect_doctor_professional_info",
-      JSON.stringify({
+    writeSessionStorage(
+      PROFESSIONAL_INFO_STORAGE_KEY,
+      {
         specialization: values.specialization,
         licenseNumber: values.licenseNumber.trim().toUpperCase(),
         yearsOfExperience: values.yearsOfExperience,
-      }),
+      },
     );
   };
 

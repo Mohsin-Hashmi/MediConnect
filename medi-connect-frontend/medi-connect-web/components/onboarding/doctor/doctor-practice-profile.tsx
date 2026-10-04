@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Form, FormikProvider } from "formik";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -53,6 +54,7 @@ function OptionalBadge() {
 }
 
 export function DoctorPracticeProfile() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     formik,
@@ -61,7 +63,10 @@ export function DoctorPracticeProfile() {
     profileImagePreview,
     updateProfile,
     updateProfileImage,
-  } = useDoctorPracticeProfile();
+    removeProfileImage,
+  } = useDoctorPracticeProfile(() =>
+    router.push("/onboarding/doctor/review-submit"),
+  );
   const hospitalError =
     formik.touched.hospitalAffiliation && formik.errors.hospitalAffiliation;
   const feeError =
@@ -195,14 +200,14 @@ export function DoctorPracticeProfile() {
                       >
                         JPEG, PNG, or WebP. Maximum file size is 5 MB.
                       </p>
-                      {profile.profileImage ? (
+                      {profileImagePreview ? (
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                           onClick={() => {
-                            updateProfileImage(null);
+                            void removeProfileImage();
                             if (fileInputRef.current) {
                               fileInputRef.current.value = "";
                             }
@@ -332,6 +337,7 @@ export function DoctorPracticeProfile() {
                 type="submit"
                 variant="link"
                 className="mx-auto h-auto w-fit px-0 text-sm text-muted-foreground"
+                disabled={formik.isSubmitting}
               >
                 Skip optional fields &amp; review
               </Button>
