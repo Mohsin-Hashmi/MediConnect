@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLogin } from "@/hooks/apis/auth/use-auth";
+import { saveAccessToken } from "@/lib/auth-storage";
 import { loginSchema } from "@/schemas/auth.schema";
 import type {
   ApiErrorResponse,
@@ -45,6 +46,7 @@ export function LoginForm() {
 
     try {
       const response = await loginMutation.mutateAsync(payload);
+      saveAccessToken(response.data.accessToken, values.remember);
       toast.success(response.message || "Signed in successfully.");
       router.replace("/");
     } catch (error) {

@@ -8,6 +8,7 @@ export const formatDoctor = (doctor: IDoctorDocument) => ({
   userId: doctor.userId.toString(),
   specialization: doctor.specialization,
   qualification: doctor.qualification,
+  profilePicture: doctor.profilePicture ?? null,
   licenseNumber: doctor.licenseNumber,
   experience: doctor.experience,
   hospitalName: doctor.hospitalName,

@@ -18,7 +18,8 @@ export const createDoctorSchema = z.object({
   userId: z
     .string()
     .trim()
-    .regex(/^[a-fA-F0-9]{24}$/, "User ID must be a valid Mongo ObjectId"),
+    .regex(/^[a-fA-F0-9]{24}$/, "User ID must be a valid Mongo ObjectId")
+    .optional(),
   specialization: z
     .string()
     .trim()

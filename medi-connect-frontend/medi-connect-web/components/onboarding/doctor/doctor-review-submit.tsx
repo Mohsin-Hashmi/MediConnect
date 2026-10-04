@@ -1,22 +1,27 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { Form, FormikProvider } from "formik";
+import { useState, type ReactNode } from "react";
+import { Form, FormikProvider, type FormikHelpers, useFormik } from "formik";
+import { isAxiosError } from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
   Banknote,
   Building2,
   GraduationCap,
+  LoaderCircle,
   Pencil,
   Save,
   ShieldCheck,
   Stethoscope,
   UserRound,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { DoctorOnboardingStepper } from "@/components/onboarding/doctor/doctor-onboarding-stepper";
+import { DoctorSubmissionSuccessDialog } from "@/components/onboarding/doctor/doctor-submission-success-dialog";
 import {
   Alert,
   AlertDescription,
@@ -38,7 +43,19 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  PROFESSIONAL_INFO_STORAGE_KEY,
+  REVIEW_SUBMISSION_STORAGE_KEY,
+} from "@/constants/onboarding";
+import { PRACTICE_PROFILE_STORAGE_KEY } from "@/constants/practice-profile";
+import { QUALIFICATIONS_STORAGE_KEY } from "@/constants/qualification";
+import { useCreateDoctor } from "@/hooks/apis/doctor/use-doctor";
 import { useDoctorReview } from "@/hooks/onboarding/use-doctor-review";
+import { deleteStoredProfileImage } from "@/lib/profile-image-storage";
+import { reviewSubmitSchema } from "@/schemas/doctor-onboarding.schema";
+import type { ApiErrorResponse } from "@/types/auth";
+import type { CreateDoctorPayload, DoctorProfile } from "@/types/doctor";
+import type { ReviewSubmitFormValues } from "@/types/review-submit";
 
 interface ReviewCardHeaderProps {
   number: string;
@@ -93,9 +110,71 @@ function formatFee(value?: string) {
 }
 
 export function DoctorReviewSubmit() {
-  const { formik, reviewData, profileImagePreview, saveDraft } =
-    useDoctorReview();
+  const router = useRouter();
+  const createDoctorMutation = useCreateDoctor();
+  const [submittedDoctor, setSubmittedDoctor] =
+    useState<DoctorProfile | null>(null);
+  const { reviewData, profileImagePreview, saveDraft } = useDoctorReview();
   const { professional, qualifications, practiceProfile } = reviewData;
+  const handleSubmit = async (
+    values: ReviewSubmitFormValues,
+    helpers: FormikHelpers<ReviewSubmitFormValues>,
+  ) => {
+    if (!professional || qualifications.length === 0 || !practiceProfile) {
+      toast.error("Complete all required onboarding sections before submitting.");
+      helpers.setSubmitting(false);
+      return;
+    }
+
+    createDoctorMutation.reset();
+
+    const payload: CreateDoctorPayload = {
+      specialization: professional.specialization,
+      qualification: qualifications.map((qualification) => ({
+        degree: qualification.degree.trim(),
+        institute: qualification.institution.trim(),
+        year: Number(qualification.graduationYear),
+      })),
+      profilePicture: profileImagePreview || null,
+      licenseNumber: professional.licenseNumber.trim().toUpperCase(),
+      experience: professional.yearsOfExperience,
+      hospitalName: practiceProfile.hospitalAffiliation.trim(),
+      consultationFee: Number(practiceProfile.consultationFee),
+      bio: practiceProfile.biography.trim() || null,
+    };
+
+    try {
+      const response = await createDoctorMutation.mutateAsync(payload);
+
+      [
+        PROFESSIONAL_INFO_STORAGE_KEY,
+        QUALIFICATIONS_STORAGE_KEY,
+        PRACTICE_PROFILE_STORAGE_KEY,
+        REVIEW_SUBMISSION_STORAGE_KEY,
+      ].forEach((key) => window.sessionStorage.removeItem(key));
+
+      try {
+        await deleteStoredProfileImage();
+      } catch {
+        // Profile creation succeeded, so stale local image cleanup is non-blocking.
+      }
+
+      setSubmittedDoctor(response.data.doctor);
+    } catch (error) {
+      const message = isAxiosError<ApiErrorResponse>(error)
+        ? (error.response?.data.message ??
+          "Unable to create the doctor profile. Please try again.")
+        : "Unable to create the doctor profile. Please try again.";
+      toast.error(message);
+    } finally {
+      helpers.setSubmitting(false);
+    }
+  };
+  const formik = useFormik<ReviewSubmitFormValues>({
+    initialValues: { confirmed: false },
+    validationSchema: reviewSubmitSchema,
+    onSubmit: handleSubmit,
+  });
   const confirmationError =
     formik.touched.confirmed && formik.errors.confirmed;
   const hasRequiredData = Boolean(
@@ -351,7 +430,8 @@ export function DoctorReviewSubmit() {
                   type="button"
                   variant="outline"
                   className="h-11"
-                  onClick={saveDraft}
+                  onClick={() => saveDraft(formik.values.confirmed)}
+                  disabled={formik.isSubmitting || createDoctorMutation.isPending}
                 >
                   <Save aria-hidden="true" />
                   Save Draft
@@ -360,10 +440,23 @@ export function DoctorReviewSubmit() {
                   type="submit"
                   size="lg"
                   className="h-11 px-6 shadow-[0_8px_20px_rgba(37,99,235,0.2)]"
-                  disabled={formik.isSubmitting || !hasRequiredData}
+                  disabled={
+                    formik.isSubmitting ||
+                    createDoctorMutation.isPending ||
+                    !hasRequiredData
+                  }
                 >
-                  Submit Profile for Verification
-                  <ArrowRight aria-hidden="true" />
+                  {createDoctorMutation.isPending ? (
+                    <>
+                      <LoaderCircle className="animate-spin" aria-hidden="true" />
+                      Submitting Profile...
+                    </>
+                  ) : (
+                    <>
+                      Submit Profile for Verification
+                      <ArrowRight aria-hidden="true" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -371,6 +464,12 @@ export function DoctorReviewSubmit() {
           </FormikProvider>
         </Card>
       </div>
+
+      <DoctorSubmissionSuccessDialog
+        doctor={submittedDoctor}
+        open={Boolean(submittedDoctor)}
+        onContinue={() => router.replace("/dashboard")}
+      />
     </main>
   );
 }

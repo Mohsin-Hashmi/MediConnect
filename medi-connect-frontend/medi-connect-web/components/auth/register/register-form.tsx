@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRegister } from "@/hooks/apis/auth/use-auth";
+import { saveAccessToken } from "@/lib/auth-storage";
 import { registerSchema } from "@/schemas/auth.schema";
 import type {
   ApiErrorResponse,
@@ -69,6 +70,7 @@ export function RegisterForm() {
 
     try {
       const response = await registerMutation.mutateAsync(payload);
+      saveAccessToken(response.data.accessToken);
       toast.success(response.message || "Account created successfully.");
       helpers.resetForm();
       router.replace("/onboarding/role");
