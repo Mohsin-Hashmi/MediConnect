@@ -9,6 +9,7 @@ export interface IDoctor {
   userId: string;
   specialization: string;
   qualification: IDoctorQualification[];
+  profilePicture?: string | null;
   licenseNumber: string;
   experience: number;
   hospitalName?: string | null;

@@ -73,6 +73,7 @@ export const createDoctorProfile = async (
     userId: authenticatedUserId,
     specialization: payload.specialization,
     qualification: payload.qualification,
+    profilePicture: payload.profilePicture ?? null,
     licenseNumber: payload.licenseNumber,
     experience: payload.experience,
     hospitalName: payload.hospitalName ?? null,

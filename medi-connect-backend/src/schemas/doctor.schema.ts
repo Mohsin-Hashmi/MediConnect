@@ -27,6 +27,11 @@ export const createDoctorSchema = z.object({
   qualification: z
     .array(qualificationSchema)
     .min(1, "At least one qualification is required"),
+  profilePicture: z
+    .string()
+    .trim()
+    .optional()
+    .nullable(),
   licenseNumber: z
     .string()
     .trim()

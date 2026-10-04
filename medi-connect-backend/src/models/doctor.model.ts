@@ -53,6 +53,11 @@ const doctorSchema = new Schema<IDoctorDocument>(
       required: true,
       default: [],
     },
+    profilePicture: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     licenseNumber: {
       type: String,
       required: true,
