@@ -1,5 +1,7 @@
 const ACCESS_TOKEN_STORAGE_KEY = "mediconnect_access_token";
 
+
+// Retrieves the access token from sessionStorage or localStorage.
 export function getAccessToken() {
   if (typeof window === "undefined") return null;
 
@@ -9,6 +11,7 @@ export function getAccessToken() {
   );
 }
 
+// Saves the access token to either sessionStorage or localStorage based on the persistent flag.
 export function saveAccessToken(token: string, persistent = false) {
   const primaryStorage = persistent
     ? window.localStorage
@@ -21,11 +24,13 @@ export function saveAccessToken(token: string, persistent = false) {
   secondaryStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
 }
 
+// Replaces the access token in storage, preserving the previous storage type (session or local).
 export function replaceAccessToken(token: string) {
   const persistent = window.localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY) !== null;
   saveAccessToken(token, persistent);
 }
 
+// Clears the access token from both sessionStorage and localStorage.
 export function clearAccessToken() {
   if (typeof window === "undefined") return;
 

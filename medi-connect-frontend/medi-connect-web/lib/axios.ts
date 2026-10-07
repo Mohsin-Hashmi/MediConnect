@@ -9,7 +9,7 @@ import {
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
-
+//Axios instance with configuration for base URL, credentials, and headers.
 export const AXIOS = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
@@ -18,6 +18,8 @@ export const AXIOS = axios.create({
   },
 });
 
+
+// Request interceptor to add the access token to the request headers if it exists.
 AXIOS.interceptors.request.use((config) => {
   const accessToken = getAccessToken();
 
@@ -28,6 +30,7 @@ AXIOS.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor to handle token refresh logic.
 AXIOS.interceptors.response.use(
   (response) => response,
   async (error) => {

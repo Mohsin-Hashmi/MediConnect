@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Form, FormikProvider, type FormikHelpers, useFormik } from "formik";
 import { isAxiosError } from "axios";
 import Link from "next/link";
@@ -21,7 +21,6 @@ import {
 import { toast } from "sonner";
 
 import { DoctorOnboardingStepper } from "@/components/onboarding/doctor/doctor-onboarding-stepper";
-import { DoctorSubmissionSuccessDialog } from "@/components/onboarding/doctor/doctor-submission-success-dialog";
 import {
   Alert,
   AlertDescription,
@@ -54,7 +53,7 @@ import { useDoctorReview } from "@/hooks/onboarding/use-doctor-review";
 import { deleteStoredProfileImage } from "@/lib/profile-image-storage";
 import { reviewSubmitSchema } from "@/schemas/doctor-onboarding.schema";
 import type { ApiErrorResponse } from "@/types/auth";
-import type { CreateDoctorPayload, DoctorProfile } from "@/types/doctor";
+import type { CreateDoctorPayload } from "@/types/doctor";
 import type { ReviewSubmitFormValues } from "@/types/review-submit";
 
 interface ReviewCardHeaderProps {
@@ -112,10 +111,10 @@ function formatFee(value?: string) {
 export function DoctorReviewSubmit() {
   const router = useRouter();
   const createDoctorMutation = useCreateDoctor();
-  const [submittedDoctor, setSubmittedDoctor] =
-    useState<DoctorProfile | null>(null);
   const { reviewData, profileImagePreview, saveDraft } = useDoctorReview();
   const { professional, qualifications, practiceProfile } = reviewData;
+  
+  // Handle form submission for doctor profile review and submission
   const handleSubmit = async (
     values: ReviewSubmitFormValues,
     helpers: FormikHelpers<ReviewSubmitFormValues>,
@@ -159,7 +158,10 @@ export function DoctorReviewSubmit() {
         // Profile creation succeeded, so stale local image cleanup is non-blocking.
       }
 
-      setSubmittedDoctor(response.data.doctor);
+      toast.success(
+        response.message || "Doctor profile submitted for verification.",
+      );
+      router.replace("/");
     } catch (error) {
       const message = isAxiosError<ApiErrorResponse>(error)
         ? (error.response?.data.message ??
@@ -464,12 +466,6 @@ export function DoctorReviewSubmit() {
           </FormikProvider>
         </Card>
       </div>
-
-      <DoctorSubmissionSuccessDialog
-        doctor={submittedDoctor}
-        open={Boolean(submittedDoctor)}
-        onContinue={() => router.replace("/dashboard")}
-      />
     </main>
   );
 }
