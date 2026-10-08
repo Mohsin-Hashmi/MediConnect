@@ -11,8 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { WeeklyActivityChart } from "@/components/dashboard/weekly-activity-chart";
-import type { DoctorDashboardMockData } from "@/types/doctor-dashboard";
+import { WeeklyActivityChart } from "@/components/dashboard/doctor-dashboard/weekly-activity-chart";
+import type { DashboardActivityPanelsProps } from "@/types/doctor-dashboard";
 
 const availabilityClasses = {
   "In-clinic": "bg-teal-50 text-teal-700 ring-teal-200",
@@ -22,9 +22,7 @@ const availabilityClasses = {
 
 export function DashboardActivityPanels({
   data,
-}: {
-  data: DoctorDashboardMockData;
-}) {
+}: DashboardActivityPanelsProps) {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(19rem,1fr)]">
       <Card className="min-w-0 gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200/90">

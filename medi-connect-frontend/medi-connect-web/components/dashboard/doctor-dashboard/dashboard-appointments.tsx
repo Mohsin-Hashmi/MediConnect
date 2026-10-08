@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Building2, Video } from "lucide-react";
 
-import { StatusBadge, type StatusTone } from "@/components/common/status-badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { DashboardAppointment } from "@/types/doctor-dashboard";
+import type {
+  DashboardAppointment,
+  DashboardAppointmentsProps,
+  DashboardPatientAvatarProps,
+} from "@/types/doctor-dashboard";
+import type { StatusTone } from "@/types/common";
 
 const avatarClasses = {
   blue: "bg-blue-100 text-blue-700",
@@ -35,7 +40,7 @@ const appointmentStatusTones: Record<DashboardAppointment["status"], StatusTone>
   completed: "neutral",
 };
 
-function PatientAvatar({ appointment }: { appointment: DashboardAppointment }) {
+function PatientAvatar({ appointment }: DashboardPatientAvatarProps) {
   return (
     <Avatar className="size-9">
       <AvatarFallback className={`text-xs font-semibold ${avatarClasses[appointment.avatarTone]}`}>
@@ -47,9 +52,7 @@ function PatientAvatar({ appointment }: { appointment: DashboardAppointment }) {
 
 export function DashboardAppointments({
   appointments,
-}: {
-  appointments: DashboardAppointment[];
-}) {
+}: DashboardAppointmentsProps) {
   const visibleAppointments = appointments.slice(0, 5);
 
   return (

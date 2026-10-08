@@ -20,7 +20,3 @@ export const DOCTOR_SPECIALTIES = [
   "Pediatrician",
   "Psychiatrist",
 ] as const;
-
-export type DoctorOnboardingStepId =
-  (typeof DOCTOR_ONBOARDING_STEPS)[number]["id"];
-export type DoctorSpecialty = (typeof DOCTOR_SPECIALTIES)[number];

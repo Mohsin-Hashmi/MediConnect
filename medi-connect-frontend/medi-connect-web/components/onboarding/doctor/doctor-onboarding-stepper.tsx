@@ -1,10 +1,6 @@
 import { DOCTOR_ONBOARDING_STEPS } from "@/constants/onboarding";
-import type { DoctorOnboardingStepId } from "@/constants/onboarding";
 import { cn } from "@/lib/utils";
-
-interface DoctorOnboardingStepperProps {
-  activeStep: DoctorOnboardingStepId;
-}
+import type { DoctorOnboardingStepperProps } from "@/types/onboarding";
 
 export function DoctorOnboardingStepper({
   activeStep,

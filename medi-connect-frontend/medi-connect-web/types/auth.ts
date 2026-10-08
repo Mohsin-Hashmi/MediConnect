@@ -1,3 +1,11 @@
+import type { ComponentProps, ReactNode } from "react";
+
+export interface AuthShellProps {
+  children: ReactNode;
+}
+
+export type PasswordInputProps = Omit<ComponentProps<"input">, "type">;
+
 export type UserRole = "patient" | "doctor" | "admin";
 export type OnboardingRole = Exclude<UserRole, "admin">;
 

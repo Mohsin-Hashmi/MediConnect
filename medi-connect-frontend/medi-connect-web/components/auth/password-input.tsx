@@ -5,8 +5,7 @@ import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-type PasswordInputProps = Omit<React.ComponentProps<typeof Input>, "type">;
+import type { PasswordInputProps } from "@/types/auth";
 
 export function PasswordInput({ className, ...props }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);

@@ -6,10 +6,10 @@ import {
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import type { DoctorDashboardMockData } from "@/types/doctor-dashboard";
+import type { DashboardMetricsProps } from "@/types/doctor-dashboard";
 import { getMockDashboardMetrics } from "@/data/mock/doctor-dashboard";
 
-export function DashboardMetrics({ data }: { data: DoctorDashboardMockData }) {
+export function DashboardMetrics({ data }: DashboardMetricsProps) {
   const metrics = getMockDashboardMetrics(data);
   const cards = [
     {

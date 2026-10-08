@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { DashboardTopbar } from "@/components/dashboard/dashboard-topbar";
+import { DashboardSidebar } from "@/components/dashboard/doctor-dashboard/dashboard-sidebar";
+import { DashboardTopbar } from "@/components/dashboard/doctor-dashboard/dashboard-topbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 

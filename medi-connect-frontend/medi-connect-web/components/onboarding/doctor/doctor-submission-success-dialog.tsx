@@ -12,13 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { DoctorProfile } from "@/types/doctor";
-
-interface DoctorSubmissionSuccessDialogProps {
-  doctor: DoctorProfile | null;
-  open: boolean;
-  onContinue: () => void;
-}
+import type { DoctorProfile, DoctorSubmissionSuccessDialogProps } from "@/types/doctor";
 
 function getApplicationReference(doctor: DoctorProfile) {
   const year = new Date(doctor.createdAt).getFullYear();

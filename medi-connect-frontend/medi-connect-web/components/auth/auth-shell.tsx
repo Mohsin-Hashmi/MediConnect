@@ -1,9 +1,5 @@
-import type { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface AuthShellProps {
-  children: ReactNode;
-}
+import type { AuthShellProps } from "@/types/auth";
 
 
 export function AuthShell({ children }: AuthShellProps) {

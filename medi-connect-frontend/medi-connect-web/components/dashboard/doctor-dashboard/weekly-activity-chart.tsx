@@ -10,7 +10,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import type { WeeklyAppointmentActivity } from "@/types/doctor-dashboard";
+import type { WeeklyActivityChartProps } from "@/types/doctor-dashboard";
 
 const chartConfig = {
   completed: { label: "Completed", color: "var(--chart-1)" },
@@ -20,9 +20,7 @@ const chartConfig = {
 
 export function WeeklyActivityChart({
   activity,
-}: {
-  activity: WeeklyAppointmentActivity[];
-}) {
+}: WeeklyActivityChartProps) {
   return (
     <ChartContainer
       config={chartConfig}

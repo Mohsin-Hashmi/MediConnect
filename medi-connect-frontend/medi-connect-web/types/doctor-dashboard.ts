@@ -45,3 +45,32 @@ export interface DoctorDashboardMockData {
   };
   availability: DashboardAvailabilitySlot[];
 }
+
+export interface DashboardMetricsProps {
+  data: DoctorDashboardMockData;
+}
+
+export interface DashboardAppointmentsProps {
+  appointments: DashboardAppointment[];
+}
+
+export interface DashboardSidePanelsProps {
+  nextAppointment: DashboardAppointment | undefined;
+}
+
+export interface DashboardActivityPanelsProps {
+  data: DoctorDashboardMockData;
+}
+
+export interface WeeklyActivityChartProps {
+  activity: WeeklyAppointmentActivity[];
+}
+
+export interface DashboardPatientAvatarProps {
+  appointment: DashboardAppointment;
+}
+
+export interface DashboardPlaceholderProps {
+  title: string;
+  icon: import("lucide-react").LucideIcon;
+}

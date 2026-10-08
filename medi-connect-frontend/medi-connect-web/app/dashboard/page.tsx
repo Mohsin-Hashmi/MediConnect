@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CalendarDays, Plus } from "lucide-react";
 
-import { DashboardActivityPanels } from "@/components/dashboard/dashboard-activity-panels";
-import { DashboardAppointments } from "@/components/dashboard/dashboard-appointments";
-import { DashboardMetrics } from "@/components/dashboard/dashboard-metrics";
-import { DashboardSidePanels } from "@/components/dashboard/dashboard-side-panels";
+import { DashboardActivityPanels } from "@/components/dashboard/doctor-dashboard/dashboard-activity-panels";
+import { DashboardAppointments } from "@/components/dashboard/doctor-dashboard/dashboard-appointments";
+import { DashboardMetrics } from "@/components/dashboard/doctor-dashboard/dashboard-metrics";
+import { DashboardSidePanels } from "@/components/dashboard/doctor-dashboard/dashboard-side-panels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { doctorDashboardMock } from "@/data/mock/doctor-dashboard";

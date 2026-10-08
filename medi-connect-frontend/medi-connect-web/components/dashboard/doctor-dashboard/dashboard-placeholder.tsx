@@ -1,9 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-
-interface DashboardPlaceholderProps {
-  title: string;
-  icon: LucideIcon;
-}
+import type { DashboardPlaceholderProps } from "@/types/doctor-dashboard";
 
 export function DashboardPlaceholder({ title, icon: Icon }: DashboardPlaceholderProps) {
   return (

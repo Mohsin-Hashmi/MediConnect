@@ -45,6 +45,9 @@ export function useDoctorPracticeProfile(onSuccess?: () => void) {
     restoredProfile && practiceProfileSchema.isValidSync(restoredProfile)
       ? restoredProfile
       : INITIAL_PRACTICE_PROFILE;
+
+
+      
   const formik = useFormik<DoctorPracticeProfile>({
     initialValues,
     enableReinitialize: true,

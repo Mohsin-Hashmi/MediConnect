@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { Form, FormikProvider, type FormikHelpers, useFormik } from "formik";
 import { isAxiosError } from "axios";
 import Link from "next/link";
@@ -54,13 +53,7 @@ import { deleteStoredProfileImage } from "@/lib/profile-image-storage";
 import { reviewSubmitSchema } from "@/schemas/doctor-onboarding.schema";
 import type { ApiErrorResponse } from "@/types/auth";
 import type { CreateDoctorPayload } from "@/types/doctor";
-import type { ReviewSubmitFormValues } from "@/types/review-submit";
-
-interface ReviewCardHeaderProps {
-  number: string;
-  title: string;
-  editHref: string;
-}
+import type { ReviewCardHeaderProps, ReviewDetailItemProps, ReviewSubmitFormValues } from "@/types/review-submit";
 
 function ReviewCardHeader({
   number,
@@ -90,7 +83,7 @@ function ReviewCardHeader({
   );
 }
 
-function DetailItem({ label, children }: { label: string; children: ReactNode }) {
+function DetailItem({ label, children }: ReviewDetailItemProps) {
   return (
     <div className="rounded-lg border border-border/80 bg-white px-4 py-3">
       <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">

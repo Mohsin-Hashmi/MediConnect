@@ -30,3 +30,9 @@ export interface CreateDoctorResponse {
     doctor: DoctorProfile;
   };
 }
+
+export interface DoctorSubmissionSuccessDialogProps {
+  doctor: DoctorProfile | null;
+  open: boolean;
+  onContinue: () => void;
+}

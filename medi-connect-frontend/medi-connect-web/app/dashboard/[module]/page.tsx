@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { DashboardPlaceholder } from "@/components/dashboard/dashboard-placeholder";
+import { DashboardPlaceholder } from "@/components/dashboard/doctor-dashboard/dashboard-placeholder";
 import { DASHBOARD_MODULES } from "@/constants/dashboard";
 
 export function generateStaticParams() {
-  return DASHBOARD_MODULES.map(({ slug }) => ({ module: slug }));
+  return DASHBOARD_MODULES.filter(({ slug }) => slug !== "appointments").map(
+    ({ slug }) => ({ module: slug }),
+  );
 }
 
 export async function generateMetadata({

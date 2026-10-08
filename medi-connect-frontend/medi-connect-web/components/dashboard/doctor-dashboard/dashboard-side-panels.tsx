@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { DashboardAppointment } from "@/types/doctor-dashboard";
+import type { DashboardSidePanelsProps } from "@/types/doctor-dashboard";
 
 const quickActions = [
   { label: "Add availability slot", href: "/dashboard/availability", icon: Clock3 },
@@ -27,9 +27,7 @@ const quickActions = [
 
 export function DashboardSidePanels({
   nextAppointment,
-}: {
-  nextAppointment: DashboardAppointment | undefined;
-}) {
+}: DashboardSidePanelsProps) {
   return (
     <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-1">
       <Card className="gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200/90">

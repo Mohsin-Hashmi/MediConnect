@@ -1,14 +1,11 @@
-import axios, { type InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
 
 import {
   clearAccessToken,
   getAccessToken,
   replaceAccessToken,
 } from "@/lib/auth-storage";
-
-interface RetryableRequestConfig extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-}
+import type { RetryableRequestConfig } from "@/types/axios";
 //Axios instance with configuration for base URL, credentials, and headers.
 export const AXIOS = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
