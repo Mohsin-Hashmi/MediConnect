@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { RoleSelection } from "@/components/onboarding/role-selection";
+import { RoleSelection } from "@/components/onboarding/role-selection/role-selection";
 
 export const metadata: Metadata = {
   title: "Choose Your Role",

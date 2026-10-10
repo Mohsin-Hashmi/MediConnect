@@ -7,8 +7,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { PasswordInput } from "@/components/auth/password-input";
-import { SocialLogin } from "@/components/auth/social-login";
+import { PasswordInput } from "@/components/auth/shared/password-input";
+import { SocialLogin } from "@/components/auth/shared/social-login";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";

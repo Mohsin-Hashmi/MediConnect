@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { DoctorPracticeProfile } from "@/components/onboarding/doctor/doctor-practice-profile";
+import { DoctorPracticeProfile } from "@/components/onboarding/doctor/practice-profile/doctor-practice-profile";
 
 export const metadata: Metadata = {
   title: "Practice and Profile",

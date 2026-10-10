@@ -1,37 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 import { Pagination } from "@/components/common/pagination";
-import { AppointmentDetailsDialog } from "@/components/dashboard/appointments/appointment-details-dialog";
-import { AppointmentFilterBar } from "@/components/dashboard/appointments/appointment-filter-bar";
-import { AppointmentList } from "@/components/dashboard/appointments/appointment-list";
-import { AppointmentMetrics } from "@/components/dashboard/appointments/appointment-metrics";
-import { AppointmentPageHeader } from "@/components/dashboard/appointments/appointment-page-header";
-import { AppointmentScheduleHeader } from "@/components/dashboard/appointments/appointment-schedule-header";
-import { EditAppointmentDrawer } from "@/components/dashboard/appointments/edit-appointment-drawer";
-import { NewAppointmentDialog } from "@/components/dashboard/appointments/new-appointment-dialog";
+import { AppointmentDetailsDialog } from "@/components/dashboard/appointments/dialogs/appointment-details-dialog";
+import { AppointmentFilterBar } from "@/components/dashboard/appointments/filters/appointment-filter-bar";
+import { AppointmentList } from "@/components/dashboard/appointments/list/appointment-list";
+import { AppointmentMetrics } from "@/components/dashboard/appointments/sections/appointment-metrics";
+import { AppointmentPageHeader } from "@/components/dashboard/appointments/sections/appointment-page-header";
+import { AppointmentScheduleHeader } from "@/components/dashboard/appointments/sections/appointment-schedule-header";
+import { EditAppointmentDrawer } from "@/components/dashboard/appointments/drawer/edit-appointment-drawer";
+import { NewAppointmentDialog } from "@/components/dashboard/appointments/dialogs/new-appointment-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { PAGINATION_PAGE_SIZE } from "@/constants/pagination";
-import { mockAppointments } from "@/data/mock/appointments";
+import { useAppointments } from "@/context/appointments-context";
 import {
   formatAppointmentDate,
   formatAppointmentTime,
 } from "@/lib/appointment-format";
-import {
-  getAppointmentTabCounts,
-  getFilteredAppointments,
-} from "@/lib/appointment-list";
-import type {
-  AppointmentFilters,
-  AppointmentRecord,
-  NewAppointmentInput,
-} from "@/types/appointment";
+import { getFilteredAppointments } from "@/lib/appointment-list";
+import type { AppointmentFilters, AppointmentRecord } from "@/types/appointment";
 
 const initialFilters: AppointmentFilters = {
-  tab: "all",
   search: "",
   date: "",
   visitType: "all",
@@ -40,8 +31,7 @@ const initialFilters: AppointmentFilters = {
 };
 
 export function AppointmentsPage() {
-  const [appointments, setAppointments] =
-    useState<AppointmentRecord[]>(mockAppointments);
+  const { appointments, addAppointment, updateAppointment, removeAppointment } = useAppointments();
   const [filters, setFilters] = useState<AppointmentFilters>(initialFilters);
   const [page, setPage] = useState(1);
   const [selectedAppointment, setSelectedAppointment] =
@@ -53,7 +43,6 @@ export function AppointmentsPage() {
   );
   const [newAppointmentOpen, setNewAppointmentOpen] = useState(false);
 
-  const tabCounts = getAppointmentTabCounts(appointments);
   const filtered = getFilteredAppointments(appointments, filters);
   const totalPages = Math.max(
     1,
@@ -79,46 +68,21 @@ export function AppointmentsPage() {
     updateFilters({ search: "", date: "", visitType: "all", status: "all" });
   }
 
-  function resetView() {
-    updateFilters({
-      tab: "all",
-      search: "",
-      date: "",
-      visitType: "all",
-      status: "all",
-    });
-  }
-
-  function handleCreate(appointment: NewAppointmentInput) {
-    setAppointments((previous) => {
-      const nextNumber =
-        previous.filter((item) => item.id.startsWith("DEMO-")).length + 1;
-      const id = `DEMO-${String(nextNumber).padStart(4, "0")}`;
-      return [
-        { ...appointment, id, patientId: id.replace("DEMO", "PAT") },
-        ...previous,
-      ];
-    });
-    resetView();
+  function handleCreate(appointment: Parameters<typeof addAppointment>[0]) {
+    return addAppointment(appointment);
   }
 
   function handleDelete() {
     if (!deleteTarget) return;
-    setAppointments((previous) =>
-      previous.filter((item) => item.id !== deleteTarget.id),
-    );
+    removeAppointment(deleteTarget.id);
     setSelectedAppointment(null);
     setEditingAppointment(null);
-    toast.success(`${deleteTarget.patientName}'s demo appointment removed.`);
     setDeleteTarget(null);
   }
 
   function handleSave(appointment: AppointmentRecord) {
-    setAppointments((previous) =>
-      previous.map((item) => (item.id === appointment.id ? appointment : item)),
-    );
+    updateAppointment(appointment);
     setEditingAppointment(null);
-    toast.success(`${appointment.patientName}'s demo appointment updated.`);
   }
 
   return (
@@ -133,12 +97,7 @@ export function AppointmentsPage() {
       <AppointmentMetrics appointments={appointments} />
 
       <Card className="min-w-0 gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200/90">
-        <AppointmentScheduleHeader
-          matchingCount={filtered.length}
-          tab={filters.tab}
-          tabCounts={tabCounts}
-          onTabChange={(tab) => updateFilters({ tab })}
-        />
+        <AppointmentScheduleHeader matchingCount={filtered.length} />
         <CardContent className="px-0">
           <AppointmentFilterBar
             filters={filters}
@@ -151,9 +110,7 @@ export function AppointmentsPage() {
             onView={setSelectedAppointment}
             onEdit={setEditingAppointment}
             onDelete={setDeleteTarget}
-            onResetFilters={
-              hasFilters || filters.tab !== "all" ? resetView : undefined
-            }
+            onResetFilters={hasFilters ? resetFilters : undefined}
           />
           <Pagination
             currentPage={currentPage}
@@ -177,7 +134,7 @@ export function AppointmentsPage() {
         open={deleteTarget !== null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         title="Delete this appointment?"
-        description="Please check the booking details before removing it from the demo schedule."
+        description="Review the booking details before previewing this action. No appointment will be removed."
         details={
           deleteTarget
             ? [
@@ -190,7 +147,7 @@ export function AppointmentsPage() {
               ]
             : undefined
         }
-        consequence="This removes the booking from the current demo page. There is no undo button."
+        consequence="This is a UI preview only. The appointment list and calendar will remain unchanged."
         onConfirm={handleDelete}
         confirmLabel="Delete appointment"
         cancelLabel="Keep appointment"

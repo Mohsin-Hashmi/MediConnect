@@ -39,7 +39,7 @@ export function PdfExportButton({
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9);
         pdf.setTextColor(95, 110, 135);
-        pdf.text(subtitle ?? `${rows.length} appointments`, margin, 26);
+        pdf.text(subtitle ?? `${rows.length} records`, margin, 26);
 
         pdf.setFillColor(235, 241, 252);
         pdf.rect(margin, 32, tableWidth, 10, "F");
@@ -91,7 +91,7 @@ export function PdfExportButton({
       }
 
       pdf.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
-      toast.success("Schedule exported as PDF.");
+      toast.success("PDF exported successfully.");
     } catch {
       toast.error("Could not export the PDF. Please try again.");
     } finally {

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { DashboardPlaceholder } from "@/components/dashboard/doctor-dashboard/dashboard-placeholder";
+import { DashboardPlaceholder } from "@/components/dashboard/doctor-dashboard/shared/dashboard-placeholder";
 import { DASHBOARD_MODULES } from "@/constants/dashboard";
 
 export function generateStaticParams() {
-  return DASHBOARD_MODULES.filter(({ slug }) => slug !== "appointments").map(
+  return DASHBOARD_MODULES.filter(({ slug }) => slug !== "appointments" && slug !== "calendar" && slug !== "patients").map(
     ({ slug }) => ({ module: slug }),
   );
 }

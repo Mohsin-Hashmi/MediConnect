@@ -21,12 +21,10 @@ export interface AppointmentRecord {
   avatarTone: "blue" | "teal" | "amber" | "violet";
 }
 
-export type AppointmentTab = "all" | "upcoming" | "today" | "completed" | "cancelled";
 export type AppointmentSortOrder = "schedule" | "oldest" | "newest";
 export type NewAppointmentInput = Omit<AppointmentRecord, "id" | "patientId">;
 
 export interface AppointmentFilters {
-  tab: AppointmentTab;
   search: string;
   date: string;
   visitType: "all" | AppointmentVisitType;
@@ -41,9 +39,6 @@ export interface AppointmentPageHeaderProps {
 
 export interface AppointmentScheduleHeaderProps {
   matchingCount: number;
-  tab: AppointmentTab;
-  tabCounts: Record<AppointmentTab, number>;
-  onTabChange: (tab: AppointmentTab) => void;
 }
 
 export interface AppointmentFilterBarProps {
@@ -71,7 +66,16 @@ export interface NewAppointmentFormValues {
 export interface NewAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (appointment: NewAppointmentInput) => void;
+  onCreate: (appointment: NewAppointmentInput) => boolean;
+  initialDate?: string;
+  initialTime?: string;
+}
+
+export interface AppointmentsContextValue {
+  appointments: AppointmentRecord[];
+  addAppointment: (appointment: NewAppointmentInput) => boolean;
+  updateAppointment: (appointment: AppointmentRecord) => void;
+  removeAppointment: (id: string) => void;
 }
 
 export interface AppointmentDetailsDialogProps {
