@@ -34,6 +34,30 @@ export interface PatientFormValues {
   status: PatientStatus;
 }
 
+export type PatientSaveHandler = (
+  values: PatientFormValues,
+  patient: PatientRecord | null,
+) => void;
+
+export interface PatientFormProps {
+  patient: PatientRecord | null;
+  variant: "dialog" | "drawer";
+  onClose: () => void;
+  onSave: PatientSaveHandler;
+}
+
+export interface PatientFormDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSave: PatientSaveHandler;
+}
+
+export interface EditPatientDrawerProps {
+  patient: PatientRecord | null;
+  onClose: () => void;
+  onSave: PatientSaveHandler;
+}
+
 export interface PatientMetricsData {
   total: number;
   active: number;

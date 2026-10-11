@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
 import { Pagination } from "@/components/common/pagination";
 import { PatientDetailsDialog } from "@/components/dashboard/patients/dialogs/patient-details-dialog";
+import { EditPatientDrawer } from "@/components/dashboard/patients/drawer/edit-patient-drawer";
 import { PatientDirectoryHeader } from "@/components/dashboard/patients/sections/patient-directory-header";
 import { PatientFilters } from "@/components/dashboard/patients/filters/patient-filters";
 import { PatientFormDialog } from "@/components/dashboard/patients/dialogs/patient-form-dialog";
@@ -109,7 +110,6 @@ export function PatientsPage() {
             onView={setSelected}
             onEdit={(patient) => {
               setEditing(patient);
-              setFormOpen(true);
             }}
             onDelete={setDeleteTarget}
             onResetFilters={hasFilters ? resetFilters : undefined}
@@ -127,16 +127,16 @@ export function PatientsPage() {
         onClose={() => setSelected(null)}
         onEdit={(patient) => {
           setEditing(patient);
-          setFormOpen(true);
         }}
       />
       <PatientFormDialog
         open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSave={savePatient}
+      />
+      <EditPatientDrawer
         patient={editing}
-        onClose={() => {
-          setFormOpen(false);
-          setEditing(null);
-        }}
+        onClose={() => setEditing(null)}
         onSave={savePatient}
       />
       <ConfirmActionDialog
