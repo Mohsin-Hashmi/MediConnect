@@ -13,10 +13,11 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Register and login | UI, Formik/Yup validation, Sonner feedback, and TanStack Query/Axios calls to existing auth endpoints. |
 | Doctor onboarding | Professional info, qualifications, practice/profile, review/submit; draft data is stored locally during the flow. Doctor creation uses an API mutation. |
 | Doctor dashboard | Shared sidebar/topbar; overview cards, appointment summary, chart, and actions use demo data. |
-| Appointments | Read-only mock list with filtering, sorting, pagination, details, create/edit/delete form previews, and PDF export. Submitting forms does not mutate records or call an API. |
+| Appointments | Read-only mock list with filtering, sorting, pagination, details, create/edit/delete form previews, and PDF export. Submitting forms does not mutate records, browser storage, or call an API. |
 | Calendar | Day/week/month views, date navigation, consultation filter, mock blocks, appointment details, and click-to-preview scheduling. It reads the same mock appointment source as the Appointments page. |
 | Patients | Separate fictional read-only directory, derived metrics, search/filter/sort, 10-row pagination, details, create/edit/delete form previews, and PDF export. Submitting forms does not mutate records or call an API. |
-| Other doctor portal links | Availability, Profile, Reviews, Earnings, Messages, Notifications, and Settings remain placeholders. |
+| Availability | UI-first schedule preview with editable booking preferences, day switches, time-range and blocked-date form previews, validation, and a calculated local capacity summary. Add/edit/delete actions do not change schedule records; nothing is saved or published or alters Calendar openings. |
+| Other doctor portal links | Profile, Reviews, Earnings, Messages, Notifications, and Settings remain placeholders. |
 
 The appointment form currently captures a patient's name and age for a UI preview; it does not create a booking or select a persisted patient record. Appointment and patient lists remain unchanged after submissions. Calendar blocks and available-time calculations are mock-only.
 
@@ -25,7 +26,7 @@ The appointment form currently captures a patient's name and age for a UI previe
 1. **Review the current UI and code with the project owner.** Address specific feedback before expanding the module surface.
 2. **Agree on scheduling workflows and backend contracts.** Define patient lookup/creation, doctor working hours, available slots, blocks/leave, appointment status transitions, conflict responses, timezone rules, and authorization. Do not infer these from the mock UI.
 3. **Connect Appointments and Calendar to authoritative APIs when available.** Use TanStack Query hooks, shared query keys/invalidation, server-side validation, and clear loading/error/empty states. Keep both views synchronized from one server source.
-4. **Build the next approved doctor module incrementally.** Availability remains a likely dependency for real calendar scheduling, but its scope requires owner approval. Connect Patients to an authoritative API only after the patient identity and authorization contract is defined.
+4. **Connect Availability to scheduling contracts when agreed.** Replace the draft-only preview with an authoritative schedule API and make Calendar use that source for openings. Connect Patients to an authoritative API only after the patient identity and authorization contract is defined.
 5. **Add automated coverage for scheduling rules and key user flows.** No test runner is configured today; choose one as part of a specific approved task.
 
 ## Current scope and non-goals
