@@ -6,17 +6,18 @@ export const CALENDAR_START_HOUR = 8;
 export const CALENDAR_END_HOUR = 22;
 export const CALENDAR_HOUR_HEIGHT = 64;
 
-export function calendarDateKey(date: Date) {
+export function calendarDateKey(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }
 
-export function timeToMinutes(time: string) {
-  const [hours, minutes] = time.split(":").map(Number);
+export function timeToMinutes(time: string): number {
+  const [hours = 0, minutes = 0] = time.split(":").map(Number);
   return hours * 60 + minutes;
 }
 
-export function getCalendarDays(date: Date, view: CalendarView) {
+export function getCalendarDays(date: Date, view: CalendarView): Date[] {
   if (view === "day") return [date];
+
   const start = startOfWeek(view === "month" ? startOfMonth(date) : date, {
     weekStartsOn: 1,
   });
@@ -25,6 +26,8 @@ export function getCalendarDays(date: Date, view: CalendarView) {
   );
 }
 
-export function getCalendarPosition(time: string) {
-  return ((timeToMinutes(time) - CALENDAR_START_HOUR * 60) / 60) * CALENDAR_HOUR_HEIGHT;
+export function getCalendarPosition(time: string): number {
+  const minutesFromCalendarStart =
+    timeToMinutes(time) - CALENDAR_START_HOUR * 60;
+  return (minutesFromCalendarStart / 60) * CALENDAR_HOUR_HEIGHT;
 }

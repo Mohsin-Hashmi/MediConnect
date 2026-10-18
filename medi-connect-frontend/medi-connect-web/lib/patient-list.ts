@@ -4,8 +4,40 @@ import type {
   PatientRecord,
 } from "@/types/patient";
 
+function matchesAgeGroup(
+  patient: PatientRecord,
+  ageGroup: PatientFilters["ageGroup"],
+): boolean {
+  if (ageGroup === "all") return true;
+  if (ageGroup === "under-18") return patient.age < 18;
+  if (ageGroup === "18-39") return patient.age >= 18 && patient.age <= 39;
+  if (ageGroup === "40-59") return patient.age >= 40 && patient.age <= 59;
+  return patient.age >= 60;
+}
+
+function matchesPatientSearch(patient: PatientRecord, query: string): boolean {
+  if (!query) return true;
+
+  return [patient.name, patient.id, patient.email, patient.careFocus].some(
+    (value) => value.toLowerCase().includes(query),
+  );
+}
+
+function matchesPatientFilters(
+  patient: PatientRecord,
+  filters: PatientFilters,
+  query: string,
+): boolean {
+  return (
+    matchesPatientSearch(patient, query) &&
+    (filters.gender === "all" || patient.gender === filters.gender) &&
+    (filters.status === "all" || patient.status === filters.status) &&
+    matchesAgeGroup(patient, filters.ageGroup)
+  );
+}
+
 export function getPatientMetrics(
-  patients: PatientRecord[],
+  patients: readonly PatientRecord[],
   referenceDate: string,
 ): PatientMetricsData {
   const recentStart = new Date(`${referenceDate}T12:00:00`);
@@ -24,32 +56,13 @@ export function getPatientMetrics(
 }
 
 export function getFilteredPatients(
-  patients: PatientRecord[],
+  patients: readonly PatientRecord[],
   filters: PatientFilters,
 ): PatientRecord[] {
   const query = filters.search.trim().toLowerCase();
+
   return patients
-    .filter((patient) => {
-      const ageMatches =
-        filters.ageGroup === "all" ||
-        (filters.ageGroup === "under-18" && patient.age < 18) ||
-        (filters.ageGroup === "18-39" &&
-          patient.age >= 18 &&
-          patient.age <= 39) ||
-        (filters.ageGroup === "40-59" &&
-          patient.age >= 40 &&
-          patient.age <= 59) ||
-        (filters.ageGroup === "60-plus" && patient.age >= 60);
-      return (
-        (!query ||
-          [patient.name, patient.id, patient.email, patient.careFocus].some(
-            (value) => value.toLowerCase().includes(query),
-          )) &&
-        (filters.gender === "all" || patient.gender === filters.gender) &&
-        (filters.status === "all" || patient.status === filters.status) &&
-        ageMatches
-      );
-    })
+    .filter((patient) => matchesPatientFilters(patient, filters, query))
     .sort((a, b) => {
       if (filters.sort === "name") return a.name.localeCompare(b.name);
       return (

@@ -1,22 +1,32 @@
 import { addDays, format, startOfWeek } from "date-fns";
 
 import type { AppointmentRecord } from "@/types/appointment";
-import type { WeeklyAppointmentActivity } from "@/types/doctor-dashboard";
+import type {
+  DashboardMetricsData,
+  WeeklyAppointmentActivity,
+} from "@/types/doctor-dashboard";
 
-function appointmentDateTime(appointment: AppointmentRecord) {
+function appointmentDateTime(appointment: AppointmentRecord): Date {
   return new Date(`${appointment.date}T${appointment.time}:00`);
+}
+
+function isOpenAppointment(appointment: AppointmentRecord): boolean {
+  return appointment.status === "pending" || appointment.status === "confirmed";
+}
+
+function isTerminalAppointment(appointment: AppointmentRecord): boolean {
+  return appointment.status === "completed" || appointment.status === "cancelled";
 }
 
 export function getNextAppointment(
   appointments: readonly AppointmentRecord[],
   now = new Date(),
-) {
+): AppointmentRecord | null {
   return (
     appointments
       .filter(
         (appointment) =>
-          (appointment.status === "pending" ||
-            appointment.status === "confirmed") &&
+          isOpenAppointment(appointment) &&
           appointmentDateTime(appointment) >= now,
       )
       .sort(
@@ -30,7 +40,7 @@ export function getNextAppointment(
 export function getDashboardMetrics(
   appointments: readonly AppointmentRecord[],
   now = new Date(),
-) {
+): DashboardMetricsData {
   const today = format(now, "yyyy-MM-dd");
   const start = startOfWeek(now, { weekStartsOn: 1 });
   const weekStart = format(start, "yyyy-MM-dd");
@@ -39,8 +49,7 @@ export function getDashboardMetrics(
     (appointment) =>
       appointment.date >= weekStart &&
       appointment.date <= weekEnd &&
-      (appointment.status === "completed" ||
-        appointment.status === "cancelled"),
+      isTerminalAppointment(appointment),
   );
   const completed = weeklyTerminalAppointments.filter(
     (appointment) => appointment.status === "completed",
@@ -52,8 +61,7 @@ export function getDashboardMetrics(
     ).length,
     upcomingAppointments: appointments.filter(
       (appointment) =>
-        (appointment.status === "pending" ||
-          appointment.status === "confirmed") &&
+        isOpenAppointment(appointment) &&
         appointmentDateTime(appointment) >= now,
     ).length,
     patientsWithAppointments: new Set(

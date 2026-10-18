@@ -3,44 +3,48 @@ import type {
   AppointmentRecord,
 } from "@/types/appointment";
 
-const avatarTones: AppointmentRecord["avatarTone"][] = [
+const AVATAR_TONES: readonly AppointmentRecord["avatarTone"][] = [
   "blue",
   "teal",
   "amber",
   "violet",
 ];
 
-function timeToMinutes(time: string) {
+function timeToMinutes(time: string): number {
   const [hours = 0, minutes = 0] = time.split(":").map(Number);
   return hours * 60 + minutes;
 }
 
-function calculateAge(dateOfBirth?: string | null) {
+function calculateAge(dateOfBirth?: string | null): number | null {
   if (!dateOfBirth) return null;
 
   const birthDate = new Date(dateOfBirth);
   if (Number.isNaN(birthDate.getTime())) return null;
 
   const today = new Date();
-  let age = today.getFullYear() - birthDate.getUTCFullYear();
+  let age = today.getUTCFullYear() - birthDate.getUTCFullYear();
   const hasNotHadBirthday =
-    today.getMonth() < birthDate.getUTCMonth() ||
-    (today.getMonth() === birthDate.getUTCMonth() &&
-      today.getDate() < birthDate.getUTCDate());
+    today.getUTCMonth() < birthDate.getUTCMonth() ||
+    (today.getUTCMonth() === birthDate.getUTCMonth() &&
+      today.getUTCDate() < birthDate.getUTCDate());
 
   if (hasNotHadBirthday) age -= 1;
   return age >= 0 ? age : null;
 }
 
-function getAvatarTone(id: string) {
+function getAvatarTone(id: string): AppointmentRecord["avatarTone"] {
   const value = [...id].reduce((total, character) => {
     return total + character.charCodeAt(0);
   }, 0);
 
-  return avatarTones[value % avatarTones.length];
+  return AVATAR_TONES[value % AVATAR_TONES.length];
 }
 
-export function mapDoctorAppointment(
+/**
+ * Converts the doctor appointment API response into the view model shared by
+ * the appointments, calendar, and dashboard screens.
+ */
+export function mapDoctorAppointmentFromApi(
   item: DoctorAppointmentApiItem,
 ): AppointmentRecord {
   const { appointment, patient } = item;

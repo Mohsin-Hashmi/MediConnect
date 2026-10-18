@@ -8,6 +8,13 @@ export interface WeeklyAppointmentActivity {
   cancelled: number;
 }
 
+export interface DashboardMetricsData {
+  todayAppointments: number;
+  upcomingAppointments: number;
+  patientsWithAppointments: number;
+  completionRate: number;
+}
+
 export interface DashboardMetricsProps {
   appointments: AppointmentRecord[];
 }

@@ -1,3 +1,4 @@
+// Shared appointment values
 export type AppointmentStatus =
   | "confirmed"
   | "pending"
@@ -8,6 +9,7 @@ export type ApiAppointmentStatus = Uppercase<AppointmentStatus>;
 export type AppointmentVisitType = "Video" | "In-person";
 export type AppointmentAction = "confirm" | "complete" | "cancel";
 
+// Backend API contracts
 export interface ApiAppointment {
   id: string;
   patientId: string;
@@ -65,6 +67,7 @@ export interface CancelAppointmentPayload {
   cancellationReason: string;
 }
 
+// Frontend view models and filters
 export interface AppointmentRecord {
   id: string;
   patientId: string;
@@ -95,6 +98,7 @@ export interface AppointmentFilters {
   sort: AppointmentSortOrder;
 }
 
+// Component props
 export interface AppointmentPageHeaderProps {
   appointments: AppointmentRecord[];
 }
@@ -155,6 +159,7 @@ export interface CancelAppointmentDialogProps {
   onConfirm: (payload: CancelAppointmentPayload) => void;
 }
 
+// Form values
 export interface CancelAppointmentFormValues {
   cancellationReason: string;
 }
