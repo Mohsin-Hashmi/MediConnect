@@ -5,18 +5,9 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
-  ListFilter,
-  Plus,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -26,7 +17,6 @@ import {
 import type {
   CalendarToolbarProps,
   CalendarView,
-  CalendarVisitFilter,
 } from "@/types/calendar";
 
 function periodLabel(date: Date, view: CalendarView) {
@@ -42,13 +32,10 @@ function periodLabel(date: Date, view: CalendarView) {
 export function CalendarToolbar({
   date,
   view,
-  visitFilter,
   onToday,
   onPrevious,
   onNext,
   onViewChange,
-  onFilterChange,
-  onNewAppointment,
 }: CalendarToolbarProps) {
   return (
     <div className="flex flex-col gap-4 border-b border-slate-200 bg-white px-4 py-4 xl:flex-row xl:items-center xl:justify-between xl:px-5">
@@ -112,30 +99,6 @@ export function CalendarToolbar({
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-        <Select
-          items={{
-            all: "All consultations",
-            "In-person": "In-person",
-            Video: "Video",
-          }}
-          value={visitFilter}
-          onValueChange={(value) =>
-            onFilterChange((value ?? "all") as CalendarVisitFilter)
-          }
-        >
-          <SelectTrigger
-            aria-label="Filter consultations by visit type"
-            className="h-10 w-full border-slate-200 bg-white px-3 text-sm shadow-xs sm:w-48"
-          >
-            <ListFilter className="size-4 text-muted-foreground" aria-hidden="true" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="start" alignItemWithTrigger={false}>
-            <SelectItem value="all">All consultations</SelectItem>
-            <SelectItem value="In-person">In-person</SelectItem>
-            <SelectItem value="Video">Video</SelectItem>
-          </SelectContent>
-        </Select>
         <Tabs
           value={view}
           onValueChange={(value) => onViewChange(value as CalendarView)}
@@ -152,14 +115,6 @@ export function CalendarToolbar({
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <Button
-          type="button"
-          onClick={onNewAppointment}
-          className="h-10 gap-2 px-4 text-sm font-semibold shadow-sm"
-        >
-          <Plus className="size-4" aria-hidden="true" />
-          New appointment
-        </Button>
       </div>
     </div>
   );

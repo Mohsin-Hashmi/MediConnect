@@ -6,7 +6,6 @@ import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
-import { APPOINTMENTS_DEMO_DATE } from "@/data/mock/appointments";
 import { formatAppointmentDate } from "@/lib/appointment-format";
 import type { AppointmentDateFilterProps } from "@/types/appointment";
 
@@ -39,7 +38,7 @@ export function AppointmentDateFilter({ date, onDateChange }: AppointmentDateFil
         <Calendar
           mode="single"
           selected={selectedDate}
-          defaultMonth={selectedDate ?? parseISO(APPOINTMENTS_DEMO_DATE)}
+          defaultMonth={selectedDate ?? new Date()}
           onSelect={(selected) => {
             if (!selected) return;
             onDateChange(format(selected, "yyyy-MM-dd"));

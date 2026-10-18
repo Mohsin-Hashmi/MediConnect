@@ -28,7 +28,7 @@ const initialFilters: PatientFilterValues = {
   gender: "all",
   ageGroup: "all",
   status: "all",
-  sort: "recent",
+  sort: "registered",
 };
 
 export function PatientsPage() {

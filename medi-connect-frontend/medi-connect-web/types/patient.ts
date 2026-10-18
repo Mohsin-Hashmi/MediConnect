@@ -1,7 +1,7 @@
 export type PatientGender = "Female" | "Male" | "Other";
 export type PatientStatus = "active" | "inactive";
 export type PatientAgeGroup = "all" | "under-18" | "18-39" | "40-59" | "60-plus";
-export type PatientSort = "recent" | "name" | "next";
+export type PatientSort = "registered" | "name";
 
 export interface PatientRecord {
   id: string;
@@ -10,9 +10,6 @@ export interface PatientRecord {
   gender: PatientGender;
   email: string;
   careFocus: string;
-  lastVisitDate: string | null;
-  nextAppointmentDate: string | null;
-  visitCount: number;
   registeredAt: string;
   status: PatientStatus;
 }
@@ -61,7 +58,7 @@ export interface EditPatientDrawerProps {
 export interface PatientMetricsData {
   total: number;
   active: number;
-  upcoming: number;
+  inactive: number;
   recentlyRegistered: number;
 }
 

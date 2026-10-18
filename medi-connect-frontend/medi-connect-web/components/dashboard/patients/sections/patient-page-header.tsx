@@ -20,16 +20,14 @@ export function PatientPageHeader({ patients, onNewPatient }: PatientPageHeaderP
           title="Patient directory"
           subtitle={`${patients.length} records | Filters currently applied | Current directory view`}
           filename="mediconnect-patients"
-          headers={["Patient ID", "Name", "Age", "Gender", "Care focus", "Last visit", "Next appointment", "Visits", "Status"]}
+          headers={["Patient ID", "Name", "Age", "Gender", "Care focus", "Registered", "Status"]}
           rows={patients.map((patient) => [
             patient.id,
             patient.name,
             String(patient.age),
             patient.gender,
             patient.careFocus,
-            patient.lastVisitDate ?? "-",
-            patient.nextAppointmentDate ?? "-",
-            String(patient.visitCount),
+            patient.registeredAt,
             patient.status,
           ])}
           label="Export patients"

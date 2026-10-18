@@ -3,9 +3,9 @@ import {
   ArrowRight,
   CalendarDays,
   Clock3,
-  MapPin,
   UsersRound,
   Video,
+  Building2,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -18,6 +18,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { DashboardSidePanelsProps } from "@/types/doctor-dashboard";
+import {
+  formatAppointmentDate,
+  formatAppointmentTime,
+} from "@/lib/appointment-format";
 
 const quickActions = [
   { label: "Add availability slot", href: "/dashboard/availability", icon: Clock3 },
@@ -34,9 +38,11 @@ export function DashboardSidePanels({
         <div className="h-1 bg-primary" aria-hidden="true" />
         <CardHeader className="flex flex-row items-center justify-between gap-2 px-5 pt-4 pb-3">
           <CardTitle className="font-semibold">Next Appointment</CardTitle>
-          <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
-            Sample
-          </Badge>
+          {nextAppointment ? (
+            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
+              {nextAppointment.status}
+            </Badge>
+          ) : null}
         </CardHeader>
         <CardContent className="px-5 pb-5">
           {nextAppointment ? (
@@ -44,7 +50,12 @@ export function DashboardSidePanels({
               <div className="flex items-center gap-3">
                 <Avatar className="size-11">
                   <AvatarFallback className="bg-blue-100 text-xs font-semibold text-primary">
-                    {nextAppointment.initials}
+                    {nextAppointment.patientName
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((part) => part[0])
+                      .join("")
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
@@ -55,15 +66,18 @@ export function DashboardSidePanels({
               <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <Clock3 className="size-3.5 text-primary" aria-hidden="true" />
-                  {nextAppointment.time}
+                  {formatAppointmentDate(nextAppointment.date)} ·{" "}
+                  {formatAppointmentTime(nextAppointment.time)}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   {nextAppointment.visitType === "Video" ? (
                     <Video className="size-3.5 text-primary" aria-hidden="true" />
+                  ) : nextAppointment.visitType === "In-person" ? (
+                    <Building2 className="size-3.5 text-primary" aria-hidden="true" />
                   ) : (
-                    <MapPin className="size-3.5 text-primary" aria-hidden="true" />
+                    <CalendarDays className="size-3.5 text-primary" aria-hidden="true" />
                   )}
-                  {nextAppointment.visitType}
+                  {nextAppointment.visitType ?? "Visit type not specified"}
                 </span>
               </div>
               <div className="mt-5 border-t pt-4">
@@ -78,7 +92,9 @@ export function DashboardSidePanels({
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">No sample appointment selected.</p>
+            <p className="text-sm text-muted-foreground">
+              No upcoming appointment is currently scheduled.
+            </p>
           )}
         </CardContent>
       </Card>

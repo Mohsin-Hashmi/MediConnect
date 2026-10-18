@@ -1,7 +1,6 @@
-import type { AppointmentRecord, AppointmentVisitType } from "@/types/appointment";
+import type { AppointmentRecord } from "@/types/appointment";
 
 export type CalendarView = "day" | "week" | "month";
-export type CalendarVisitFilter = "all" | AppointmentVisitType;
 
 export interface CalendarBlock {
   id: string;
@@ -15,13 +14,10 @@ export interface CalendarBlock {
 export interface CalendarToolbarProps {
   date: Date;
   view: CalendarView;
-  visitFilter: CalendarVisitFilter;
   onToday: () => void;
   onPrevious: () => void;
   onNext: () => void;
   onViewChange: (view: CalendarView) => void;
-  onFilterChange: (filter: CalendarVisitFilter) => void;
-  onNewAppointment: () => void;
 }
 
 export interface CalendarTimeGridProps {
@@ -31,7 +27,6 @@ export interface CalendarTimeGridProps {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
   onSelectAppointment: (appointment: AppointmentRecord) => void;
-  onSelectSlot: (date: string, time: string) => void;
 }
 
 export interface CalendarMonthGridProps {
@@ -48,5 +43,4 @@ export interface CalendarSidebarProps {
   blocks: CalendarBlock[];
   onSelectDate: (date: Date) => void;
   onSelectAppointment: (appointment: AppointmentRecord) => void;
-  onSelectSlot: (date: string, time: string) => void;
 }

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { PatientFilterBarProps, PatientFilters as PatientFilterValues } from "@/types/patient";
 
 export function PatientFilters({ filters, onChange, onReset }: PatientFilterBarProps) {
-  const hasFilters = filters.search !== "" || filters.gender !== "all" || filters.ageGroup !== "all" || filters.status !== "all" || filters.sort !== "recent";
+  const hasFilters = filters.search !== "" || filters.gender !== "all" || filters.ageGroup !== "all" || filters.status !== "all" || filters.sort !== "registered";
   return (
     <div className="grid gap-3 border-b px-5 py-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[minmax(14rem,1fr)_11rem_11rem_11rem_11rem_auto]">
       <div className="relative md:col-span-2 xl:col-span-1">
@@ -25,9 +25,9 @@ export function PatientFilters({ filters, onChange, onReset }: PatientFilterBarP
         <SelectTrigger aria-label="Filter by status" className="w-full bg-white px-2.5 text-sm data-[size=default]:h-10"><SelectValue /></SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}><SelectItem value="all">All statuses</SelectItem><SelectItem value="active">Active</SelectItem><SelectItem value="inactive">Inactive</SelectItem></SelectContent>
       </Select>
-      <Select items={{ recent: "Recent visit", name: "Name A–Z", next: "Next appointment" }} value={filters.sort} onValueChange={(value) => onChange({ sort: (value ?? "recent") as PatientFilterValues["sort"] })}>
+      <Select items={{ registered: "Recently registered", name: "Name A–Z" }} value={filters.sort} onValueChange={(value) => onChange({ sort: (value ?? "registered") as PatientFilterValues["sort"] })}>
         <SelectTrigger aria-label="Sort patients" className="w-full bg-white px-2.5 text-sm data-[size=default]:h-10"><SlidersHorizontal className="size-4 text-muted-foreground" aria-hidden="true" /><SelectValue /></SelectTrigger>
-        <SelectContent align="start" alignItemWithTrigger={false}><SelectItem value="recent">Recent visit</SelectItem><SelectItem value="name">Name A–Z</SelectItem><SelectItem value="next">Next appointment</SelectItem></SelectContent>
+        <SelectContent align="start" alignItemWithTrigger={false}><SelectItem value="registered">Recently registered</SelectItem><SelectItem value="name">Name A–Z</SelectItem></SelectContent>
       </Select>
       {hasFilters ? <Button type="button" variant="ghost" className="h-10 px-3 text-sm" onClick={onReset}><X className="size-4" aria-hidden="true" />Clear</Button> : null}
     </div>

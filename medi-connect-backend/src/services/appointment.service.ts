@@ -291,8 +291,39 @@ export const getDoctorAppointments = async (
     throw new ServiceError("NOT_FOUND", "Doctor profile not found");
   }
 
-  return getAppointmentsWithAvailability({
-    doctorId: doctor._id,
+  const appointments = await AppointmentModel.find({ doctorId: doctor._id })
+    .sort({ date: 1, startTime: 1, createdAt: -1 });
+
+  if (appointments.length === 0) {
+    return [];
+  }
+
+  const [availabilities, patients] = await Promise.all([
+    AvailabilityModel.find({
+      _id: { $in: appointments.map((item) => item.availabilityId) },
+    }),
+    UserModel.find({
+      _id: { $in: appointments.map((item) => item.patientId) },
+    }).select("_id name email role phone profileImage dateOfBirth gender"),
+  ]);
+
+  const availabilityById = new Map(
+    availabilities.map((item) => [item._id.toString(), item]),
+  );
+  const patientById = new Map(
+    patients.map((item) => [item._id.toString(), item]),
+  );
+
+  return appointments.map((appointment) => {
+    const patient = patientById.get(appointment.patientId.toString());
+
+    return {
+      appointment: formatAppointment(
+        appointment,
+        availabilityById.get(appointment.availabilityId.toString()) ?? null,
+      ),
+      patient: patient ? formatPatient(patient) : null,
+    };
   });
 };
 
@@ -360,7 +391,7 @@ export const getAppointmentById = async (
     }
 
     const patient = await UserModel.findById(appointment.patientId).select(
-      "_id name email role phone profileImage",
+      "_id name email role phone profileImage dateOfBirth gender",
     );
 
     if (!patient) {
@@ -401,6 +432,13 @@ export const cancelAppointment = async (
 
   if (appointment.status === AppointmentStatusEnum.CANCELLED) {
     throw new ServiceError("CONFLICT", "Appointment is already cancelled");
+  }
+
+  if (appointment.status === AppointmentStatusEnum.COMPLETED) {
+    throw new ServiceError(
+      "CONFLICT",
+      "Completed appointments cannot be cancelled",
+    );
   }
 
   if (authenticatedUserRole === "patient") {

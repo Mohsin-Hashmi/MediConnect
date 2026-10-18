@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Ban, Check, CircleCheckBig, Eye, MoreVertical } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,8 +15,9 @@ import type { AppointmentActionsProps } from "@/types/appointment";
 export function AppointmentActions({
   appointment,
   onView,
-  onEdit,
-  onDelete,
+  onConfirm,
+  onComplete,
+  onCancel,
 }: AppointmentActionsProps) {
   return (
     <DropdownMenu>
@@ -41,25 +42,36 @@ export function AppointmentActions({
           <Eye className="size-4" aria-hidden="true" />
           View
         </DropdownMenuItem>
-        {onEdit ? (
+        {appointment.status === "pending" && onConfirm ? (
           <DropdownMenuItem
             className="min-h-9 gap-2 px-2.5"
-            onClick={() => onEdit(appointment)}
+            onClick={() => onConfirm(appointment)}
           >
-            <Pencil className="size-4" aria-hidden="true" />
-            Edit
+            <Check className="size-4" aria-hidden="true" />
+            Confirm
           </DropdownMenuItem>
         ) : null}
-        {onDelete ? (
+        {appointment.status === "confirmed" && onComplete ? (
+          <DropdownMenuItem
+            className="min-h-9 gap-2 px-2.5"
+            onClick={() => onComplete(appointment)}
+          >
+            <CircleCheckBig className="size-4" aria-hidden="true" />
+            Mark completed
+          </DropdownMenuItem>
+        ) : null}
+        {(appointment.status === "pending" ||
+          appointment.status === "confirmed") &&
+        onCancel ? (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"
               className="min-h-9 gap-2 px-2.5"
-              onClick={() => onDelete(appointment)}
+              onClick={() => onCancel(appointment)}
             >
-              <Trash2 className="size-4" aria-hidden="true" />
-              Delete
+              <Ban className="size-4" aria-hidden="true" />
+              Cancel appointment
             </DropdownMenuItem>
           </>
         ) : null}

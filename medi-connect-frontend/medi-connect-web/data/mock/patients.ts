@@ -27,9 +27,6 @@ export const mockPatients: PatientRecord[] = sampleNames.map((name, index) => {
     gender: index % 5 === 4 ? "Other" : index % 2 === 0 ? "Female" : "Male",
     email: `patient${String(number).padStart(2, "0")}@example.test`,
     careFocus: careFocuses[index % careFocuses.length],
-    lastVisitDate: index % 7 === 0 ? null : `2026-09-${day}`,
-    nextAppointmentDate: index % 3 === 0 ? `2026-10-${String(11 + (index % 7)).padStart(2, "0")}` : null,
-    visitCount: index % 7 === 0 ? 0 : 1 + (index % 8),
     registeredAt: index < 7 ? `2026-10-${day}` : `2026-08-${day}`,
     status: index % 9 === 8 ? "inactive" : "active",
   };

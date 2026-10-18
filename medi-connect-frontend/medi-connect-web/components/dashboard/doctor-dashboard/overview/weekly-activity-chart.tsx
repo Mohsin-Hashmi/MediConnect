@@ -26,7 +26,7 @@ export function WeeklyActivityChart({
       config={chartConfig}
       className="h-64 min-h-64 w-full aspect-auto sm:h-72"
       role="img"
-      aria-label="Sample weekly appointment counts by day for completed, confirmed, and cancelled visits"
+      aria-label="Weekly appointment counts by day for completed, confirmed, and cancelled visits"
     >
       <BarChart accessibilityLayer data={activity} margin={{ top: 12, right: 4, bottom: 4, left: -24 }}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" />

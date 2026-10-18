@@ -7,29 +7,29 @@ import {
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { DashboardMetricsProps } from "@/types/doctor-dashboard";
-import { getMockDashboardMetrics } from "@/data/mock/doctor-dashboard";
+import { getDashboardMetrics } from "@/lib/doctor-dashboard";
 
-export function DashboardMetrics({ data }: DashboardMetricsProps) {
-  const metrics = getMockDashboardMetrics(data);
+export function DashboardMetrics({ appointments }: DashboardMetricsProps) {
+  const metrics = getDashboardMetrics(appointments);
   const cards = [
     {
       label: "Today's appointments",
       value: metrics.todayAppointments.toString(),
-      note: "Scheduled in the sample day",
+      note: "Scheduled for today",
       icon: CalendarCheck2,
       iconClass: "bg-blue-50 text-primary",
     },
     {
       label: "Upcoming appointments",
       value: metrics.upcomingAppointments.toString(),
-      note: "Across the sample schedule",
+      note: "Pending or confirmed bookings",
       icon: CalendarClock,
       iconClass: "bg-violet-50 text-violet-600",
     },
     {
-      label: "Total patients",
-      value: metrics.totalPatients.toLocaleString("en-US"),
-      note: "In the sample practice",
+      label: "Patients with appointments",
+      value: metrics.patientsWithAppointments.toLocaleString("en-US"),
+      note: "Unique patients in the current records",
       icon: UsersRound,
       iconClass: "bg-teal-50 text-secondary",
     },

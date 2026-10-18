@@ -27,6 +27,7 @@ import type {
   RegisterFormValues,
   RegisterPayload,
 } from "@/types/auth";
+import { getPasswordStrength } from "@/lib/password-strength";
 
 const initialValues: RegisterFormValues = {
   name: "",
@@ -35,32 +36,14 @@ const initialValues: RegisterFormValues = {
   acceptTerms: false,
 };
 
-function getPasswordStrength(password: string) {
-  const checks = [
-    password.length >= 6,
-    /[a-z]/.test(password) && /[A-Z]/.test(password),
-    /\d/.test(password),
-    /[^A-Za-z0-9]/.test(password),
-  ];
-  const score = checks.filter(Boolean).length;
-
-  if (!password) return { score: 0, label: "Enter password" };
-  if (score <= 1) return { score: 1, label: "Weak" };
-  if (score === 2) return { score: 2, label: "Fair" };
-  if (score === 3) return { score: 3, label: "Good" };
-  return { score: 4, label: "Strong" };
-}
-
 export function RegisterForm() {
   const router = useRouter();
-  const registerMutation = useRegister();
+  const { mutateAsync: registerMutation, isPending } = useRegister();
 
   const handleSubmit = async (
     values: RegisterFormValues,
     helpers: FormikHelpers<RegisterFormValues>,
   ) => {
-    registerMutation.reset();
-
     const payload: RegisterPayload = {
       name: values.name.trim(),
       email: values.email.trim().toLowerCase(),
@@ -69,7 +52,7 @@ export function RegisterForm() {
     };
 
     try {
-      const response = await registerMutation.mutateAsync(payload);
+      const response = await registerMutation(payload);
       saveAccessToken(response.data.accessToken);
       toast.success(response.message || "Account created successfully.");
       helpers.resetForm();
@@ -151,7 +134,7 @@ export function RegisterForm() {
                     aria-describedby={
                       touched.name && errors.name ? "name-error" : undefined
                     }
-                     className="h-11.5 pl-10 text-sm"
+                    className="h-11.5 pl-10 text-sm"
                   />
                 </div>
 
@@ -284,9 +267,9 @@ export function RegisterForm() {
                 type="submit"
                 size="lg"
                 className="h-11.5 w-full text-sm shadow-sm"
-                disabled={isSubmitting || registerMutation.isPending}
+                disabled={isSubmitting || isPending}
               >
-                {registerMutation.isPending ? (
+                {isPending ? (
                   <LoaderCircle className="animate-spin" aria-hidden="true" />
                 ) : (
                   <>

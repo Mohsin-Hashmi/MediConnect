@@ -1,7 +1,7 @@
 import {
-  CalendarDays,
   UserRoundCheck,
   UserRoundPlus,
+  UserRoundX,
   UsersRound,
 } from "lucide-react";
 
@@ -25,10 +25,10 @@ export function PatientMetrics({ metrics }: { metrics: PatientMetricsData }) {
       color: "bg-emerald-50 text-emerald-700",
     },
     {
-      label: "Follow-ups due",
-      value: metrics.upcoming,
-      detail: "Within the next 7 days",
-      icon: CalendarDays,
+      label: "Inactive patients",
+      value: metrics.inactive,
+      detail: "Currently marked inactive",
+      icon: UserRoundX,
       color: "bg-amber-50 text-amber-700",
     },
     {

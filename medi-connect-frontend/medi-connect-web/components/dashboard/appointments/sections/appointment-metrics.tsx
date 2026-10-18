@@ -6,10 +6,10 @@ import {
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { APPOINTMENTS_DEMO_DATE } from "@/data/mock/appointments";
 import type { AppointmentMetricsProps } from "@/types/appointment";
 
 export function AppointmentMetrics({ appointments }: AppointmentMetricsProps) {
+  const today = new Date().toISOString().slice(0, 10);
   const metrics = [
     {
       label: "Total appointments",
@@ -22,7 +22,7 @@ export function AppointmentMetrics({ appointments }: AppointmentMetricsProps) {
       label: "Upcoming",
       value: appointments.filter(
         (item) =>
-          item.date >= APPOINTMENTS_DEMO_DATE &&
+          item.date >= today &&
           (item.status === "confirmed" || item.status === "pending"),
       ).length,
       note: "Confirmed or awaiting review",

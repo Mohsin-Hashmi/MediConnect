@@ -1,4 +1,3 @@
-import { APPOINTMENTS_DEMO_DATE } from "@/data/mock/appointments";
 import type {
   AppointmentFilters,
   AppointmentRecord,
@@ -16,8 +15,9 @@ export function compareAppointments(
   if (sort === "oldest") return aDateTime.localeCompare(bDateTime);
   if (sort === "newest") return bDateTime.localeCompare(aDateTime);
 
+  const today = new Date().toISOString().slice(0, 10);
   const group = (date: string) =>
-    date === APPOINTMENTS_DEMO_DATE ? 0 : date > APPOINTMENTS_DEMO_DATE ? 1 : 2;
+    date === today ? 0 : date > today ? 1 : 2;
   const groupDifference = group(a.date) - group(b.date);
   if (groupDifference !== 0) return groupDifference;
   return group(a.date) === 2
@@ -40,10 +40,6 @@ export function getFilteredAppointments(
         ),
     )
     .filter((item) => !filters.date || item.date === filters.date)
-    .filter(
-      (item) =>
-        filters.visitType === "all" || item.visitType === filters.visitType,
-    )
     .filter(
       (item) => filters.status === "all" || item.status === filters.status,
     )

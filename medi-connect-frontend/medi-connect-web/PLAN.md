@@ -12,27 +12,27 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | --- | --- |
 | Register and login | UI, Formik/Yup validation, Sonner feedback, and TanStack Query/Axios calls to existing auth endpoints. |
 | Doctor onboarding | Professional info, qualifications, practice/profile, review/submit; draft data is stored locally during the flow. Doctor creation uses an API mutation. |
-| Doctor dashboard | Shared sidebar/topbar; overview cards, appointment summary, chart, and actions use demo data. |
-| Appointments | Read-only mock list with filtering, sorting, pagination, details, create/edit/delete form previews, and PDF export. Submitting forms does not mutate records, browser storage, or call an API. |
-| Calendar | Day/week/month views, date navigation, consultation filter, mock blocks, appointment details, and click-to-preview scheduling. It reads the same mock appointment source as the Appointments page. |
+| Doctor dashboard | Shared sidebar/topbar with API-backed appointment metrics, today’s schedule, next appointment, and weekly activity. |
+| Appointments | Doctor-scoped API list/detail data with filtering, sorting, pagination, PDF export, and confirm/complete/cancel actions. Doctors cannot create, arbitrarily edit, or delete patient bookings. |
+| Calendar | Day/week/month views and appointment details backed by the same TanStack Query appointment cache as Appointments. Blocked-time data is not displayed until an authoritative API is connected. |
 | Patients | Separate fictional read-only directory, derived metrics, search/filter/sort, 10-row pagination, details, create/edit/delete form previews, and PDF export. Submitting forms does not mutate records or call an API. |
 | Availability | UI-first schedule preview with editable booking preferences, day switches, time-range and blocked-date form previews, validation, and a calculated local capacity summary. Add/edit/delete actions do not change schedule records; nothing is saved or published or alters Calendar openings. |
 | Other doctor portal links | Profile, Reviews, Earnings, Messages, Notifications, and Settings remain placeholders. |
 
-The appointment form currently captures a patient's name and age for a UI preview; it does not create a booking or select a persisted patient record. Appointment and patient lists remain unchanged after submissions. Calendar blocks and available-time calculations are mock-only.
+Patients own appointment creation through the patient-only backend booking endpoint. The doctor portal reads assigned bookings and performs only supported status transitions. The patient dashboard booking UI is not built yet. Patient-directory forms and availability controls remain UI previews.
 
 ## Near-term priorities
 
 1. **Review the current UI and code with the project owner.** Address specific feedback before expanding the module surface.
-2. **Agree on scheduling workflows and backend contracts.** Define patient lookup/creation, doctor working hours, available slots, blocks/leave, appointment status transitions, conflict responses, timezone rules, and authorization. Do not infer these from the mock UI.
-3. **Connect Appointments and Calendar to authoritative APIs when available.** Use TanStack Query hooks, shared query keys/invalidation, server-side validation, and clear loading/error/empty states. Keep both views synchronized from one server source.
-4. **Connect Availability to scheduling contracts when agreed.** Replace the draft-only preview with an authoritative schedule API and make Calendar use that source for openings. Connect Patients to an authoritative API only after the patient identity and authorization contract is defined.
+2. **Build the patient booking journey.** Use the existing patient-only booking contract and authoritative doctor availability; keep booking validation on the server.
+3. **Finish scheduling contracts.** Define visit mode, fee snapshots, timezone behavior, conflict guarantees, and patient notification rules before displaying those fields as authoritative appointment data.
+4. **Connect Availability to scheduling contracts when agreed.** Replace the draft-only preview with an authoritative schedule API and make Calendar use that source for blocks and openings. Connect Patients to an authoritative API only after the patient-directory authorization contract is defined.
 5. **Add automated coverage for scheduling rules and key user flows.** No test runner is configured today; choose one as part of a specific approved task.
 
 ## Current scope and non-goals
 
 - Current development is frontend-first and can use clearly labeled mock data for unfinished modules.
-- No appointment, availability, patient-directory, payment, telemedicine, messaging, or notification backend integration is assumed to exist merely because UI controls or routes exist.
+- Appointment reads and doctor status actions are integrated. Availability, patient-directory, payment, telemedicine, messaging, and notification UI must not be treated as integrated merely because controls or routes exist.
 - Do not treat browser session storage as a secure health-record store or as multi-device persistence.
 - Do not make regulatory, security, or verification promises in product copy without confirmed implementation and review.
 - Do not build all sidebar modules at once or expand the patient experience without a specific approved design and workflow.

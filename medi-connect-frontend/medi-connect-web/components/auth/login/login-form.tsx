@@ -31,21 +31,19 @@ const initialValues: LoginFormValues = {
 
 export function LoginForm() {
   const router = useRouter();
-  const loginMutation = useLogin();
+  const { mutateAsync: loginMutation, isPending } = useLogin();
 
   const handleSubmit = async (
     values: LoginFormValues,
     helpers: FormikHelpers<LoginFormValues>,
   ) => {
-    loginMutation.reset();
-
     const payload: LoginPayload = {
       email: values.email.trim().toLowerCase(),
       password: values.password,
     };
 
     try {
-      const response = await loginMutation.mutateAsync(payload);
+      const response = await loginMutation(payload);
       saveAccessToken(response.data.accessToken, values.remember);
       toast.success(response.message || "Signed in successfully.");
       router.replace("/");
@@ -93,7 +91,15 @@ export function LoginForm() {
         validationSchema={loginSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, values, handleBlur, handleChange, setFieldValue, isSubmitting }) => (
+        {({
+          errors,
+          touched,
+          values,
+          handleBlur,
+          handleChange,
+          setFieldValue,
+          isSubmitting,
+        }) => (
           <Form className="space-y-5" noValidate>
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-3">
@@ -118,19 +124,26 @@ export function LoginForm() {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   aria-invalid={Boolean(touched.email && errors.email)}
-                  aria-describedby={touched.email && errors.email ? "email-error" : undefined}
+                  aria-describedby={
+                    touched.email && errors.email ? "email-error" : undefined
+                  }
                   className="h-11.5 pl-10 text-sm"
                 />
               </div>
               {touched.email && errors.email ? (
-                <p id="email-error" className="text-xs text-destructive">{errors.email}</p>
+                <p id="email-error" className="text-xs text-destructive">
+                  {errors.email}
+                </p>
               ) : null}
             </div>
 
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-xs font-semibold text-primary hover:underline">
+                <Link
+                  href="#"
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -143,10 +156,16 @@ export function LoginForm() {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 aria-invalid={Boolean(touched.password && errors.password)}
-                aria-describedby={touched.password && errors.password ? "password-error" : undefined}
+                aria-describedby={
+                  touched.password && errors.password
+                    ? "password-error"
+                    : undefined
+                }
               />
               {touched.password && errors.password ? (
-                <p id="password-error" className="text-xs text-destructive">{errors.password}</p>
+                <p id="password-error" className="text-xs text-destructive">
+                  {errors.password}
+                </p>
               ) : null}
             </div>
 
@@ -155,7 +174,9 @@ export function LoginForm() {
                 <Checkbox
                   name="remember"
                   checked={values.remember}
-                  onCheckedChange={(checked) => void setFieldValue("remember", checked)}
+                  onCheckedChange={(checked) =>
+                    void setFieldValue("remember", checked)
+                  }
                 />
                 Remember for 30 days
               </Label>
@@ -169,9 +190,9 @@ export function LoginForm() {
               type="submit"
               size="lg"
               className="h-11.5 w-full text-sm shadow-sm"
-              disabled={isSubmitting || loginMutation.isPending}
+              disabled={isSubmitting || isPending}
             >
-              {loginMutation.isPending ? (
+              {isPending ? (
                 <LoaderCircle className="animate-spin" aria-hidden="true" />
               ) : (
                 <>

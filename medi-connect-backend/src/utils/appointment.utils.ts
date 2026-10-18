@@ -39,6 +39,8 @@ export const formatPatient = (patient: {
   role: string;
   phone?: string | null;
   profileImage?: string | null;
+  dateOfBirth?: Date | null;
+  gender?: string | null;
 }) => ({
   id: patient._id.toString(),
   name: patient.name,
@@ -46,6 +48,8 @@ export const formatPatient = (patient: {
   role: patient.role,
   phone: patient.phone,
   profileImage: patient.profileImage,
+  dateOfBirth: patient.dateOfBirth,
+  gender: patient.gender,
 });
 
 /**

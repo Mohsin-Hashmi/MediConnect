@@ -62,7 +62,10 @@ function PatientCell({ appointment }: AppointmentPatientCellProps) {
           {appointment.patientName}
         </p>
         <p className="text-xs text-muted-foreground">
-          {appointment.patientAge} years · {appointment.patientId}
+          {appointment.patientAge !== null
+            ? `${appointment.patientAge} years · `
+            : ""}
+          {appointment.patientId}
         </p>
       </div>
     </div>
@@ -72,8 +75,9 @@ function PatientCell({ appointment }: AppointmentPatientCellProps) {
 export function AppointmentList({
   appointments,
   onView,
-  onEdit,
-  onDelete,
+  onConfirm,
+  onComplete,
+  onCancel,
   onResetFilters,
   isLoading = false,
   error = null,
@@ -155,13 +159,13 @@ export function AppointmentList({
                         className="size-3.5 text-primary"
                         aria-hidden="true"
                       />
-                    ) : (
+                    ) : appointment.visitType === "In-person" ? (
                       <Building2
                         className="size-3.5 text-secondary"
                         aria-hidden="true"
                       />
-                    )}
-                    {appointment.visitType}
+                    ) : null}
+                    {appointment.visitType ?? "Not specified"}
                   </p>
                 </TableCell>
                 <TableCell>
@@ -171,14 +175,17 @@ export function AppointmentList({
                   />
                 </TableCell>
                 <TableCell className="font-medium tabular-nums">
-                  {formatAppointmentFee(appointment.feePkr)}
+                  {appointment.feePkr === null
+                    ? "Not recorded"
+                    : formatAppointmentFee(appointment.feePkr)}
                 </TableCell>
                 <TableCell className="pr-5 text-right">
                   <AppointmentActions
                     appointment={appointment}
                     onView={onView}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
+                    onConfirm={onConfirm}
+                    onComplete={onComplete}
+                    onCancel={onCancel}
                   />
                 </TableCell>
               </TableRow>
@@ -200,8 +207,9 @@ export function AppointmentList({
                 <AppointmentActions
                   appointment={appointment}
                   onView={onView}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
+                  onConfirm={onConfirm}
+                  onComplete={onComplete}
+                  onCancel={onCancel}
                 />
               </div>
             </div>
@@ -210,10 +218,12 @@ export function AppointmentList({
               <span>
                 {formatAppointmentDate(appointment.date)} ·{" "}
                 {formatAppointmentTime(appointment.time)} ·{" "}
-                {appointment.visitType}
+                {appointment.visitType ?? "Visit type not specified"}
               </span>
               <span className="font-semibold text-foreground">
-                {formatAppointmentFee(appointment.feePkr)}
+                {appointment.feePkr === null
+                  ? "Fee not recorded"
+                  : formatAppointmentFee(appointment.feePkr)}
               </span>
             </div>
           </div>

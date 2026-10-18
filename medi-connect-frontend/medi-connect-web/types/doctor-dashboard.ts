@@ -1,65 +1,30 @@
-export type DashboardAppointmentStatus =
-  | "confirmed"
-  | "pending"
-  | "completed";
-
-export type DashboardVisitType = "Video" | "In-person";
-
-export interface DashboardAppointment {
-  id: string;
-  patientName: string;
-  initials: string;
-  reason: string;
-  time: string;
-  visitType: DashboardVisitType;
-  status: DashboardAppointmentStatus;
-  avatarTone: "blue" | "teal" | "amber" | "violet";
-}
+import type { AppointmentRecord } from "@/types/appointment";
 
 export interface WeeklyAppointmentActivity {
   day: string;
+  date: string;
   completed: number;
   confirmed: number;
   cancelled: number;
 }
 
-export interface DashboardAvailabilitySlot {
-  day: string;
-  hours: string;
-  mode: "In-clinic" | "Telehealth" | "Hybrid";
-}
-
-export interface DoctorDashboardMockData {
-  doctor: {
-    firstName: string;
-    specialty: string;
-  };
-  appointments: DashboardAppointment[];
-  upcomingAppointmentsCount: number;
-  totalPatients: number;
-  weeklyActivity: WeeklyAppointmentActivity[];
-  nextAppointmentId: string;
-  patientCohort: {
-    newPatientsPercent: number;
-    returningPatientsPercent: number;
-  };
-  availability: DashboardAvailabilitySlot[];
-}
-
 export interface DashboardMetricsProps {
-  data: DoctorDashboardMockData;
+  appointments: AppointmentRecord[];
 }
 
 export interface DashboardAppointmentsProps {
-  appointments: DashboardAppointment[];
+  appointments: AppointmentRecord[];
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
 export interface DashboardSidePanelsProps {
-  nextAppointment: DashboardAppointment | undefined;
+  nextAppointment: AppointmentRecord | null;
 }
 
 export interface DashboardActivityPanelsProps {
-  data: DoctorDashboardMockData;
+  appointments: AppointmentRecord[];
 }
 
 export interface WeeklyActivityChartProps {
@@ -67,7 +32,7 @@ export interface WeeklyActivityChartProps {
 }
 
 export interface DashboardPatientAvatarProps {
-  appointment: DashboardAppointment;
+  appointment: AppointmentRecord;
 }
 
 export interface DashboardPlaceholderProps {

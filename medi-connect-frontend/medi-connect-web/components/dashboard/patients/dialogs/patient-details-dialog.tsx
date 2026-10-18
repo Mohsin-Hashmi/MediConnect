@@ -51,9 +51,6 @@ export function PatientDetailsDialog({ patient, onClose, onEdit }: Props) {
                 ["Age & gender", `${patient.age} years · ${patient.gender}`],
                 ["Email", patient.email],
                 ["Care focus", patient.careFocus],
-                ["Total visits", String(patient.visitCount)],
-                ["Last visit", dateLabel(patient.lastVisitDate)],
-                ["Next appointment", dateLabel(patient.nextAppointmentDate)],
                 ["Registered", dateLabel(patient.registeredAt)],
               ].map(([label, value]) => (
                 <div key={label} className="min-w-0 rounded-lg border p-3">

@@ -15,6 +15,7 @@ export function CalendarEventCard({
   compact?: boolean;
 }) {
   const isVideo = appointment.visitType === "Video";
+  const isInPerson = appointment.visitType === "In-person";
   return (
     <button
       type="button"
@@ -24,7 +25,9 @@ export function CalendarEventCard({
         "flex w-full min-w-0 flex-col overflow-hidden rounded-md border-l-[3px] px-2 py-1 text-left shadow-sm transition hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary",
         isVideo
           ? "border-blue-500 bg-blue-50 text-blue-900"
-          : "border-teal-500 bg-teal-50 text-teal-900",
+          : isInPerson
+            ? "border-teal-500 bg-teal-50 text-teal-900"
+            : "border-slate-400 bg-slate-50 text-slate-800",
         appointment.status === "pending" &&
           "border-amber-500 bg-amber-50 text-amber-900",
         appointment.status === "completed" &&
@@ -37,9 +40,9 @@ export function CalendarEventCard({
       <span className="flex min-w-0 items-center gap-1 font-semibold">
         {isVideo ? (
           <Video className="size-3 shrink-0" aria-hidden="true" />
-        ) : (
+        ) : isInPerson ? (
           <Building2 className="size-3 shrink-0" aria-hidden="true" />
-        )}
+        ) : null}
         <span className="truncate">{appointment.patientName}</span>
       </span>
       {!compact && (

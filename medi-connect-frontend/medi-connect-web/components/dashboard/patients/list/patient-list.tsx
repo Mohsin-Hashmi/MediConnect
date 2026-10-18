@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/table";
 import type { PatientIdentityProps, PatientListProps } from "@/types/patient";
 
-function displayDate(date: string | null) {
-  return date ? format(parseISO(date), "d MMM yyyy") : "Not scheduled";
+function displayDate(date: string) {
+  return format(parseISO(date), "d MMM yyyy");
 }
 
 function PatientIdentity({ patient }: PatientIdentityProps) {
@@ -78,13 +78,7 @@ export function PatientList({
                 Care focus
               </TableHead>
               <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Last visit
-              </TableHead>
-              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Next appointment
-              </TableHead>
-              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Visits
+                Registered
               </TableHead>
               <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
                 Status
@@ -106,21 +100,7 @@ export function PatientList({
                   </p>
                 </TableCell>
                 <TableCell className="text-foreground">
-                  {patient.lastVisitDate ? (
-                    displayDate(patient.lastVisitDate)
-                  ) : (
-                    <span className="text-muted-foreground">No visits yet</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-foreground">
-                  {patient.nextAppointmentDate ? (
-                    displayDate(patient.nextAppointmentDate)
-                  ) : (
-                    <span className="text-muted-foreground">Not scheduled</span>
-                  )}
-                </TableCell>
-                <TableCell className="tabular-nums text-foreground">
-                  {patient.visitCount}
+                  {displayDate(patient.registeredAt)}
                 </TableCell>
                 <TableCell>
                   <StatusBadge
@@ -163,18 +143,9 @@ export function PatientList({
             <p className="text-sm font-medium text-foreground">
               {patient.careFocus}
             </p>
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span>
-                Last visit:{" "}
-                {patient.lastVisitDate
-                  ? displayDate(patient.lastVisitDate)
-                  : "No visits yet"}
-              </span>
-              <span>Next: {displayDate(patient.nextAppointmentDate)}</span>
-              <span className="font-semibold text-foreground">
-                {patient.visitCount} visits
-              </span>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Registered {displayDate(patient.registeredAt)}
+            </p>
           </div>
         ))}
       </div>

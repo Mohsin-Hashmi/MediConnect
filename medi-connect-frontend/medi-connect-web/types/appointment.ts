@@ -4,37 +4,99 @@ export type AppointmentStatus =
   | "completed"
   | "cancelled";
 
+export type ApiAppointmentStatus = Uppercase<AppointmentStatus>;
 export type AppointmentVisitType = "Video" | "In-person";
+export type AppointmentAction = "confirm" | "complete" | "cancel";
+
+export interface ApiAppointment {
+  id: string;
+  patientId: string;
+  doctorId: string;
+  availabilityId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: ApiAppointmentStatus;
+  reason?: string | null;
+  notes?: string | null;
+  cancellationReason?: string | null;
+  cancelledBy?: "patient" | "doctor" | null;
+  cancelledAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiAppointmentPatient {
+  id: string;
+  name: string;
+  email: string;
+  role: "patient";
+  phone?: string | null;
+  profileImage?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+}
+
+export interface DoctorAppointmentApiItem {
+  appointment: ApiAppointment;
+  patient: ApiAppointmentPatient | null;
+}
+
+export interface DoctorAppointmentsResponse {
+  success: true;
+  message: string;
+  data: { appointments: DoctorAppointmentApiItem[] };
+}
+
+export interface DoctorAppointmentResponse {
+  success: true;
+  message: string;
+  data: DoctorAppointmentApiItem;
+}
+
+export interface AppointmentMutationResponse {
+  success: true;
+  message: string;
+  data: { appointment: ApiAppointment };
+}
+
+export interface CancelAppointmentPayload {
+  appointmentId: string;
+  cancellationReason: string;
+}
 
 export interface AppointmentRecord {
   id: string;
   patientId: string;
   patientName: string;
-  patientAge: number;
+  patientAge: number | null;
+  patientEmail: string | null;
+  patientPhone: string | null;
+  patientProfileImage: string | null;
   reason: string;
+  notes: string | null;
   date: string;
   time: string;
+  endTime: string;
   durationMinutes: number;
-  visitType: AppointmentVisitType;
+  visitType: AppointmentVisitType | null;
   status: AppointmentStatus;
-  feePkr: number;
+  feePkr: number | null;
+  cancellationReason: string | null;
   avatarTone: "blue" | "teal" | "amber" | "violet";
 }
 
 export type AppointmentSortOrder = "schedule" | "oldest" | "newest";
-export type NewAppointmentInput = Omit<AppointmentRecord, "id" | "patientId">;
 
 export interface AppointmentFilters {
   search: string;
   date: string;
-  visitType: "all" | AppointmentVisitType;
   status: "all" | AppointmentStatus;
   sort: AppointmentSortOrder;
 }
 
 export interface AppointmentPageHeaderProps {
   appointments: AppointmentRecord[];
-  onNewAppointment: () => void;
 }
 
 export interface AppointmentScheduleHeaderProps {
@@ -53,31 +115,6 @@ export interface AppointmentDateFilterProps {
   onDateChange: (date: string) => void;
 }
 
-export interface NewAppointmentFormValues {
-  patientName: string;
-  patientAge: string;
-  reason: string;
-  date: string;
-  time: string;
-  visitType: AppointmentVisitType;
-  feePkr: string;
-}
-
-export interface NewAppointmentDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCreate: (appointment: NewAppointmentInput) => boolean;
-  initialDate?: string;
-  initialTime?: string;
-}
-
-export interface AppointmentsContextValue {
-  appointments: AppointmentRecord[];
-  addAppointment: (appointment: NewAppointmentInput) => boolean;
-  updateAppointment: (appointment: AppointmentRecord) => void;
-  removeAppointment: (id: string) => void;
-}
-
 export interface AppointmentDetailsDialogProps {
   appointment: AppointmentRecord | null;
   onClose: () => void;
@@ -90,8 +127,9 @@ export interface AppointmentListProps {
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
-  onEdit?: (appointment: AppointmentRecord) => void;
-  onDelete?: (appointment: AppointmentRecord) => void;
+  onConfirm?: (appointment: AppointmentRecord) => void;
+  onComplete?: (appointment: AppointmentRecord) => void;
+  onCancel?: (appointment: AppointmentRecord) => void;
 }
 
 export interface AppointmentMetricsProps {
@@ -105,30 +143,18 @@ export interface AppointmentPatientCellProps {
 export interface AppointmentActionsProps {
   appointment: AppointmentRecord;
   onView: (appointment: AppointmentRecord) => void;
-  onEdit?: (appointment: AppointmentRecord) => void;
-  onDelete?: (appointment: AppointmentRecord) => void;
+  onConfirm?: (appointment: AppointmentRecord) => void;
+  onComplete?: (appointment: AppointmentRecord) => void;
+  onCancel?: (appointment: AppointmentRecord) => void;
 }
 
-export interface EditAppointmentDrawerProps {
+export interface CancelAppointmentDialogProps {
   appointment: AppointmentRecord | null;
+  isPending: boolean;
   onClose: () => void;
-  onSave: (appointment: AppointmentRecord) => void;
+  onConfirm: (payload: CancelAppointmentPayload) => void;
 }
 
-export interface EditAppointmentFormValues {
-  patientName: string;
-  patientAge: string;
-  reason: string;
-  date: string;
-  time: string;
-  durationMinutes: string;
-  visitType: AppointmentVisitType;
-  status: AppointmentStatus;
-  feePkr: string;
-}
-
-export interface EditAppointmentFormProps {
-  appointment: AppointmentRecord;
-  onClose: () => void;
-  onSave: (appointment: AppointmentRecord) => void;
+export interface CancelAppointmentFormValues {
+  cancellationReason: string;
 }

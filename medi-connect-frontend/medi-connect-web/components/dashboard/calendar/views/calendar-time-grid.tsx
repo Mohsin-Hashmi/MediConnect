@@ -1,7 +1,7 @@
 "use client";
 
 import { format, isSameDay } from "date-fns";
-import { LockKeyhole, Plus } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 
 import { CalendarEventCard } from "@/components/dashboard/calendar/views/calendar-event-card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ export function CalendarTimeGrid({
   selectedDate,
   onSelectDate,
   onSelectAppointment,
-  onSelectSlot,
 }: CalendarTimeGridProps) {
   const gridColumns = `64px repeat(${days.length}, minmax(${days.length === 1 ? 280 : 142}px, 1fr))`;
   return (
@@ -64,15 +63,10 @@ export function CalendarTimeGrid({
             return (
               <div key={date} className="relative border-r border-slate-100 bg-white">
                 {hours.map((hour) => (
-                  <button
+                  <div
                     key={hour}
-                    type="button"
-                    aria-label={`Schedule appointment on ${format(day, "EEEE, MMMM d")} at ${format(new Date(2026, 0, 1, hour), "h a")}`}
-                    onClick={() => onSelectSlot(date, `${String(hour).padStart(2, "0")}:00`)}
-                    className="group flex h-16 w-full items-start justify-end border-b border-slate-100 p-1 text-primary hover:bg-blue-50/50 focus-visible:outline-2 focus-visible:outline-primary"
-                  >
-                    <Plus className="size-3.5 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true" />
-                  </button>
+                    className="h-16 border-b border-slate-100"
+                  />
                 ))}
                 {dayBlocks.map((block) => {
                   const height = ((timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60) * CALENDAR_HOUR_HEIGHT;
