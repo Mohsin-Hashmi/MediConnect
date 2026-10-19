@@ -1,3 +1,4 @@
+import { DashboardPageHeader } from "@/components/common/dashboard-page-header";
 import { PdfExportButton } from "@/components/common/pdf-export-button";
 import {
   formatAppointmentDate,
@@ -10,18 +11,10 @@ export function AppointmentPageHeader({
   appointments,
 }: AppointmentPageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Appointments
-          </h1>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage your schedule and review patient consultations.
-        </p>
-      </div>
-      <div className="flex flex-wrap gap-2">
+    <DashboardPageHeader
+      title="Appointments"
+      description="Manage your schedule and review patient consultations."
+      actions={
         <PdfExportButton
           title="MediConnect appointment schedule"
           subtitle={`${appointments.length} appointments | Filters currently applied`}
@@ -38,7 +31,7 @@ export function AppointmentPageHeader({
           ])}
           className="h-10 gap-2 px-4 text-sm"
         />
-      </div>
-    </div>
+      }
+    />
   );
 }

@@ -1,3 +1,10 @@
+import type {
+  ChangeEventHandler,
+  FocusEventHandler,
+  ReactNode,
+} from "react";
+import type { LucideIcon } from "lucide-react";
+
 export type StatusTone = "info" | "warning" | "success" | "neutral" | "danger";
 
 export interface StatusBadgeProps {
@@ -52,4 +59,63 @@ export interface PaginationProps {
   totalItems: number;
   onPageChange: (page: number) => void;
   itemLabel?: string;
+}
+
+export interface ProfileFieldProps {
+  id: string;
+  name: string;
+  label: string;
+  value: string | number;
+  type?: "text" | "email" | "tel" | "url" | "number";
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  error?: string;
+  icon?: LucideIcon;
+  min?: number;
+  max?: number;
+  autoComplete?: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  onBlur: FocusEventHandler<HTMLInputElement>;
+  className?: string;
+  inputClassName?: string;
+}
+
+export interface DashboardPageHeaderProps {
+  title: string;
+  description: string;
+  actions?: ReactNode;
+}
+
+export interface DataSectionHeaderProps {
+  title: string;
+  description: ReactNode;
+  countLabel?: string;
+  icon?: LucideIcon;
+}
+
+export interface LabeledValueCardProps {
+  label: string;
+  value: ReactNode;
+  className?: string;
+}
+
+export interface IconTextProps {
+  icon: LucideIcon;
+  text: ReactNode;
+  className?: string;
+  iconClassName?: string;
+}
+
+export type ChecklistItemStatus =
+  | "complete"
+  | "incomplete"
+  | "warning"
+  | "neutral";
+
+export interface ChecklistItemProps {
+  label: ReactNode;
+  status?: ChecklistItemStatus;
+  className?: string;
 }

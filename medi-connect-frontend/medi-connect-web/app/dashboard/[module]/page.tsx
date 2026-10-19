@@ -5,9 +5,14 @@ import { DashboardPlaceholder } from "@/components/dashboard/doctor-dashboard/sh
 import { DASHBOARD_MODULES } from "@/constants/dashboard";
 
 export function generateStaticParams() {
-  return DASHBOARD_MODULES.filter(({ slug }) => slug !== "appointments" && slug !== "calendar" && slug !== "patients" && slug !== "availability").map(
-    ({ slug }) => ({ module: slug }),
-  );
+  return DASHBOARD_MODULES.filter(
+    ({ slug }) =>
+      slug !== "appointments" &&
+      slug !== "calendar" &&
+      slug !== "patients" &&
+      slug !== "availability" &&
+      slug !== "profile",
+  ).map(({ slug }) => ({ module: slug }));
 }
 
 export async function generateMetadata({
