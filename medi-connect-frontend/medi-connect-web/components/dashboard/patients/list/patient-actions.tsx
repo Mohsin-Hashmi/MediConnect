@@ -1,25 +1,40 @@
-import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
+"use client";
+
+import { Eye, MoreVertical } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import type { PatientRecord } from "@/types/patient";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { PatientActionsProps } from "@/types/patient";
 
-interface Props {
-  patient: PatientRecord;
-  onView: (patient: PatientRecord) => void;
-  onEdit: (patient: PatientRecord) => void;
-  onDelete: (patient: PatientRecord) => void;
-}
-
-export function PatientActions({ patient, onView, onEdit, onDelete }: Props) {
+export function PatientActions({ patient, onView }: PatientActionsProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button type="button" variant="outline" size="icon" className="size-9" aria-label={`Actions for ${patient.name}`} />}><MoreVertical className="size-4" aria-hidden="true" /></DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-9"
+            aria-label={`Actions for ${patient.name}`}
+          />
+        }
+      >
+        <MoreVertical className="size-4" aria-hidden="true" />
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-36 p-1.5">
-        <DropdownMenuItem onClick={() => onView(patient)}><Eye className="size-4" />View</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onEdit(patient)}><Pencil className="size-4" />Edit</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={() => onDelete(patient)}><Trash2 className="size-4" />Delete</DropdownMenuItem>
+        <DropdownMenuItem
+          className="min-h-9 gap-2 px-2.5"
+          onClick={() => onView(patient)}
+        >
+          <Eye className="size-4" aria-hidden="true" />
+          View
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

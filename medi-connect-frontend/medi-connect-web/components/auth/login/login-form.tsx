@@ -2,7 +2,7 @@
 
 import { Form, Formik, type FormikHelpers } from "formik";
 import { isAxiosError } from "axios";
-import { ArrowRight, AtSign, LoaderCircle, ShieldCheck } from "lucide-react";
+import { ArrowRight, AtSign, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLogin } from "@/hooks/apis/auth/use-auth";
 import { saveAccessToken } from "@/lib/auth-storage";
@@ -46,7 +47,9 @@ export function LoginForm() {
       const response = await loginMutation(payload);
       saveAccessToken(response.data.accessToken, values.remember);
       toast.success(response.message || "Signed in successfully.");
-      router.replace("/");
+      router.replace(
+        response.data.user.role === "doctor" ? "/dashboard" : "/",
+      );
     } catch (error) {
       const message = isAxiosError<ApiErrorResponse>(error)
         ? (error.response?.data.message ??
@@ -193,7 +196,7 @@ export function LoginForm() {
               disabled={isSubmitting || isPending}
             >
               {isPending ? (
-                <LoaderCircle className="animate-spin" aria-hidden="true" />
+                <Spinner aria-label="Signing in" />
               ) : (
                 <>
                   Sign In

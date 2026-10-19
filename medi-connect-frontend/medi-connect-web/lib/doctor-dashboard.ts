@@ -2,9 +2,11 @@ import { addDays, format, startOfWeek } from "date-fns";
 
 import type { AppointmentRecord } from "@/types/appointment";
 import type {
+  AppointmentWeekdayActivity,
   DashboardMetricsData,
-  WeeklyAppointmentActivity,
 } from "@/types/doctor-dashboard";
+
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 function appointmentDateTime(appointment: AppointmentRecord): Date {
   return new Date(`${appointment.date}T${appointment.time}:00`);
@@ -74,31 +76,36 @@ export function getDashboardMetrics(
   };
 }
 
-export function getWeeklyAppointmentActivity(
+function getWeekdayIndex(date: string): number | null {
+  const [year, month, day] = date.split("-").map(Number);
+  if (!year || !month || !day) return null;
+
+  const appointmentDate = new Date(year, month - 1, day);
+  if (Number.isNaN(appointmentDate.getTime())) return null;
+
+  return (appointmentDate.getDay() + 6) % 7;
+}
+
+/** Groups all loaded appointment records by weekday and terminal status. */
+export function getAppointmentActivityByWeekday(
   appointments: readonly AppointmentRecord[],
-  now = new Date(),
-): WeeklyAppointmentActivity[] {
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+): AppointmentWeekdayActivity[] {
+  const activity = WEEKDAYS.map((day) => ({
+    day,
+    completed: 0,
+    confirmed: 0,
+    cancelled: 0,
+  }));
 
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = addDays(weekStart, index);
-    const dateKey = format(date, "yyyy-MM-dd");
-    const dayAppointments = appointments.filter(
-      (appointment) => appointment.date === dateKey,
-    );
+  appointments.forEach((appointment) => {
+    const weekdayIndex = getWeekdayIndex(appointment.date);
+    if (weekdayIndex === null) return;
 
-    return {
-      day: format(date, "EEE"),
-      date: dateKey,
-      completed: dayAppointments.filter(
-        (appointment) => appointment.status === "completed",
-      ).length,
-      confirmed: dayAppointments.filter(
-        (appointment) => appointment.status === "confirmed",
-      ).length,
-      cancelled: dayAppointments.filter(
-        (appointment) => appointment.status === "cancelled",
-      ).length,
-    };
+    const dayActivity = activity[weekdayIndex];
+    if (appointment.status === "completed") dayActivity.completed += 1;
+    if (appointment.status === "confirmed") dayActivity.confirmed += 1;
+    if (appointment.status === "cancelled") dayActivity.cancelled += 1;
   });
+
+  return activity;
 }

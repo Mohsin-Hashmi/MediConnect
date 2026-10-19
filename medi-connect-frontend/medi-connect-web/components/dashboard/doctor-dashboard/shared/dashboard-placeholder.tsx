@@ -1,10 +1,15 @@
 import type { DashboardPlaceholderProps } from "@/types/doctor-dashboard";
 
-export function DashboardPlaceholder({ title, icon: Icon }: DashboardPlaceholderProps) {
+export function DashboardPlaceholder({
+  title,
+  icon: Icon,
+}: DashboardPlaceholderProps) {
   return (
     <section className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-7">
-        <p className="text-xs font-medium text-muted-foreground">Doctor Portal / {title}</p>
+        <p className="text-xs font-medium text-muted-foreground">
+          Doctor Portal / {title}
+        </p>
         <h1 className="mt-2 font-heading text-2xl font-bold tracking-tight sm:text-3xl">
           {title}
         </h1>

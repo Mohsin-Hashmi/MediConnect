@@ -18,25 +18,47 @@ const chartConfig = {
   cancelled: { label: "Cancelled", color: "#f59e0b" },
 } satisfies ChartConfig;
 
-export function WeeklyActivityChart({
-  activity,
-}: WeeklyActivityChartProps) {
+export function WeeklyActivityChart({ activity }: WeeklyActivityChartProps) {
   return (
     <ChartContainer
       config={chartConfig}
       className="h-64 min-h-64 w-full aspect-auto sm:h-72"
       role="img"
-      aria-label="Weekly appointment counts by day for completed, confirmed, and cancelled visits"
+      aria-label="Appointment counts grouped by weekday for completed, confirmed, and cancelled visits"
     >
-      <BarChart accessibilityLayer data={activity} margin={{ top: 12, right: 4, bottom: 4, left: -24 }}>
+      <BarChart
+        accessibilityLayer
+        data={activity}
+        margin={{ top: 12, right: 4, bottom: 4, left: -24 }}
+      >
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={9} />
-        <YAxis allowDecimals={false} tickLine={false} axisLine={false} tickMargin={8} />
+        <YAxis
+          allowDecimals={false}
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
-        <Bar dataKey="completed" fill="var(--color-completed)" radius={[4, 4, 0, 0]} maxBarSize={18} />
-        <Bar dataKey="confirmed" fill="var(--color-confirmed)" radius={[4, 4, 0, 0]} maxBarSize={18} />
-        <Bar dataKey="cancelled" fill="var(--color-cancelled)" radius={[4, 4, 0, 0]} maxBarSize={18} />
+        <Bar
+          dataKey="completed"
+          fill="var(--color-completed)"
+          radius={[4, 4, 0, 0]}
+          maxBarSize={18}
+        />
+        <Bar
+          dataKey="confirmed"
+          fill="var(--color-confirmed)"
+          radius={[4, 4, 0, 0]}
+          maxBarSize={18}
+        />
+        <Bar
+          dataKey="cancelled"
+          fill="var(--color-cancelled)"
+          radius={[4, 4, 0, 0]}
+          maxBarSize={18}
+        />
       </BarChart>
     </ChartContainer>
   );

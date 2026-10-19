@@ -5,7 +5,6 @@ import { isAxiosError } from "axios";
 import {
   AtSign,
   KeyRound,
-  LoaderCircle,
   UserRoundPlus,
   User,
 } from "lucide-react";
@@ -18,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRegister } from "@/hooks/apis/auth/use-auth";
 import { saveAccessToken } from "@/lib/auth-storage";
@@ -270,7 +270,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || isPending}
               >
                 {isPending ? (
-                  <LoaderCircle className="animate-spin" aria-hidden="true" />
+                  <Spinner aria-label="Creating account" />
                 ) : (
                   <>
                     <UserRoundPlus aria-hidden="true" />

@@ -1,123 +1,100 @@
-import { Clock3, Pencil, Plus, Trash2, Video, Building2 } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { Clock3 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import type { WeeklyScheduleProps } from "@/types/availability";
+import { Error } from "@/components/common/error";
+import { Loader } from "@/components/common/loader";
+import { NoDataFound } from "@/components/common/no-data-found";
+import { StatusBadge } from "@/components/common/status-badge";
+import { AvailabilityActions } from "@/components/dashboard/availability/list/availability-actions";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { AvailabilityScheduleProps } from "@/types/availability";
 
 export function WeeklySchedule({
-  days,
-  onToggle,
+  availabilities,
+  isLoading,
+  error,
+  onRetry,
   onEdit,
-  onRemove,
-}: WeeklyScheduleProps) {
+  onDelete,
+  onResetFilters,
+}: AvailabilityScheduleProps) {
+  if (isLoading) return <Loader label="Loading availability..." />;
+  if (error)
+    return (
+      <Error
+        title="Could not load availability"
+        message={error}
+        onRetry={onRetry}
+      />
+    );
+  if (availabilities.length === 0)
+    return (
+      <NoDataFound
+        title="No availability found"
+        description={
+          onResetFilters
+            ? "Try a different search or clear the current filters."
+            : "Add your first dated availability window so patients can book."
+        }
+        actionLabel={onResetFilters ? "Clear filters" : undefined}
+        onAction={onResetFilters}
+      />
+    );
+
   return (
-    <Card className="gap-0 border border-slate-200 bg-white py-0 shadow-sm xl:h-full">
-      <CardHeader className="flex flex-row items-start justify-between gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
-        <div>
-          <CardTitle className="text-base font-semibold">
-            Weekly operating schedule
-          </CardTitle>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Set one or more consultation windows for each day.
-          </p>
-        </div>
-        <Badge variant="secondary" className="shrink-0">
-          {days.filter((day) => day.enabled).length} days active
-        </Badge>
-      </CardHeader>
-      <CardContent className="divide-y divide-slate-100 px-5 sm:px-6 xl:flex xl:flex-1 xl:flex-col">
-        {days.map((day, dayIndex) => (
-          <div
-            key={day.day}
-            className="grid gap-3 py-4 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4 xl:min-h-20 xl:flex-1 xl:items-center"
-          >
-            <div className="flex items-center gap-3 sm:pt-2 xl:pt-0">
-              <Switch
-                checked={day.enabled}
-                onCheckedChange={(checked) => onToggle(dayIndex, checked)}
-                aria-label={`${day.enabled ? "Disable" : "Enable"} ${day.day}`}
-              />
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  {day.day}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {day.enabled
-                    ? `${day.ranges.length} ${day.ranges.length === 1 ? "window" : "windows"}`
-                    : "Day off"}
-                </p>
-              </div>
-            </div>
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
-              {day.enabled ? (
-                <>
-                  {day.ranges.map((range) => (
-                    <div
-                      key={range.id}
-                      className="flex min-h-14 min-w-0 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
-                    >
-                      {range.mode === "Video" ? (
-                        <Video
-                          className="size-4 shrink-0 text-violet-600"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <Building2
-                          className="size-4 shrink-0 text-blue-600"
-                          aria-hidden="true"
-                        />
-                      )}
-                      <div className="min-w-0">
-                        <p className="font-medium text-slate-900">
-                          {range.startTime}–{range.endTime}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {range.mode}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="ml-1 text-slate-600"
-                        aria-label={`Edit ${day.day} ${range.startTime} range`}
-                        onClick={() => onEdit({ dayIndex, rangeId: range.id })}
-                      >
-                        <Pencil className="size-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-slate-600 hover:text-destructive"
-                        aria-label={`Remove ${day.day} ${range.startTime} range`}
-                        onClick={() => onRemove(dayIndex, range.id)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 border-dashed px-3 text-primary"
-                    onClick={() => onEdit({ dayIndex })}
-                  >
-                    <Plus className="size-4" /> Add time range
-                  </Button>
-                </>
-              ) : (
-                <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <Clock3 className="size-4" aria-hidden="true" /> No
-                  consultations scheduled
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader className="bg-slate-50/90">
+          <TableRow>
+            <TableHead className="pl-5">Date</TableHead>
+            <TableHead>Time window</TableHead>
+            <TableHead>Slot duration</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="pr-5 text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {availabilities.map((availability) => (
+              <TableRow key={availability.id}>
+                <TableCell className="min-w-44 pl-5">
+                  <p className="font-semibold">
+                    {format(parseISO(availability.date), "EEEE")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(parseISO(availability.date), "d MMMM yyyy")}
+                  </p>
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center gap-2 font-medium">
+                    <Clock3 className="size-4 text-primary" />
+                    {availability.startTime} - {availability.endTime}
+                  </span>
+                </TableCell>
+                <TableCell>{availability.slotDuration} minutes</TableCell>
+                <TableCell>
+                  <StatusBadge
+                    status={availability.isAvailable ? "Available" : "Paused"}
+                    tone={availability.isAvailable ? "success" : "neutral"}
+                  />
+                </TableCell>
+                <TableCell className="pr-5 text-right">
+                  <AvailabilityActions
+                    availability={availability}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

@@ -1,10 +1,9 @@
 import {
-  UserRoundCheck,
-  UserRoundPlus,
-  UserRoundX,
+  CalendarCheck2,
+  CalendarClock,
+  ClipboardCheck,
   UsersRound,
 } from "lucide-react";
-
 import { Card, CardContent } from "@/components/ui/card";
 import type { PatientMetricsData } from "@/types/patient";
 
@@ -13,30 +12,30 @@ export function PatientMetrics({ metrics }: { metrics: PatientMetricsData }) {
     {
       label: "Total patients",
       value: metrics.total,
-      detail: "Records in the directory",
+      detail: "Connected through appointments",
       icon: UsersRound,
       color: "bg-blue-50 text-primary",
     },
     {
-      label: "Active patients",
-      value: metrics.active,
-      detail: "Currently marked active",
-      icon: UserRoundCheck,
-      color: "bg-emerald-50 text-emerald-700",
+      label: "Appointments",
+      value: metrics.appointments,
+      detail: "Across these patients",
+      icon: CalendarCheck2,
+      color: "bg-indigo-50 text-indigo-600",
     },
     {
-      label: "Inactive patients",
-      value: metrics.inactive,
-      detail: "Currently marked inactive",
-      icon: UserRoundX,
+      label: "Upcoming",
+      value: metrics.upcoming,
+      detail: "Pending or confirmed",
+      icon: CalendarClock,
       color: "bg-amber-50 text-amber-700",
     },
     {
-      label: "New registrations",
-      value: metrics.recentlyRegistered,
-      detail: "Within the past 30 days",
-      icon: UserRoundPlus,
-      color: "bg-indigo-50 text-indigo-600",
+      label: "Completed",
+      value: metrics.completed,
+      detail: "Completed consultations",
+      icon: ClipboardCheck,
+      color: "bg-emerald-50 text-emerald-700",
     },
   ];
   return (
@@ -55,12 +54,12 @@ export function PatientMetrics({ metrics }: { metrics: PatientMetricsData }) {
                 {label}
               </p>
               <span
-                className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${color}`}
+                className={`flex size-9 items-center justify-center rounded-lg ${color}`}
               >
-                <Icon className="size-4.5" aria-hidden="true" />
+                <Icon className="size-4.5" />
               </span>
             </div>
-            <p className="mt-3 text-3xl font-bold tracking-tight tabular-nums">
+            <p className="mt-3 text-3xl font-bold tabular-nums">
               {value.toLocaleString()}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">{detail}</p>

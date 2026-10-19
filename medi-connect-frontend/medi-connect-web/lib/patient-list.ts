@@ -1,58 +1,57 @@
 import type {
+  ApiDoctorPatient,
   PatientFilters,
   PatientMetricsData,
   PatientRecord,
 } from "@/types/patient";
 
-function matchesAgeGroup(
-  patient: PatientRecord,
-  ageGroup: PatientFilters["ageGroup"],
-): boolean {
-  if (ageGroup === "all") return true;
-  if (ageGroup === "under-18") return patient.age < 18;
-  if (ageGroup === "18-39") return patient.age >= 18 && patient.age <= 39;
-  if (ageGroup === "40-59") return patient.age >= 40 && patient.age <= 59;
-  return patient.age >= 60;
+function normalizeGender(value: string | null): string | null {
+  if (!value) return null;
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 }
 
-function matchesPatientSearch(patient: PatientRecord, query: string): boolean {
-  if (!query) return true;
-
-  return [patient.name, patient.id, patient.email, patient.careFocus].some(
-    (value) => value.toLowerCase().includes(query),
-  );
+function calculateAge(dateOfBirth?: string | null): number | null {
+  if (!dateOfBirth) return null;
+  const birthDate = new Date(dateOfBirth);
+  if (Number.isNaN(birthDate.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  if (
+    today.getMonth() < birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() &&
+      today.getDate() < birthDate.getDate())
+  )
+    age -= 1;
+  return age >= 0 ? age : null;
 }
 
-function matchesPatientFilters(
-  patient: PatientRecord,
-  filters: PatientFilters,
-  query: string,
-): boolean {
-  return (
-    matchesPatientSearch(patient, query) &&
-    (filters.gender === "all" || patient.gender === filters.gender) &&
-    (filters.status === "all" || patient.status === filters.status) &&
-    matchesAgeGroup(patient, filters.ageGroup)
-  );
-}
-
-export function getPatientMetrics(
-  patients: readonly PatientRecord[],
-  referenceDate: string,
-): PatientMetricsData {
-  const recentStart = new Date(`${referenceDate}T12:00:00`);
-  recentStart.setDate(recentStart.getDate() - 30);
-  const start = recentStart.toISOString().slice(0, 10);
+export function mapDoctorPatientFromApi(item: ApiDoctorPatient): PatientRecord {
   return {
-    total: patients.length,
-    active: patients.filter((patient) => patient.status === "active").length,
-    inactive: patients.filter((patient) => patient.status === "inactive")
-      .length,
-    recentlyRegistered: patients.filter(
-      (patient) =>
-        patient.registeredAt >= start && patient.registeredAt <= referenceDate,
-    ).length,
+    id: item.patient.id,
+    name: item.patient.name,
+    age: calculateAge(item.patient.dateOfBirth),
+    gender: normalizeGender(item.patient.gender ?? null),
+    email: item.patient.email,
+    phone: item.patient.phone ?? null,
+    profileImage: item.patient.profileImage ?? null,
+    latestReason:
+      item.appointmentSummary.latest.reason?.trim() || "No reason provided",
+    latestAppointmentDate: item.appointmentSummary.latest.date,
+    latestAppointmentStatus:
+      item.appointmentSummary.latest.status.toLowerCase() as PatientRecord["latestAppointmentStatus"],
+    appointmentCount: item.appointmentSummary.total,
+    upcomingAppointmentCount: item.appointmentSummary.upcoming,
+    completedAppointmentCount: item.appointmentSummary.completed,
   };
+}
+
+function matchesAge(patient: PatientRecord, group: PatientFilters["ageGroup"]) {
+  if (group === "all") return true;
+  if (patient.age === null) return false;
+  if (group === "under-18") return patient.age < 18;
+  if (group === "18-39") return patient.age <= 39;
+  if (group === "40-59") return patient.age <= 59;
+  return patient.age >= 60;
 }
 
 export function getFilteredPatients(
@@ -60,14 +59,45 @@ export function getFilteredPatients(
   filters: PatientFilters,
 ): PatientRecord[] {
   const query = filters.search.trim().toLowerCase();
-
   return patients
-    .filter((patient) => matchesPatientFilters(patient, filters, query))
-    .sort((a, b) => {
-      if (filters.sort === "name") return a.name.localeCompare(b.name);
+    .filter((patient) => {
+      const values = [
+        patient.name,
+        patient.id,
+        patient.email ?? "",
+        patient.latestReason,
+      ];
       return (
-        b.registeredAt.localeCompare(a.registeredAt) ||
-        a.name.localeCompare(b.name)
+        (!query ||
+          values.some((value) => value.toLowerCase().includes(query))) &&
+        (filters.gender === "all" || patient.gender === filters.gender) &&
+        matchesAge(patient, filters.ageGroup)
       );
-    });
+    })
+    .sort((a, b) =>
+      filters.sort === "name"
+        ? a.name.localeCompare(b.name)
+        : b.latestAppointmentDate.localeCompare(a.latestAppointmentDate) ||
+          a.name.localeCompare(b.name),
+    );
+}
+
+export function getPatientMetrics(
+  patients: readonly PatientRecord[],
+): PatientMetricsData {
+  return {
+    total: patients.length,
+    appointments: patients.reduce(
+      (total, patient) => total + patient.appointmentCount,
+      0,
+    ),
+    upcoming: patients.reduce(
+      (total, patient) => total + patient.upcomingAppointmentCount,
+      0,
+    ),
+    completed: patients.reduce(
+      (total, patient) => total + patient.completedAppointmentCount,
+      0,
+    ),
+  };
 }

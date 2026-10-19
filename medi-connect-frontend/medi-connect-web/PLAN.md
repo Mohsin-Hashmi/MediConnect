@@ -15,24 +15,24 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Doctor dashboard | Shared sidebar/topbar with API-backed appointment metrics, today’s schedule, next appointment, and weekly activity. |
 | Appointments | Doctor-scoped API list/detail data with filtering, sorting, pagination, PDF export, and confirm/complete/cancel actions. Doctors cannot create, arbitrarily edit, or delete patient bookings. |
 | Calendar | Day/week/month views and appointment details backed by the same TanStack Query appointment cache as Appointments. Blocked-time data is not displayed until an authoritative API is connected. |
-| Patients | Separate fictional read-only directory, derived metrics, search/filter/sort, 10-row pagination, details, create/edit/delete form previews, and PDF export. Submitting forms does not mutate records or call an API. |
-| Availability | UI-first schedule preview with editable booking preferences, day switches, time-range and blocked-date form previews, validation, and a calculated local capacity summary. Add/edit/delete actions do not change schedule records; nothing is saved or published or alters Calendar openings. |
+| Patients | Read-only doctor-scoped API directory of patients connected through assigned appointments, with metrics, search/filter/sort, 10-row pagination, details, and PDF export. Patient account creation and profile management stay in the patient flow. |
+| Availability | Doctor-scoped API list/create/update/delete for dated bookable windows, with Formik/Yup validation, status, slot capacity, loading/error/empty states, and confirmation before deletion. |
 | Other doctor portal links | Profile, Reviews, Earnings, Messages, Notifications, and Settings remain placeholders. |
 
-Patients own appointment creation through the patient-only backend booking endpoint. The doctor portal reads assigned bookings and performs only supported status transitions. The patient dashboard booking UI is not built yet. Patient-directory forms and availability controls remain UI previews.
+Patients own appointment creation through the patient-only backend booking endpoint. The doctor portal reads assigned bookings, exposes connected patients as read-only, manages dated availability, and performs only supported appointment status transitions. The patient dashboard booking UI is not built yet.
 
 ## Near-term priorities
 
 1. **Review the current UI and code with the project owner.** Address specific feedback before expanding the module surface.
 2. **Build the patient booking journey.** Use the existing patient-only booking contract and authoritative doctor availability; keep booking validation on the server.
 3. **Finish scheduling contracts.** Define visit mode, fee snapshots, timezone behavior, conflict guarantees, and patient notification rules before displaying those fields as authoritative appointment data.
-4. **Connect Availability to scheduling contracts when agreed.** Replace the draft-only preview with an authoritative schedule API and make Calendar use that source for blocks and openings. Connect Patients to an authoritative API only after the patient-directory authorization contract is defined.
+4. **Build the patient booking experience.** Consume doctor availability from the patient dashboard and keep booking ownership outside the doctor portal.
 5. **Add automated coverage for scheduling rules and key user flows.** No test runner is configured today; choose one as part of a specific approved task.
 
 ## Current scope and non-goals
 
 - Current development is frontend-first and can use clearly labeled mock data for unfinished modules.
-- Appointment reads and doctor status actions are integrated. Availability, patient-directory, payment, telemedicine, messaging, and notification UI must not be treated as integrated merely because controls or routes exist.
+- Appointment reads, doctor status actions, dated availability, and the appointment-derived read-only patient directory are integrated. Payment, telemedicine, messaging, and notification UI must not be treated as integrated merely because controls or routes exist.
 - Do not treat browser session storage as a secure health-record store or as multi-device persistence.
 - Do not make regulatory, security, or verification promises in product copy without confirmed implementation and review.
 - Do not build all sidebar modules at once or expand the patient experience without a specific approved design and workflow.

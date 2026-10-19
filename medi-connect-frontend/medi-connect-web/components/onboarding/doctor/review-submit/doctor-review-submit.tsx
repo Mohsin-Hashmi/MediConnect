@@ -10,7 +10,6 @@ import {
   Banknote,
   Building2,
   GraduationCap,
-  LoaderCircle,
   Pencil,
   Save,
   ShieldCheck,
@@ -33,6 +32,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import {
   PROFESSIONAL_INFO_STORAGE_KEY,
   REVIEW_SUBMISSION_STORAGE_KEY,
@@ -453,13 +453,7 @@ export function DoctorReviewSubmit() {
                     }
                   >
                     {isPending ? (
-                      <>
-                        <LoaderCircle
-                          className="animate-spin"
-                          aria-hidden="true"
-                        />
-                        Submitting Profile...
-                      </>
+                      <Spinner aria-label="Submitting profile" />
                     ) : (
                       <>
                         Submit Profile for Verification

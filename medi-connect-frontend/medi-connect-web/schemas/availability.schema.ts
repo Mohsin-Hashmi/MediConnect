@@ -1,42 +1,45 @@
 import * as Yup from "yup";
 
+const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 export const availabilitySchema = Yup.object({
-  acceptingAppointments: Yup.boolean().required(),
-  durationMinutes: Yup.number().integer().min(15).max(120).required(),
-  bufferMinutes: Yup.number().integer().min(0).max(60).required(),
-  clinicName: Yup.string().trim().required("Clinic name is required."),
-  timezone: Yup.string().required(),
-  days: Yup.array()
-    .of(
-      Yup.object({
-        day: Yup.string().required(),
-        enabled: Yup.boolean().required(),
-        ranges: Yup.array()
-          .of(
-            Yup.object({
-              id: Yup.string().required(),
-              startTime: Yup.string()
-                .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
-                .required(),
-              endTime: Yup.string()
-                .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
-                .required(),
-              mode: Yup.string().oneOf(["In-person", "Video"]).required(),
-            }),
-          )
-          .required(),
-      }),
+  date: Yup.string().required("Date is required."),
+  startTime: Yup.string()
+    .matches(timePattern, "Choose a valid start time.")
+    .required("Start time is required."),
+  endTime: Yup.string()
+    .matches(timePattern, "Choose a valid end time.")
+    .required("End time is required.")
+    .test(
+      "after-start",
+      "End time must be after start time.",
+      function (value) {
+        return Boolean(
+          value && this.parent.startTime && value > this.parent.startTime,
+        );
+      },
+    ),
+  slotDuration: Yup.number()
+    .typeError("Slot duration is required.")
+    .integer("Use a whole number of minutes.")
+    .min(5, "Use at least 5 minutes.")
+    .max(240, "Use no more than 240 minutes.")
+    .test(
+      "fits-window",
+      "Slot duration must fit inside the time window.",
+      function (value) {
+        if (!value || !this.parent.startTime || !this.parent.endTime)
+          return true;
+        const toMinutes = (time: string) => {
+          const [hours, minutes] = time.split(":").map(Number);
+          return hours * 60 + minutes;
+        };
+        return (
+          value <=
+          toMinutes(this.parent.endTime) - toMinutes(this.parent.startTime)
+        );
+      },
     )
-    .required(),
-  blocks: Yup.array()
-    .of(
-      Yup.object({
-        id: Yup.string().required(),
-        date: Yup.string()
-          .matches(/^\d{4}-\d{2}-\d{2}$/)
-          .required(),
-        reason: Yup.string().trim().required(),
-      }),
-    )
-    .required(),
+    .required("Slot duration is required."),
+  isAvailable: Yup.boolean().required(),
 });

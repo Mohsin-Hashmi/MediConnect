@@ -13,15 +13,9 @@ import type {
   DoctorAppointmentsResponse,
 } from "@/types/appointment";
 
-export const appointmentQueryKeys = {
-  all: ["doctor", "appointments"] as const,
-  detail: (appointmentId: string) =>
-    [...appointmentQueryKeys.all, appointmentId] as const,
-};
-
 export function useDoctorAppointments() {
   return useQuery({
-    queryKey: appointmentQueryKeys.all,
+    queryKey: ["doctor", "appointments"],
     queryFn: async () => {
       const response = await AXIOS.get<DoctorAppointmentsResponse>(
         "/appointments/doctor",
@@ -34,7 +28,7 @@ export function useDoctorAppointments() {
 
 export function useDoctorAppointment(appointmentId?: string) {
   return useQuery({
-    queryKey: appointmentQueryKeys.detail(appointmentId ?? ""),
+    queryKey: ["doctor", "appointments", appointmentId ?? ""],
     enabled: Boolean(appointmentId),
     queryFn: async () => {
       const response = await AXIOS.get<DoctorAppointmentResponse>(
@@ -63,12 +57,13 @@ function useStatusMutation(endpoint: "confirm" | "complete") {
     onSuccess: async (_data, appointmentId) => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: appointmentQueryKeys.all,
+          queryKey: ["doctor", "appointments"],
           exact: true,
         }),
         queryClient.invalidateQueries({
-          queryKey: appointmentQueryKeys.detail(appointmentId),
+          queryKey: ["doctor", "appointments", appointmentId],
         }),
+        queryClient.invalidateQueries({ queryKey: ["doctor", "patients"] }),
       ]);
     },
   });
@@ -100,12 +95,13 @@ export function useCancelAppointment() {
     onSuccess: async (_data, { appointmentId }) => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: appointmentQueryKeys.all,
+          queryKey: ["doctor", "appointments"],
           exact: true,
         }),
         queryClient.invalidateQueries({
-          queryKey: appointmentQueryKeys.detail(appointmentId),
+          queryKey: ["doctor", "appointments", appointmentId],
         }),
+        queryClient.invalidateQueries({ queryKey: ["doctor", "patients"] }),
       ]);
     },
   });

@@ -1,71 +1,182 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
+import { format, parseISO } from "date-fns";
+import { useFormik } from "formik";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { TimeRangeDialogProps, VisitMode } from "@/types/availability";
+import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
+import { availabilitySchema } from "@/schemas/availability.schema";
+import type {
+  AvailabilityFormValues,
+  TimeRangeDialogProps,
+} from "@/types/availability";
+
+function today() {
+  return format(new Date(), "yyyy-MM-dd");
+}
 
 export function TimeRangeDialog({
   open,
-  day,
-  range,
+  availability,
+  isPending,
   onOpenChange,
   onSave,
 }: TimeRangeDialogProps) {
-  const [startTime, setStartTime] = useState(range?.startTime ?? "09:00");
-  const [endTime, setEndTime] = useState(range?.endTime ?? "12:00");
-  const [mode, setMode] = useState<VisitMode>(range?.mode ?? "In-person");
+  const formik = useFormik<AvailabilityFormValues>({
+    initialValues: {
+      date: availability
+        ? format(parseISO(availability.date), "yyyy-MM-dd")
+        : today(),
+      startTime: availability?.startTime ?? "09:00",
+      endTime: availability?.endTime ?? "13:00",
+      slotDuration: String(availability?.slotDuration ?? 30),
+      isAvailable: availability?.isAvailable ?? true,
+    },
+    validationSchema: availabilitySchema,
+    onSubmit: onSave,
+  });
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!startTime || !endTime || startTime >= endTime) {
-      toast.error("End time must be later than start time.");
-      return;
-    }
-    onSave({ startTime, endTime, mode });
-    onOpenChange(false);
-  }
-
+  const error = (name: keyof AvailabilityFormValues) =>
+    formik.touched[name] ? formik.errors[name] : undefined;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{range ? "Edit" : "Add"} {day} time range</DialogTitle>
+          <DialogTitle>
+            {availability ? "Edit availability" : "Add availability"}
+          </DialogTitle>
           <DialogDescription>
-            Preview the hours and consultation mode. The schedule will not change.
+            Set a dated window and the duration of each patient-bookable slot.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="space-y-5">
+        <form onSubmit={formik.handleSubmit} className="space-y-5" noValidate>
+          <div className="space-y-2">
+            <Label htmlFor="availability-date">
+              Date <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="availability-date"
+              name="date"
+              type="date"
+              min={today()}
+              value={formik.values.date}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              aria-invalid={Boolean(error("date"))}
+              className="h-11"
+            />
+            {error("date") ? (
+              <p className="text-xs text-destructive">{error("date")}</p>
+            ) : null}
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="range-start">Start time</Label>
-              <Input id="range-start" type="time" required value={startTime} onChange={(event) => setStartTime(event.target.value)} className="mt-2 h-11" />
+              <Label htmlFor="availability-start">
+                Start time <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="availability-start"
+                name="startTime"
+                type="time"
+                value={formik.values.startTime}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                aria-invalid={Boolean(error("startTime"))}
+                className="h-11"
+              />
+              {error("startTime") ? (
+                <p className="text-xs text-destructive">{error("startTime")}</p>
+              ) : null}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="range-end">End time</Label>
-              <Input id="range-end" type="time" required value={endTime} onChange={(event) => setEndTime(event.target.value)} className="mt-2 h-11" />
+              <Label htmlFor="availability-end">
+                End time <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="availability-end"
+                name="endTime"
+                type="time"
+                value={formik.values.endTime}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                aria-invalid={Boolean(error("endTime"))}
+                className="h-11"
+              />
+              {error("endTime") ? (
+                <p className="text-xs text-destructive">{error("endTime")}</p>
+              ) : null}
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="range-mode">Consultation mode</Label>
-            <Select value={mode} onValueChange={(value) => setMode(value as VisitMode)}>
-              <SelectTrigger id="range-mode" className="h-11 w-full border-slate-300 bg-white px-3 text-sm font-medium">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent align="start" alignItemWithTrigger={false} side="bottom" sideOffset={8} className="rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-                <SelectItem value="In-person" className="min-h-10 rounded-lg py-2 pr-9 pl-3 text-sm data-selected:bg-blue-50 data-selected:text-primary">In-person</SelectItem>
-                <SelectItem value="Video" className="min-h-10 rounded-lg py-2 pr-9 pl-3 text-sm data-selected:bg-blue-50 data-selected:text-primary">Video</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="slot-duration">
+              Slot duration (minutes){" "}
+              <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="slot-duration"
+              name="slotDuration"
+              type="number"
+              min={5}
+              max={240}
+              step={5}
+              value={formik.values.slotDuration}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              aria-invalid={Boolean(error("slotDuration"))}
+              className="h-11"
+            />
+            {error("slotDuration") ? (
+              <p className="text-xs text-destructive">
+                {error("slotDuration")}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Patients will choose one slot of this length.
+              </p>
+            )}
+          </div>
+          <div className="flex items-center justify-between rounded-xl border bg-slate-50 p-4">
+            <div>
+              <Label htmlFor="availability-active">Available for booking</Label>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Turn this off to keep the window without accepting bookings.
+              </p>
+            </div>
+            <Switch
+              id="availability-active"
+              checked={formik.values.isAvailable}
+              onCheckedChange={(checked) =>
+                void formik.setFieldValue("isAvailable", checked)
+              }
+            />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">Preview range</Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isPending}
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending
+                ? <Spinner aria-label="Saving availability" />
+                : availability
+                  ? "Save changes"
+                  : "Create availability"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

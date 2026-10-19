@@ -1,42 +1,42 @@
-import { Plus } from "lucide-react";
-
 import { PdfExportButton } from "@/components/common/pdf-export-button";
-import { Button } from "@/components/ui/button";
 import type { PatientPageHeaderProps } from "@/types/patient";
 
-export function PatientPageHeader({ patients, onNewPatient }: PatientPageHeaderProps) {
+export function PatientPageHeader({ patients }: PatientPageHeaderProps) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Patients</h1>
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Patients
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Browse and manage patient records in one place.
+          View patients connected to your practice through appointments.
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <PdfExportButton
-          title="Patient directory"
-          subtitle={`${patients.length} records | Filters currently applied | Current directory view`}
-          filename="mediconnect-patients"
-          headers={["Patient ID", "Name", "Age", "Gender", "Care focus", "Registered", "Status"]}
-          rows={patients.map((patient) => [
-            patient.id,
-            patient.name,
-            String(patient.age),
-            patient.gender,
-            patient.careFocus,
-            patient.registeredAt,
-            patient.status,
-          ])}
-          label="Export patients"
-          className="h-10 gap-2 px-4 text-sm"
-        />
-        <Button type="button" className="h-10 gap-2 px-4 text-sm" onClick={onNewPatient}>
-          <Plus className="size-4" aria-hidden="true" />New patient
-        </Button>
-      </div>
+      <PdfExportButton
+        title="Patient directory"
+        subtitle={`${patients.length} patients in the current view`}
+        filename="mediconnect-patients"
+        headers={[
+          "Patient ID",
+          "Name",
+          "Age",
+          "Gender",
+          "Email",
+          "Latest appointment",
+          "Appointments",
+        ]}
+        rows={patients.map((patient) => [
+          patient.id,
+          patient.name,
+          patient.age?.toString() ?? "",
+          patient.gender ?? "",
+          patient.email ?? "",
+          patient.latestAppointmentDate,
+          patient.appointmentCount.toString(),
+        ])}
+        label="Export patients"
+        className="h-10 px-4 text-sm"
+      />
     </div>
   );
 }

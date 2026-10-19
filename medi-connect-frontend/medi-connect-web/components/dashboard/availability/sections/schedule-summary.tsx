@@ -1,64 +1,91 @@
 import {
-  Building2,
-  CalendarOff,
-  CalendarRange,
+  CalendarCheck2,
+  CalendarDays,
   Clock3,
-  Globe2,
+  PauseCircle,
 } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getWeeklyCapacity } from "@/lib/availability-schedule";
-import type { AvailabilityValues } from "@/types/availability";
+import { Card, CardContent } from "@/components/ui/card";
+import type { AvailabilityRecord } from "@/types/availability";
 
-export function ScheduleSummary({ values }: { values: AvailabilityValues }) {
-  const activeDays = values.days.filter((day) => day.enabled).length;
-  const capacity = getWeeklyCapacity(values);
+function minutes(time: string) {
+  const [hours, mins] = time.split(":").map(Number);
+  return hours * 60 + mins;
+}
+
+export function ScheduleSummary({
+  availabilities,
+}: {
+  availabilities: AvailabilityRecord[];
+}) {
+  const active = availabilities.filter((item) => item.isAvailable);
+  const days = new Set(active.map((item) => item.date.slice(0, 10))).size;
+  const slots = active.reduce(
+    (total, item) =>
+      total +
+      Math.floor(
+        (minutes(item.endTime) - minutes(item.startTime)) / item.slotDuration,
+      ),
+    0,
+  );
+  const items = [
+    {
+      label: "Published windows",
+      value: active.length,
+      note: "Currently accepting bookings",
+      icon: CalendarCheck2,
+      color: "bg-blue-50 text-primary",
+    },
+    {
+      label: "Available dates",
+      value: days,
+      note: "Distinct bookable dates",
+      icon: CalendarDays,
+      color: "bg-indigo-50 text-indigo-600",
+    },
+    {
+      label: "Potential slots",
+      value: slots,
+      note: "Calculated from window duration",
+      icon: Clock3,
+      color: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      label: "Paused windows",
+      value: availabilities.length - active.length,
+      note: "Not accepting bookings",
+      icon: PauseCircle,
+      color: "bg-amber-50 text-amber-700",
+    },
+  ];
   return (
-    <Card className="gap-0 border border-slate-200 border-t-4 border-t-primary bg-white py-0 shadow-sm">
-      <CardHeader className="px-5 py-5">
-        <CardTitle className="text-base font-semibold">
-          Schedule at a glance
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Calculated from the current draft.
-        </p>
-      </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-3 border-t border-slate-100 px-5 py-5">
-        <div className="rounded-xl bg-blue-50 p-3">
-          <CalendarRange className="size-5 text-primary" aria-hidden="true" />
-          <p className="mt-2 text-2xl font-bold text-slate-900">{capacity}</p>
-          <p className="text-sm text-slate-600">Potential weekly slots</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-3">
-          <Clock3 className="size-5 text-slate-600" aria-hidden="true" />
-          <p className="mt-2 text-2xl font-bold text-slate-900">{activeDays}</p>
-          <p className="text-sm text-slate-600">Working days</p>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-slate-600">
-          <CalendarOff
-            className="size-4 shrink-0 text-amber-600"
-            aria-hidden="true"
-          />
-          {values.blocks.length} blocked dates
-        </div>
-        <div className="flex items-center gap-2 text-sm text-slate-600">
-          <Globe2 className="size-4 shrink-0 text-primary" aria-hidden="true" />
-          PKT (UTC+05:00)
-        </div>
-        <p className="col-span-2 text-sm leading-relaxed text-muted-foreground">
-          Capacity is an estimate, not a live booking count. It excludes blocked
-          dates and existing appointments.
-        </p>
-        <p className="col-span-2 flex items-start gap-2 border-t border-slate-100 pt-3 text-sm text-muted-foreground">
-          <Building2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          <span>
-            <strong className="block font-medium text-slate-800">
-              {values.clinicName}
-            </strong>
-            In-person consultation location
-          </span>
-        </p>
-      </CardContent>
-    </Card>
+    <section
+      aria-label="Availability summary"
+      className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+    >
+      {items.map(({ label, value, note, icon: Icon, color }) => (
+        <Card
+          key={label}
+          className="gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200/90"
+        >
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                {label}
+              </p>
+              <span
+                className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${color}`}
+              >
+                <Icon className="size-4.5" />
+              </span>
+            </div>
+            <p className="mt-3 text-3xl font-bold tracking-tight tabular-nums">
+              {value}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">{note}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </section>
   );
 }

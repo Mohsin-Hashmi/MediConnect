@@ -1,90 +1,84 @@
-export type PatientGender = "Female" | "Male" | "Other";
-export type PatientStatus = "active" | "inactive";
+import type { AppointmentStatus } from "@/types/appointment";
+
+export interface ApiDoctorPatient {
+  patient: {
+    id: string;
+    name: string;
+    email: string;
+    role: "patient";
+    phone?: string | null;
+    profileImage?: string | null;
+    dateOfBirth?: string | null;
+    gender?: string | null;
+  };
+  appointmentSummary: {
+    total: number;
+    upcoming: number;
+    completed: number;
+    latest: {
+      date: string;
+      status: Uppercase<AppointmentStatus>;
+      reason?: string | null;
+    };
+  };
+}
+
+export interface DoctorPatientsResponse {
+  success: true;
+  message: string;
+  data: { patients: ApiDoctorPatient[] };
+}
+
 export type PatientAgeGroup = "all" | "under-18" | "18-39" | "40-59" | "60-plus";
-export type PatientSort = "registered" | "name";
+export type PatientSort = "recent" | "name";
 
 export interface PatientRecord {
   id: string;
   name: string;
-  age: number;
-  gender: PatientGender;
-  email: string;
-  careFocus: string;
-  registeredAt: string;
-  status: PatientStatus;
+  age: number | null;
+  gender: string | null;
+  email: string | null;
+  phone: string | null;
+  profileImage: string | null;
+  latestReason: string;
+  latestAppointmentDate: string;
+  latestAppointmentStatus: AppointmentStatus;
+  appointmentCount: number;
+  upcomingAppointmentCount: number;
+  completedAppointmentCount: number;
 }
 
 export interface PatientFilters {
   search: string;
-  gender: "all" | PatientGender;
+  gender: "all" | "Female" | "Male" | "Other";
   ageGroup: PatientAgeGroup;
-  status: "all" | PatientStatus;
   sort: PatientSort;
-}
-
-export interface PatientFormValues {
-  name: string;
-  age: string;
-  gender: PatientGender;
-  email: string;
-  careFocus: string;
-  status: PatientStatus;
-}
-
-export type PatientSaveHandler = (
-  values: PatientFormValues,
-  patient: PatientRecord | null,
-) => void;
-
-export interface PatientFormProps {
-  patient: PatientRecord | null;
-  variant: "dialog" | "drawer";
-  onClose: () => void;
-  onSave: PatientSaveHandler;
-}
-
-export interface PatientFormDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: PatientSaveHandler;
-}
-
-export interface EditPatientDrawerProps {
-  patient: PatientRecord | null;
-  onClose: () => void;
-  onSave: PatientSaveHandler;
 }
 
 export interface PatientMetricsData {
   total: number;
-  active: number;
-  inactive: number;
-  recentlyRegistered: number;
+  appointments: number;
+  upcoming: number;
+  completed: number;
 }
 
-export interface PatientPageHeaderProps {
-  patients: PatientRecord[];
-  onNewPatient: () => void;
-}
-
-export interface PatientDirectoryHeaderProps {
-  matchingCount: number;
-}
-
+export interface PatientPageHeaderProps { patients: PatientRecord[] }
+export interface PatientDirectoryHeaderProps { matchingCount: number }
 export interface PatientFilterBarProps {
   filters: PatientFilters;
   onChange: (changes: Partial<PatientFilters>) => void;
   onReset: () => void;
 }
-
 export interface PatientListProps {
   patients: PatientRecord[];
   onView: (patient: PatientRecord) => void;
-  onEdit: (patient: PatientRecord) => void;
-  onDelete: (patient: PatientRecord) => void;
   onResetFilters?: () => void;
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
-
-export interface PatientIdentityProps {
+export interface PatientIdentityProps { patient: PatientRecord }
+export interface PatientActionsProps {
   patient: PatientRecord;
+  onView: (patient: PatientRecord) => void;
 }

@@ -1,187 +1,201 @@
 "use client";
 
 import { useState } from "react";
-import { useFormik } from "formik";
-import { CalendarClock } from "lucide-react";
+import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
 
-import { BlockedDateDialog } from "@/components/dashboard/availability/dialogs/blocked-date-dialog";
+import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
+import { Pagination } from "@/components/common/pagination";
 import { TimeRangeDialog } from "@/components/dashboard/availability/dialogs/time-range-dialog";
-import { BlockedDates } from "@/components/dashboard/availability/sections/blocked-dates";
-import { BookingSettings } from "@/components/dashboard/availability/sections/booking-settings";
+import { AvailabilityFilterBar } from "@/components/dashboard/availability/filters/availability-filter-bar";
+import { AvailabilityPageHeader } from "@/components/dashboard/availability/sections/availability-page-header";
+import { AvailabilityScheduleHeader } from "@/components/dashboard/availability/sections/availability-schedule-header";
 import { ScheduleSummary } from "@/components/dashboard/availability/sections/schedule-summary";
 import { WeeklySchedule } from "@/components/dashboard/availability/sections/weekly-schedule";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { mockAvailability } from "@/data/mock/availability";
-import { getScheduleIssues } from "@/lib/availability-schedule";
-import { availabilitySchema } from "@/schemas/availability.schema";
+import { Card, CardContent } from "@/components/ui/card";
+import { PAGINATION_PAGE_SIZE } from "@/constants/pagination";
+import {
+  useCreateAvailability,
+  useDeleteAvailability,
+  useDoctorAvailability,
+  useUpdateAvailability,
+} from "@/hooks/apis/availability/use-availability";
+import { getApiErrorMessage } from "@/lib/api-error";
+import { getFilteredAvailabilities } from "@/lib/availability-list";
 import type {
-  AvailabilityTimeRange,
-  AvailabilityValues,
-  TimeRangeTarget,
+  AvailabilityFilters,
+  AvailabilityFormValues,
+  AvailabilityPayload,
+  AvailabilityRecord,
 } from "@/types/availability";
 
+const initialFilters: AvailabilityFilters = {
+  search: "",
+  date: "",
+  status: "all",
+  sort: "schedule",
+};
+
+function toPayload(values: AvailabilityFormValues): AvailabilityPayload {
+  return { ...values, slotDuration: Number(values.slotDuration) };
+}
+
 export function AvailabilityPage() {
-  const [rangeTarget, setRangeTarget] = useState<TimeRangeTarget | null>(null);
-  const [blockedDialogOpen, setBlockedDialogOpen] = useState(false);
-  const formik = useFormik<AvailabilityValues>({
-    initialValues: structuredClone(mockAvailability),
-    validationSchema: availabilitySchema,
-    onSubmit(values) {
-      const issues = getScheduleIssues(values);
-      if (issues.length > 0) {
-        toast.error(issues[0]);
-        return;
-      }
-      toast.info(
-        "Draft validated for UI preview. No schedule was saved or published.",
-      );
-    },
-  });
-
-  function updateDay(
-    dayIndex: number,
-    day: AvailabilityValues["days"][number],
-  ) {
-    const days = [...formik.values.days];
-    days[dayIndex] = day;
-    void formik.setFieldValue("days", days);
-  }
-
-  function handleRangeSubmit(
-    input: Pick<AvailabilityTimeRange, "startTime" | "endTime" | "mode">,
-  ) {
-    // API integration point: do not change the mock schedule.
-    void input;
-    toast.info("Time range preview only. No schedule was changed.");
-  }
-
-  function handleRemoveRange(dayIndex: number, rangeId: string) {
-    // API integration point: no time range is deleted yet.
-    void dayIndex;
-    void rangeId;
-    toast.info("Delete preview only. No time range was removed.");
-  }
-
-  function handleAddBlockedDate(date: string, reason: string) {
-    // API integration point: no blocked date is added yet.
-    void date;
-    void reason;
-    toast.info("Blocked date preview only. No date was added.");
-  }
-
-  function handleRemoveBlockedDate(id: string) {
-    // API integration point: no blocked date is deleted yet.
-    void id;
-    toast.info("Delete preview only. No blocked date was removed.");
-  }
-
-  const selectedDay = rangeTarget
-    ? formik.values.days[rangeTarget.dayIndex]
-    : null;
-  const selectedRange = selectedDay?.ranges.find(
-    (range) => range.id === rangeTarget?.rangeId,
+  const query = useDoctorAvailability();
+  const createMutation = useCreateAvailability();
+  const updateMutation = useUpdateAvailability();
+  const deleteMutation = useDeleteAvailability();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [filters, setFilters] = useState(initialFilters);
+  const [page, setPage] = useState(1);
+  const [editing, setEditing] = useState<AvailabilityRecord | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AvailabilityRecord | null>(
+    null,
   );
+  const availabilities = query.data ?? [];
+  const filtered = getFilteredAvailabilities(availabilities, filters);
+  const currentPage = Math.min(
+    page,
+    Math.max(1, Math.ceil(filtered.length / PAGINATION_PAGE_SIZE)),
+  );
+  const visible = filtered.slice(
+    (currentPage - 1) * PAGINATION_PAGE_SIZE,
+    currentPage * PAGINATION_PAGE_SIZE,
+  );
+  const hasFilters =
+    filters.search !== "" || filters.date !== "" || filters.status !== "all";
+
+  function updateFilters(changes: Partial<AvailabilityFilters>) {
+    setFilters((previous) => ({ ...previous, ...changes }));
+    setPage(1);
+  }
+
+  function resetFilters() {
+    setFilters(initialFilters);
+    setPage(1);
+  }
+
+  function openCreate() {
+    setEditing(null);
+    setDialogOpen(true);
+  }
+  function openEdit(availability: AvailabilityRecord) {
+    setEditing(availability);
+    setDialogOpen(true);
+  }
+
+  function saveAvailability(values: AvailabilityFormValues) {
+    const payload = toPayload(values);
+    const mutation = editing
+      ? updateMutation.mutateAsync({ id: editing.id, payload })
+      : createMutation.mutateAsync(payload);
+    void mutation
+      .then((response) => {
+        toast.success(response.message);
+        setDialogOpen(false);
+        setEditing(null);
+      })
+      .catch((error) =>
+        toast.error(
+          getApiErrorMessage(error, "Availability could not be saved."),
+        ),
+      );
+  }
+
+  function deleteAvailability() {
+    if (!deleteTarget) return;
+    const target = deleteTarget;
+    void deleteMutation
+      .mutateAsync(target.id)
+      .then((response) => {
+        toast.success(response.message);
+        setDeleteTarget(null);
+      })
+      .catch((error) =>
+        toast.error(
+          getApiErrorMessage(error, "Availability could not be deleted."),
+        ),
+      );
+  }
 
   return (
     <section
       aria-label="Doctor availability"
       className="w-full flex-1 space-y-5 px-4 py-6 sm:px-5 lg:px-6 2xl:px-8"
     >
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            <CalendarClock className="size-6 text-primary" aria-hidden="true" />{" "}
-            Availability
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Shape your consultation hours and time away before scheduling goes
-            live.
-          </p>
-        </div>
-        <p className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600">
-          Times shown in PKT (UTC+05:00)
-        </p>
-      </div>
-
-      <form onSubmit={formik.handleSubmit} noValidate className="space-y-5">
-        <BookingSettings
-          values={formik.values}
-          onChange={(field, value) => {
-            void formik.setFieldValue(field, value);
-          }}
-        />
-        <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_21rem] xl:items-stretch">
-          <WeeklySchedule
-            days={formik.values.days}
-            onToggle={(dayIndex, enabled) =>
-              updateDay(dayIndex, { ...formik.values.days[dayIndex], enabled })
-            }
-            onEdit={setRangeTarget}
-            onRemove={handleRemoveRange}
+      <AvailabilityPageHeader availabilities={filtered} onAdd={openCreate} />
+      <ScheduleSummary availabilities={availabilities} />
+      <Card className="min-w-0 gap-0 border-0 py-0 shadow-sm ring-1 ring-slate-200/90">
+        <AvailabilityScheduleHeader matchingCount={filtered.length} />
+        <CardContent className="px-0">
+          <AvailabilityFilterBar
+            filters={filters}
+            onChange={updateFilters}
+            onReset={resetFilters}
+            hasFilters={hasFilters}
           />
-          <div className="space-y-5">
-            <ScheduleSummary values={formik.values} />
-            <BlockedDates
-              blocks={formik.values.blocks}
-              onAdd={() => setBlockedDialogOpen(true)}
-              onRemove={handleRemoveBlockedDate}
+          <WeeklySchedule
+            availabilities={visible}
+            isLoading={query.isLoading}
+            error={
+              query.isError
+                ? getApiErrorMessage(
+                    query.error,
+                    "Your availability could not be loaded.",
+                  )
+                : null
+            }
+            onRetry={() => void query.refetch()}
+            onEdit={openEdit}
+            onDelete={setDeleteTarget}
+            onResetFilters={hasFilters ? resetFilters : undefined}
+          />
+          {!query.isLoading && !query.isError ? (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filtered.length}
+              onPageChange={setPage}
+              itemLabel="availability windows"
             />
-            <Card className="gap-0 border border-slate-200 bg-white py-0 shadow-sm">
-              <CardHeader className="px-5 py-5">
-                <CardTitle className="text-base font-semibold">
-                  Practice location
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Label for your in-person sessions.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-2 border-t border-slate-100 px-5 py-5">
-                <Label htmlFor="clinic-name">Clinic or hospital name</Label>
-                <Input
-                  id="clinic-name"
-                  name="clinicName"
-                  className="h-11"
-                  value={formik.values.clinicName}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  aria-invalid={Boolean(
-                    formik.touched.clinicName && formik.errors.clinicName,
-                  )}
-                />
-                {formik.touched.clinicName && formik.errors.clinicName ? (
-                  <p className="text-xs text-destructive">
-                    {formik.errors.clinicName}
-                  </p>
-                ) : null}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </form>
-
+          ) : null}
+        </CardContent>
+      </Card>
       <TimeRangeDialog
-        key={
-          rangeTarget
-            ? `${rangeTarget.dayIndex}-${rangeTarget.rangeId ?? "new"}`
-            : "closed"
-        }
-        open={rangeTarget !== null}
-        day={selectedDay?.day ?? ""}
-        range={selectedRange}
+        key={editing?.id ?? (dialogOpen ? "new-open" : "new-closed")}
+        open={dialogOpen}
+        availability={editing}
+        isPending={createMutation.isPending || updateMutation.isPending}
         onOpenChange={(open) => {
-          if (!open) setRangeTarget(null);
+          setDialogOpen(open);
+          if (!open) setEditing(null);
         }}
-        onSave={handleRangeSubmit}
+        onSave={saveAvailability}
       />
-      <BlockedDateDialog
-        key={blockedDialogOpen ? "open" : "closed"}
-        open={blockedDialogOpen}
-        existingDates={formik.values.blocks.map((block) => block.date)}
-        onOpenChange={setBlockedDialogOpen}
-        onSave={handleAddBlockedDate}
+      <ConfirmActionDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Delete availability window?"
+        description="Patients will no longer be able to book slots from this window."
+        confirmLabel="Delete window"
+        destructive
+        details={
+          deleteTarget
+            ? [
+                {
+                  label: "Date",
+                  value: format(parseISO(deleteTarget.date), "d MMM yyyy"),
+                },
+                {
+                  label: "Time",
+                  value: `${deleteTarget.startTime} - ${deleteTarget.endTime}`,
+                },
+              ]
+            : []
+        }
+        consequence="This action permanently removes the availability window."
+        onConfirm={deleteAvailability}
       />
     </section>
   );

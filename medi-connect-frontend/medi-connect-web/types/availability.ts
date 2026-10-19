@@ -1,68 +1,99 @@
-export type VisitMode = "In-person" | "Video";
-
-export interface AvailabilityTimeRange {
+export interface AvailabilityRecord {
   id: string;
+  doctorId: string;
+  date: string;
   startTime: string;
   endTime: string;
-  mode: VisitMode;
+  slotDuration: number;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface AvailabilityDay {
-  day: string;
-  enabled: boolean;
-  ranges: AvailabilityTimeRange[];
-}
-
-export interface AvailabilityBlock {
-  id: string;
+export interface AvailabilityFormValues {
   date: string;
-  reason: string;
+  startTime: string;
+  endTime: string;
+  slotDuration: string;
+  isAvailable: boolean;
 }
 
-export interface AvailabilityValues {
-  acceptingAppointments: boolean;
-  durationMinutes: number;
-  bufferMinutes: number;
-  clinicName: string;
-  timezone: string;
-  days: AvailabilityDay[];
-  blocks: AvailabilityBlock[];
+export interface AvailabilityPayload {
+  date: string;
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  isAvailable: boolean;
 }
 
-export interface TimeRangeTarget {
-  dayIndex: number;
-  rangeId?: string;
+export interface AvailabilityListResponse {
+  success: true;
+  message: string;
+  data: { availabilities: AvailabilityRecord[] };
 }
 
-export interface BookingSettingsProps {
-  values: AvailabilityValues;
-  onChange: <K extends keyof AvailabilityValues>(field: K, value: AvailabilityValues[K]) => void;
+export interface AvailabilityMutationResponse {
+  success: true;
+  message: string;
+  data: { availability: AvailabilityRecord };
 }
 
-export interface WeeklyScheduleProps {
-  days: AvailabilityDay[];
-  onToggle: (index: number, enabled: boolean) => void;
-  onEdit: (target: TimeRangeTarget) => void;
-  onRemove: (dayIndex: number, rangeId: string) => void;
+export interface UpdateAvailabilityVariables {
+  id: string;
+  payload: AvailabilityPayload;
 }
 
-export interface BlockedDatesProps {
-  blocks: AvailabilityBlock[];
+export type AvailabilityStatusFilter = "all" | "available" | "paused";
+export type AvailabilitySortOrder = "schedule" | "oldest" | "newest";
+
+export interface AvailabilityFilters {
+  search: string;
+  date: string;
+  status: AvailabilityStatusFilter;
+  sort: AvailabilitySortOrder;
+}
+
+export interface AvailabilityFilterBarProps {
+  filters: AvailabilityFilters;
+  onChange: (changes: Partial<AvailabilityFilters>) => void;
+  onReset: () => void;
+  hasFilters: boolean;
+}
+
+export interface AvailabilityDateFilterProps {
+  date: string;
+  onDateChange: (date: string) => void;
+}
+
+export interface AvailabilityPageHeaderProps {
+  availabilities: AvailabilityRecord[];
   onAdd: () => void;
-  onRemove: (id: string) => void;
+}
+
+export interface AvailabilityScheduleHeaderProps {
+  matchingCount: number;
 }
 
 export interface TimeRangeDialogProps {
   open: boolean;
-  day: string;
-  range?: AvailabilityTimeRange;
+  availability: AvailabilityRecord | null;
+  isPending: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (range: Pick<AvailabilityTimeRange, "startTime" | "endTime" | "mode">) => void;
+  onSave: (values: AvailabilityFormValues) => void;
 }
 
-export interface BlockedDateDialogProps {
-  open: boolean;
-  existingDates: string[];
-  onOpenChange: (open: boolean) => void;
-  onSave: (date: string, reason: string) => void;
+export interface AvailabilityScheduleProps {
+  availabilities: AvailabilityRecord[];
+  isLoading: boolean;
+  error: string | null;
+  onRetry: () => void;
+  onEdit: (availability: AvailabilityRecord) => void;
+  onDelete: (availability: AvailabilityRecord) => void;
+  onResetFilters?: () => void;
+}
+
+export interface AvailabilityActionsProps {
+  availability: AvailabilityRecord;
+  onEdit: (availability: AvailabilityRecord) => void;
+  onDelete: (availability: AvailabilityRecord) => void;
 }

@@ -5,7 +5,7 @@ import { addDays, addMonths } from "date-fns";
 import { CalendarDays } from "lucide-react";
 
 import { Error as ErrorState } from "@/components/common/error";
-import { Loader } from "@/components/common/loader";
+import { CalendarScheduleLoader } from "@/components/common/calendar-schedule-loader";
 import { AppointmentDetailsDialog } from "@/components/dashboard/appointments/dialogs/appointment-details-dialog";
 import { CalendarSidebar } from "@/components/dashboard/calendar/sections/calendar-sidebar";
 import { CalendarToolbar } from "@/components/dashboard/calendar/sections/calendar-toolbar";
@@ -63,9 +63,7 @@ export function CalendarPage() {
       </div>
 
       {appointmentsQuery.isPending ? (
-        <Card className="border-0 shadow-sm ring-1 ring-slate-200">
-          <Loader label="Loading calendar appointments..." />
-        </Card>
+        <CalendarScheduleLoader />
       ) : appointmentsQuery.isError ? (
         <Card className="border-0 shadow-sm ring-1 ring-slate-200">
           <ErrorState

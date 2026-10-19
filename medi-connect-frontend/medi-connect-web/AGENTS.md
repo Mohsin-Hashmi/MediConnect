@@ -14,7 +14,7 @@ This file applies to this Next.js application (`medi-connect-frontend/medi-conne
 
 ## Purpose and current reality
 
-MediConnect is a healthcare scheduling frontend with account access, doctor onboarding, and a doctor portal. The portal currently has a dashboard overview, an API-backed doctor appointments module, a calendar, a fictional Patients directory, and a UI-only Availability preview. Other sidebar destinations are placeholders. Authentication, doctor creation, doctor appointment reads, doctor appointment status actions, and appointment-derived dashboard metrics use backend APIs. Patient-directory records remain mock data. Patient create/edit/delete forms are UI previews only. Availability add/edit/delete actions are preview-only, and its drafts are not persisted or published and do not affect Calendar openings.
+MediConnect is a healthcare scheduling frontend with account access, doctor onboarding, and a doctor portal. The portal currently has a dashboard overview, API-backed appointments, a calendar, a read-only patient directory derived from assigned appointments, and API-backed dated availability management. Other sidebar destinations are placeholders. Patients own their accounts and appointment creation; doctors can view connected patients, manage their bookable availability, and perform only supported appointment status actions.
 
 ## Stack and commands
 
@@ -34,7 +34,7 @@ MediConnect is a healthcare scheduling frontend with account access, doctor onbo
 - `hooks/onboarding/`: onboarding form state and flow. `context/`: cross-feature React contexts. `providers/`: other application-level providers.
 - `types/`: shared TypeScript types and component prop interfaces. `schemas/`: Yup validation schemas. `constants/`: reusable static options and keys. `data/mock/`: clearly labeled demo fixtures. `lib/`: pure formatting, filtering, scheduling, and storage utilities.
 - Reuse the existing Formik/Yup/Sonner patterns for new forms and validation. Keep mock fixtures out of production API hooks. Use the `@/` import alias and preserve the project's existing naming conventions.
-- Appointments and Calendar read the same TanStack Query appointment cache through `hooks/apis/appointments/`. Patients create bookings; the doctor portal may only view, confirm, complete, or cancel assigned appointments.
+- Appointments, Calendar, and Dashboard reuse the doctor appointment query through `hooks/apis/appointments/`. The read-only Patients directory uses its doctor-scoped query in `hooks/apis/patients/`. Patients create bookings; the doctor portal may only view, confirm, complete, or cancel assigned appointments. Availability mutations live in `hooks/apis/availability/`.
 - Keep date and time handling consistent with the existing `YYYY-MM-DD` and `HH:mm` appointment fields. Account for timezone and overlapping/blocked slots when changing scheduling behavior.
 
 ## Strict boundaries

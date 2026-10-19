@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { cancelAppointmentSchema } from "@/schemas/appointment.schema";
 import type {
@@ -104,7 +105,11 @@ export function CancelAppointmentDialog({
               Keep appointment
             </Button>
             <Button type="submit" variant="destructive" disabled={isPending}>
-              {isPending ? "Cancelling..." : "Cancel appointment"}
+              {isPending ? (
+                <Spinner aria-label="Cancelling appointment" />
+              ) : (
+                "Cancel appointment"
+              )}
             </Button>
           </DialogFooter>
         </form>

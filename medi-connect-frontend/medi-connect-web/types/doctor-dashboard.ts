@@ -1,8 +1,7 @@
 import type { AppointmentRecord } from "@/types/appointment";
 
-export interface WeeklyAppointmentActivity {
+export interface AppointmentWeekdayActivity {
   day: string;
-  date: string;
   completed: number;
   confirmed: number;
   cancelled: number;
@@ -35,7 +34,7 @@ export interface DashboardActivityPanelsProps {
 }
 
 export interface WeeklyActivityChartProps {
-  activity: WeeklyAppointmentActivity[];
+  activity: AppointmentWeekdayActivity[];
 }
 
 export interface DashboardPatientAvatarProps {
