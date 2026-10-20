@@ -119,3 +119,10 @@ export interface ChecklistItemProps {
   status?: ChecklistItemStatus;
   className?: string;
 }
+
+export interface AmountProps {
+  label: string;
+  value: string;
+  strong?: boolean;
+  className?: string;
+}

@@ -18,7 +18,8 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Patients | Read-only doctor-scoped API directory of patients connected through assigned appointments, with metrics, search/filter/sort, 10-row pagination, details, and PDF export. Patient account creation and profile management stay in the patient flow. |
 | Availability | Doctor-scoped API list/create/update/delete for dated bookable windows, with Formik/Yup validation, status, slot capacity, loading/error/empty states, and confirmation before deletion. |
 | Doctor profile | Responsive profile-management UI built with isolated mock data; API persistence and public-profile preview are not connected yet. |
-| Other doctor portal links | Reviews, Earnings, Messages, Notifications, and Settings remain placeholders. |
+| Earnings | Responsive financial reporting preview with isolated mock data, revenue metrics, chart, filters, pagination, and PDF export; payout and settlement APIs are not connected. |
+| Other doctor portal links | Reviews, Messages, Notifications, and Settings remain placeholders. |
 
 Patients own appointment creation through the patient-only backend booking endpoint. The doctor portal reads assigned bookings, exposes connected patients as read-only, manages dated availability, and performs only supported appointment status transitions. The patient dashboard booking UI is not built yet.
 

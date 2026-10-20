@@ -20,8 +20,8 @@ import type { DoctorProfileSectionProps } from "@/types/doctor-profile";
 
 export function ProfileSummary({ profile }: DoctorProfileSectionProps) {
   return (
-    <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
-      <Card className="gap-0 py-0 shadow-sm ring-slate-200/90">
+    <aside className="grid w-full min-w-0 content-start gap-5 self-start">
+      <Card className="w-full gap-0 py-0 shadow-sm ring-slate-200/90">
         <CardHeader className="border-b px-5 py-4">
           <CardTitle className="flex items-center gap-2">
             <Eye className="size-4 text-primary" />
@@ -65,7 +65,7 @@ export function ProfileSummary({ profile }: DoctorProfileSectionProps) {
         </CardContent>
       </Card>
 
-      <Card className="gap-0 py-0 shadow-sm ring-slate-200/90">
+      <Card className="w-full gap-0 py-0 shadow-sm ring-slate-200/90">
         <CardHeader className="border-b px-5 py-4">
           <CardTitle>Profile readiness</CardTitle>
         </CardHeader>

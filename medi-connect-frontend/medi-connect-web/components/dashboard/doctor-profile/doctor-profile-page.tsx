@@ -88,7 +88,7 @@ export function DoctorProfilePage() {
     <section aria-label="Doctor profile" className="w-full flex-1 space-y-5 px-4 py-6 sm:px-5 lg:px-6 2xl:px-8">
       <ProfilePageHeader />
       <form className="space-y-5" onSubmit={formik.handleSubmit} noValidate>
-        <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0 space-y-5">
             <PersonalInformationCard
               profile={DOCTOR_PROFILE_FIXTURE}
@@ -102,13 +102,13 @@ export function DoctorProfilePage() {
               profile={DOCTOR_PROFILE_FIXTURE}
               formik={formik}
             />
+            <ProfileFormActions
+              onPreview={() => void handlePreview()}
+              isSubmitting={formik.isSubmitting}
+            />
           </div>
           <ProfileSummary profile={previewProfile} />
         </div>
-        <ProfileFormActions
-          onPreview={() => void handlePreview()}
-          isSubmitting={formik.isSubmitting}
-        />
       </form>
     </section>
   );

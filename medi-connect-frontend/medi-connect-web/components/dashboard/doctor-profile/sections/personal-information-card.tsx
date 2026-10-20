@@ -137,7 +137,7 @@ export function PersonalInformationCard({
               <SelectTrigger
                 id="gender"
                 size="lg"
-                className="w-full bg-white"
+                className="w-full bg-white data-[size=lg]:h-11 data-[size=lg]:px-2.5"
                 aria-invalid={Boolean(
                   formik.touched.gender && formik.errors.gender,
                 )}
