@@ -30,7 +30,7 @@ export const DASHBOARD_NAVIGATION = [
   {
     label: "Practice",
     items: [
-      { label: "Doctor Profile", href: "/dashboard/profile", icon: UserRound },
+      { label: "Profile", href: "/dashboard/profile", icon: UserRound },
       { label: "Reviews", href: "/dashboard/reviews", icon: Star },
       {
         label: "Earnings",
