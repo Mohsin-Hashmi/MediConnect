@@ -1,6 +1,6 @@
 # MediConnect frontend plan
 
-Updated: 2026-10-19. This is a working scope document, not a claim that the entire product is implemented. `AGENTS.md` contains the coding rules and boundaries.
+Updated: 2026-10-21. This is a working scope document, not a claim that the entire product is implemented. `AGENTS.md` contains the coding rules and boundaries.
 
 ## Product shape
 
@@ -18,6 +18,7 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Patients | Read-only doctor-scoped API directory of patients connected through assigned appointments, with metrics, search/filter/sort, 10-row pagination, details, and PDF export. Patient account creation and profile management stay in the patient flow. |
 | Availability | Doctor-scoped API list/create/update/delete for dated bookable windows, with Formik/Yup validation, status, slot capacity, loading/error/empty states, and confirmation before deletion. |
 | Doctor profile | Responsive profile-management UI built with isolated mock data; API persistence and public-profile preview are not connected yet. |
+| Reviews | Responsive patient-feedback preview with isolated mock data, rating metrics and distribution, filters, pagination, PDF export, and non-persisting reply controls; the reviews API is not connected yet. |
 | Earnings | Responsive financial reporting preview with isolated mock data, revenue metrics, chart, filters, pagination, and PDF export; payout and settlement APIs are not connected. |
 | Other doctor portal links | Reviews, Messages, Notifications, and Settings remain placeholders. |
 
