@@ -20,7 +20,9 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Doctor profile | Responsive profile-management UI built with isolated mock data; API persistence and public-profile preview are not connected yet. |
 | Reviews | Responsive patient-feedback preview with isolated mock data, rating metrics and distribution, filters, pagination, PDF export, and non-persisting reply controls; the reviews API is not connected yet. |
 | Earnings | Responsive financial reporting preview with isolated mock data, revenue metrics, chart, filters, pagination, and PDF export; payout and settlement APIs are not connected. |
-| Other doctor portal links | Reviews, Messages, Notifications, and Settings remain placeholders. |
+| Messages | Responsive messaging workspace preview with isolated mock conversations, searchable All/Unread inbox views, appointment context, accessible message history, and non-sending composer controls; REST history and Socket.IO are not connected yet. |
+| Notifications | Responsive activity-center preview with isolated mock events, summary metrics, filters, date-grouped rows, pagination, related-module links, and non-persisting read/remove controls; notification APIs and real-time delivery are not connected yet. |
+| Other doctor portal links | Settings remains a placeholder. |
 
 Patients own appointment creation through the patient-only backend booking endpoint. The doctor portal reads assigned bookings, exposes connected patients as read-only, manages dated availability, and performs only supported appointment status transitions. The patient dashboard booking UI is not built yet.
 
