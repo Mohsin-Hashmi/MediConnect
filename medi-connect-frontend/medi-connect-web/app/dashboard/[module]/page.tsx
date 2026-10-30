@@ -15,7 +15,8 @@ export function generateStaticParams() {
       slug !== "reviews" &&
       slug !== "messages" &&
       slug !== "notifications" &&
-      slug !== "earnings",
+      slug !== "earnings" &&
+      slug !== "settings",
   ).map(({ slug }) => ({ module: slug }));
 }
 

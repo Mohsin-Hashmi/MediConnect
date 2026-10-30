@@ -14,7 +14,7 @@ This file applies to this Next.js application (`medi-connect-frontend/medi-conne
 
 ## Purpose and current reality
 
-MediConnect is a healthcare scheduling frontend with account access, doctor onboarding, and a doctor portal. The portal currently has a dashboard overview, API-backed appointments, a calendar, a read-only patient directory derived from assigned appointments, and API-backed dated availability management. Other sidebar destinations are placeholders. Patients own their accounts and appointment creation; doctors can view connected patients, manage their bookable availability, and perform only supported appointment status actions.
+MediConnect is a healthcare scheduling frontend with account access, doctor onboarding, and a doctor portal. The portal currently has a dashboard overview, API-backed appointments, a calendar, a read-only patient directory derived from assigned appointments, and API-backed dated availability management. Doctor profile, reviews, earnings, messages, notifications, and settings currently provide clearly bounded interface previews. Patients own their accounts and appointment creation; doctors can view connected patients, manage their bookable availability, and perform only supported appointment status actions.
 
 ## Stack and commands
 
@@ -29,7 +29,7 @@ MediConnect is a healthcare scheduling frontend with account access, doctor onbo
 
 - `app/`: routes and route layouts. Keep page files thin; the dashboard layout owns the shared sidebar and topbar.
 - `components/ui/`: installed shadcn primitives. Compose these before adding new UI dependencies or recreating a primitive. Keep feature-specific styling in feature components; do not casually rewrite generated primitives.
-- `components/auth/`, `components/onboarding/`, and `components/dashboard/{doctor-dashboard,appointments,calendar,patients,availability}/`: feature UI. Keep each feature's entry component at its feature root, then group implementation details into focused subfolders such as `dialogs/`, `filters/`, `list/`, `sections/`, `views/`, `layout/`, or `shared/` as appropriate. Do not add a subfolder for a single component without a clear feature boundary. Give each component one responsibility and avoid oversized page components. Put only genuinely cross-feature UI in `components/common/`.
+- `components/auth/`, `components/onboarding/`, and `components/dashboard/<feature>/`: feature UI. Keep each feature's entry component at its feature root, then group implementation details into focused subfolders such as `dialogs/`, `filters/`, `list/`, `sections/`, `views/`, `layout/`, or `shared/` as appropriate. Do not add a subfolder for a single component without a clear feature boundary. Give each component one responsibility and avoid oversized page components. Put only genuinely cross-feature UI in `components/common/`.
 - `hooks/apis/`: TanStack Query API hooks. `lib/axios.ts` owns the shared Axios client and token-refresh behavior. Do not put direct endpoint calls in presentation components.
 - `hooks/onboarding/`: onboarding form state and flow. `context/`: cross-feature React contexts. `providers/`: other application-level providers.
 - `types/`: shared TypeScript types and component prop interfaces. `schemas/`: Yup validation schemas. `constants/`: reusable static options and keys. `data/mock/`: clearly labeled demo fixtures. `lib/`: pure formatting, filtering, scheduling, and storage utilities.
