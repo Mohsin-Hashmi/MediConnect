@@ -36,7 +36,7 @@ export function CalendarMonthGrid({
           {days.map((day) => {
             const dayKey = calendarDateKey(day);
             const dayAppointments = appointments.filter(
-              (item) => item.date === dayKey,
+              (item) => item.appointment.date.slice(0, 10) === dayKey,
             );
             const dayBlocks = blocks.filter((block) => block.date === dayKey);
             return (
@@ -64,7 +64,7 @@ export function CalendarMonthGrid({
                 <div className="space-y-1">
                   {dayAppointments.slice(0, 2).map((appointment) => (
                     <CalendarEventCard
-                      key={appointment.id}
+                      key={appointment.appointment.id}
                       appointment={appointment}
                       onClick={() => onSelectAppointment(appointment)}
                       compact

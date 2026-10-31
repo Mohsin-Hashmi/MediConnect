@@ -34,7 +34,7 @@ export function CancelAppointmentDialog({
     onSubmit: (values) => {
       if (!appointment) return;
       onConfirm({
-        appointmentId: appointment.id,
+        appointmentId: appointment.appointment.id,
         cancellationReason: values.cancellationReason.trim(),
       });
     },
@@ -64,7 +64,7 @@ export function CancelAppointmentDialog({
               </DialogTitle>
               <DialogDescription className="leading-relaxed">
                 {appointment
-                  ? `Cancel the appointment with ${appointment.patientName}. The patient will see the cancellation reason.`
+                  ? `Cancel the appointment with ${appointment.patient?.name ?? "this patient"}. The patient will see the cancellation reason.`
                   : "Add a reason for cancelling this appointment."}
               </DialogDescription>
             </DialogHeader>

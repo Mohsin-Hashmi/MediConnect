@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from "@/types/appointment";
+import type { ApiAppointmentStatus } from "@/types/appointment";
 
 export interface ApiDoctorPatient {
   patient: {
@@ -17,7 +17,7 @@ export interface ApiDoctorPatient {
     completed: number;
     latest: {
       date: string;
-      status: Uppercase<AppointmentStatus>;
+      status: ApiAppointmentStatus;
       reason?: string | null;
     };
   };
@@ -31,22 +31,6 @@ export interface DoctorPatientsResponse {
 
 export type PatientAgeGroup = "all" | "under-18" | "18-39" | "40-59" | "60-plus";
 export type PatientSort = "recent" | "name";
-
-export interface PatientRecord {
-  id: string;
-  name: string;
-  age: number | null;
-  gender: string | null;
-  email: string | null;
-  phone: string | null;
-  profileImage: string | null;
-  latestReason: string;
-  latestAppointmentDate: string;
-  latestAppointmentStatus: AppointmentStatus;
-  appointmentCount: number;
-  upcomingAppointmentCount: number;
-  completedAppointmentCount: number;
-}
 
 export interface PatientFilters {
   search: string;
@@ -62,7 +46,7 @@ export interface PatientMetricsData {
   completed: number;
 }
 
-export interface PatientPageHeaderProps { patients: PatientRecord[] }
+export interface PatientPageHeaderProps { patients: ApiDoctorPatient[] }
 export interface PatientDirectoryHeaderProps { matchingCount: number }
 export interface PatientFilterBarProps {
   filters: PatientFilters;
@@ -70,15 +54,15 @@ export interface PatientFilterBarProps {
   onReset: () => void;
 }
 export interface PatientListProps {
-  patients: PatientRecord[];
-  onView: (patient: PatientRecord) => void;
+  patients: ApiDoctorPatient[];
+  onView: (patient: ApiDoctorPatient) => void;
   onResetFilters?: () => void;
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
 }
-export interface PatientIdentityProps { patient: PatientRecord }
+export interface PatientIdentityProps { patient: ApiDoctorPatient }
 export interface PatientActionsProps {
-  patient: PatientRecord;
-  onView: (patient: PatientRecord) => void;
+  patient: ApiDoctorPatient;
+  onView: (patient: ApiDoctorPatient) => void;
 }

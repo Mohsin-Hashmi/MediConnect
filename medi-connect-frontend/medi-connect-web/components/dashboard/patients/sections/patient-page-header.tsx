@@ -1,5 +1,6 @@
 import { DashboardPageHeader } from "@/components/common/dashboard-page-header";
 import { PdfExportButton } from "@/components/common/pdf-export-button";
+import { getPatientAge } from "@/lib/appointment-format";
 import type { PatientPageHeaderProps } from "@/types/patient";
 
 export function PatientPageHeader({ patients }: PatientPageHeaderProps) {
@@ -22,13 +23,13 @@ export function PatientPageHeader({ patients }: PatientPageHeaderProps) {
             "Appointments",
           ]}
           rows={patients.map((patient) => [
-            patient.id,
-            patient.name,
-            patient.age?.toString() ?? "",
-            patient.gender ?? "",
-            patient.email ?? "",
-            patient.latestAppointmentDate,
-            patient.appointmentCount.toString(),
+            patient.patient.id,
+            patient.patient.name,
+            getPatientAge(patient.patient.dateOfBirth)?.toString() ?? "",
+            patient.patient.gender ?? "",
+            patient.patient.email ?? "",
+            patient.appointmentSummary.latest.date,
+            patient.appointmentSummary.total.toString(),
           ])}
           label="Export patients"
           className="h-10 px-4 text-sm"

@@ -19,6 +19,9 @@ export function AppointmentActions({
   onComplete,
   onCancel,
 }: AppointmentActionsProps) {
+  const patientName = appointment.patient?.name ?? "patient";
+  const status = appointment.appointment.status;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -28,7 +31,7 @@ export function AppointmentActions({
             variant="outline"
             size="icon"
             className="size-9"
-            aria-label={`Actions for ${appointment.patientName}`}
+            aria-label={`Actions for ${patientName}`}
           />
         }
       >
@@ -42,7 +45,7 @@ export function AppointmentActions({
           <Eye className="size-4" aria-hidden="true" />
           View
         </DropdownMenuItem>
-        {appointment.status === "pending" && onConfirm ? (
+        {status === "PENDING" && onConfirm ? (
           <DropdownMenuItem
             className="min-h-9 gap-2 px-2.5"
             onClick={() => onConfirm(appointment)}
@@ -51,7 +54,7 @@ export function AppointmentActions({
             Confirm
           </DropdownMenuItem>
         ) : null}
-        {appointment.status === "confirmed" && onComplete ? (
+        {status === "CONFIRMED" && onComplete ? (
           <DropdownMenuItem
             className="min-h-9 gap-2 px-2.5"
             onClick={() => onComplete(appointment)}
@@ -60,8 +63,7 @@ export function AppointmentActions({
             Mark completed
           </DropdownMenuItem>
         ) : null}
-        {(appointment.status === "pending" ||
-          appointment.status === "confirmed") &&
+        {(status === "PENDING" || status === "CONFIRMED") &&
         onCancel ? (
           <>
             <DropdownMenuSeparator />

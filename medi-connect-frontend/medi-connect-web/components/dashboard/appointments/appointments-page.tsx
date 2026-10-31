@@ -26,8 +26,8 @@ import { getApiErrorMessage } from "@/lib/api-error";
 import type {
   AppointmentAction,
   AppointmentFilters,
-  AppointmentRecord,
   CancelAppointmentPayload,
+  DoctorAppointmentApiItem,
 } from "@/types/appointment";
 
 const initialFilters: AppointmentFilters = {
@@ -39,7 +39,7 @@ const initialFilters: AppointmentFilters = {
 
 type StatusActionTarget = {
   action: Exclude<AppointmentAction, "cancel">;
-  appointment: AppointmentRecord;
+  appointment: DoctorAppointmentApiItem;
 };
 
 export function AppointmentsPage() {
@@ -51,10 +51,11 @@ export function AppointmentsPage() {
   const [filters, setFilters] = useState<AppointmentFilters>(initialFilters);
   const [page, setPage] = useState(1);
   const [selectedAppointment, setSelectedAppointment] =
-    useState<AppointmentRecord | null>(null);
+    useState<DoctorAppointmentApiItem | null>(null);
   const [statusActionTarget, setStatusActionTarget] =
     useState<StatusActionTarget | null>(null);
-  const [cancelTarget, setCancelTarget] = useState<AppointmentRecord | null>(null);
+  const [cancelTarget, setCancelTarget] =
+    useState<DoctorAppointmentApiItem | null>(null);
 
   const filtered = getFilteredAppointments(appointments, filters);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGINATION_PAGE_SIZE));
@@ -87,7 +88,7 @@ export function AppointmentsPage() {
         ? "Appointment confirmed."
         : "Appointment marked as completed.";
 
-    mutation.mutate(statusActionTarget.appointment.id, {
+    mutation.mutate(statusActionTarget.appointment.appointment.id, {
       onSuccess: () => {
         toast.success(successMessage);
         setStatusActionTarget(null);
@@ -177,10 +178,13 @@ export function AppointmentsPage() {
         details={
           actionAppointment
             ? [
-                { label: "Patient", value: actionAppointment.patientName },
+                {
+                  label: "Patient",
+                  value: actionAppointment.patient?.name ?? "Patient unavailable",
+                },
                 {
                   label: "Appointment",
-                  value: `${formatAppointmentDate(actionAppointment.date)} at ${formatAppointmentTime(actionAppointment.time)}`,
+                  value: `${formatAppointmentDate(actionAppointment.appointment.date)} at ${formatAppointmentTime(actionAppointment.appointment.startTime)}`,
                 },
               ]
             : undefined

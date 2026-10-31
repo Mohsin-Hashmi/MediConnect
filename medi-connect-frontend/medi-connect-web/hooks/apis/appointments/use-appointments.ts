@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import { AXIOS } from "@/lib/axios";
-import { mapDoctorAppointmentFromApi } from "@/lib/appointment-api";
 import type { ApiErrorResponse } from "@/types/auth";
 import type {
   AppointmentMutationResponse,
@@ -22,7 +21,6 @@ export function useDoctorAppointments() {
       );
       return response.data.data.appointments;
     },
-    select: (appointments) => appointments.map(mapDoctorAppointmentFromApi),
   });
 }
 
@@ -36,7 +34,6 @@ export function useDoctorAppointment(appointmentId?: string) {
       );
       return response.data.data;
     },
-    select: mapDoctorAppointmentFromApi,
   });
 }
 

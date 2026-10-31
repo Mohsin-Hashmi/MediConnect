@@ -1,4 +1,4 @@
-import type { AppointmentRecord } from "@/types/appointment";
+import type { DoctorAppointmentApiItem } from "@/types/appointment";
 
 export interface AppointmentWeekdayActivity {
   day: string;
@@ -15,22 +15,22 @@ export interface DashboardMetricsData {
 }
 
 export interface DashboardMetricsProps {
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
 }
 
 export interface DashboardAppointmentsProps {
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
 }
 
 export interface DashboardSidePanelsProps {
-  nextAppointment: AppointmentRecord | null;
+  nextAppointment: DoctorAppointmentApiItem | null;
 }
 
 export interface DashboardActivityPanelsProps {
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
 }
 
 export interface WeeklyActivityChartProps {
@@ -38,7 +38,7 @@ export interface WeeklyActivityChartProps {
 }
 
 export interface DashboardPatientAvatarProps {
-  appointment: AppointmentRecord;
+  appointment: DoctorAppointmentApiItem;
 }
 
 export interface DashboardPlaceholderProps {

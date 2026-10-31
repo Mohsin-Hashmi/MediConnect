@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useDoctorAppointments } from "@/hooks/apis/appointments/use-appointments";
 import { calendarDateKey, getCalendarDays } from "@/lib/calendar-schedule";
 import { getApiErrorMessage } from "@/lib/api-error";
-import type { AppointmentRecord } from "@/types/appointment";
+import type { DoctorAppointmentApiItem } from "@/types/appointment";
 import type { CalendarBlock, CalendarView } from "@/types/calendar";
 
 export function CalendarPage() {
@@ -24,12 +24,15 @@ export function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [view, setView] = useState<CalendarView>("week");
   const [selectedAppointment, setSelectedAppointment] =
-    useState<AppointmentRecord | null>(null);
+    useState<DoctorAppointmentApiItem | null>(null);
   const calendarBlocks: CalendarBlock[] = [];
 
   const visibleDays = getCalendarDays(selectedDate, view);
   const visibleAppointments = appointments.filter((appointment) =>
-    visibleDays.some((day) => calendarDateKey(day) === appointment.date),
+    visibleDays.some(
+      (day) =>
+        calendarDateKey(day) === appointment.appointment.date.slice(0, 10),
+    ),
   );
 
   function movePeriod(direction: -1 | 1) {
@@ -109,11 +112,11 @@ export function CalendarPage() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-200 px-4 py-3 text-xs text-muted-foreground">
               <span>
                 <span className="mr-1 inline-block size-2 rounded-full bg-blue-500" />
-                Video
+                Confirmed
               </span>
               <span>
                 <span className="mr-1 inline-block size-2 rounded-full bg-teal-500" />
-                In-person
+                Completed
               </span>
               <span>
                 <span className="mr-1 inline-block size-2 rounded-full bg-amber-500" />

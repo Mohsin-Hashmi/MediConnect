@@ -1,4 +1,4 @@
-import type { AppointmentRecord } from "@/types/appointment";
+import type { DoctorAppointmentApiItem } from "@/types/appointment";
 
 export type CalendarView = "day" | "week" | "month";
 
@@ -22,25 +22,25 @@ export interface CalendarToolbarProps {
 
 export interface CalendarTimeGridProps {
   days: Date[];
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
   blocks: CalendarBlock[];
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
-  onSelectAppointment: (appointment: AppointmentRecord) => void;
+  onSelectAppointment: (appointment: DoctorAppointmentApiItem) => void;
 }
 
 export interface CalendarMonthGridProps {
   date: Date;
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
   blocks: CalendarBlock[];
   onSelectDate: (date: Date) => void;
-  onSelectAppointment: (appointment: AppointmentRecord) => void;
+  onSelectAppointment: (appointment: DoctorAppointmentApiItem) => void;
 }
 
 export interface CalendarSidebarProps {
   date: Date;
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
   blocks: CalendarBlock[];
   onSelectDate: (date: Date) => void;
-  onSelectAppointment: (appointment: AppointmentRecord) => void;
+  onSelectAppointment: (appointment: DoctorAppointmentApiItem) => void;
 }

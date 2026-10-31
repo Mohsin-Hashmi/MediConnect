@@ -1,5 +1,3 @@
-import { Building2, Video } from "lucide-react";
-
 import { Error as ErrorState } from "@/components/common/error";
 import { Loader } from "@/components/common/loader";
 import { NoDataFound } from "@/components/common/no-data-found";
@@ -16,13 +14,14 @@ import {
 } from "@/components/ui/table";
 import {
   formatAppointmentDate,
-  formatAppointmentFee,
   formatAppointmentTime,
+  getAppointmentDurationMinutes,
+  getPatientAge,
 } from "@/lib/appointment-format";
 import type {
+  ApiAppointmentStatus,
   AppointmentListProps,
   AppointmentPatientCellProps,
-  AppointmentRecord,
 } from "@/types/appointment";
 import type { StatusTone } from "@/types/common";
 
@@ -33,15 +32,26 @@ const avatarClasses = {
   violet: "bg-violet-100 text-violet-700",
 } as const;
 
-const statusTones: Record<AppointmentRecord["status"], StatusTone> = {
-  confirmed: "info",
-  pending: "warning",
-  completed: "success",
-  cancelled: "danger",
+const statusTones: Record<ApiAppointmentStatus, StatusTone> = {
+  CONFIRMED: "info",
+  PENDING: "warning",
+  COMPLETED: "success",
+  CANCELLED: "danger",
 };
 
+function getAvatarTone(patientId: string): keyof typeof avatarClasses {
+  const tones = Object.keys(avatarClasses) as (keyof typeof avatarClasses)[];
+  const value = [...patientId].reduce(
+    (total, character) => total + character.charCodeAt(0),
+    0,
+  );
+  return tones[value % tones.length];
+}
+
 function PatientCell({ appointment }: AppointmentPatientCellProps) {
-  const initials = appointment.patientName
+  const patientName = appointment.patient?.name ?? "Patient unavailable";
+  const patientAge = getPatientAge(appointment.patient?.dateOfBirth);
+  const initials = patientName
     .split(" ")
     .slice(0, 2)
     .map((part) => part[0])
@@ -52,20 +62,16 @@ function PatientCell({ appointment }: AppointmentPatientCellProps) {
     <div className="flex min-w-0 items-center gap-3">
       <Avatar className="size-9 shrink-0">
         <AvatarFallback
-          className={`text-xs font-semibold ${avatarClasses[appointment.avatarTone]}`}
+          className={`text-xs font-semibold ${avatarClasses[getAvatarTone(appointment.appointment.patientId)]}`}
         >
           {initials}
         </AvatarFallback>
       </Avatar>
       <div className="min-w-0">
-        <p className="truncate font-semibold text-foreground">
-          {appointment.patientName}
-        </p>
+        <p className="truncate font-semibold text-foreground">{patientName}</p>
         <p className="text-xs text-muted-foreground">
-          {appointment.patientAge !== null
-            ? `${appointment.patientAge} years · `
-            : ""}
-          {appointment.patientId}
+          {patientAge !== null ? `${patientAge} years · ` : ""}
+          {appointment.appointment.patientId}
         </p>
       </div>
     </div>
@@ -84,24 +90,16 @@ export function AppointmentList({
   onRetry,
 }: AppointmentListProps) {
   if (isLoading) return <Loader label="Loading appointments..." />;
-  if (error)
+  if (error) {
     return (
-      <ErrorState
-        title="Could not load appointments"
-        message={error}
-        onRetry={onRetry}
-      />
+      <ErrorState title="Could not load appointments" message={error} onRetry={onRetry} />
     );
-
+  }
   if (appointments.length === 0) {
     return (
       <NoDataFound
         title="No appointments found"
-        description={
-          onResetFilters
-            ? "Try a different search term or clear your filters."
-            : "There are no appointments to show yet."
-        }
+        description={onResetFilters ? "Try a different search term or clear your filters." : "There are no appointments to show yet."}
         actionLabel={onResetFilters ? "Clear filters" : undefined}
         onAction={onResetFilters}
       />
@@ -114,120 +112,50 @@ export function AppointmentList({
         <Table>
           <TableHeader className="bg-slate-50/90">
             <TableRow className="hover:bg-transparent">
-              <TableHead className="pl-5 text-xs tracking-wide text-muted-foreground uppercase">
-                Patient
-              </TableHead>
-              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Date &amp; time
-              </TableHead>
-              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Visit
-              </TableHead>
-              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Status
-              </TableHead>
-              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">
-                Fee
-              </TableHead>
-              <TableHead className="pr-5 text-right text-xs tracking-wide text-muted-foreground uppercase">
-                Action
-              </TableHead>
+              <TableHead className="pl-5 text-xs tracking-wide text-muted-foreground uppercase">Patient</TableHead>
+              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">Date &amp; time</TableHead>
+              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">Reason</TableHead>
+              <TableHead className="text-xs tracking-wide text-muted-foreground uppercase">Status</TableHead>
+              <TableHead className="pr-5 text-right text-xs tracking-wide text-muted-foreground uppercase">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {appointments.map((appointment) => (
-              <TableRow key={appointment.id}>
-                <TableCell className="max-w-58 pl-5">
-                  <PatientCell appointment={appointment} />
-                </TableCell>
-                <TableCell>
-                  <p className="font-medium text-foreground">
-                    {formatAppointmentDate(appointment.date)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatAppointmentTime(appointment.time)} ·{" "}
-                    {appointment.durationMinutes} min
-                  </p>
-                </TableCell>
-                <TableCell className="max-w-50">
-                  <p className="truncate font-medium text-foreground">
-                    {appointment.reason}
-                  </p>
-                  <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                    {appointment.visitType === "Video" ? (
-                      <Video
-                        className="size-3.5 text-primary"
-                        aria-hidden="true"
-                      />
-                    ) : appointment.visitType === "In-person" ? (
-                      <Building2
-                        className="size-3.5 text-secondary"
-                        aria-hidden="true"
-                      />
-                    ) : null}
-                    {appointment.visitType ?? "Not specified"}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <StatusBadge
-                    status={appointment.status}
-                    tone={statusTones[appointment.status]}
-                  />
-                </TableCell>
-                <TableCell className="font-medium tabular-nums">
-                  {appointment.feePkr === null
-                    ? "Not recorded"
-                    : formatAppointmentFee(appointment.feePkr)}
-                </TableCell>
-                <TableCell className="pr-5 text-right">
-                  <AppointmentActions
-                    appointment={appointment}
-                    onView={onView}
-                    onConfirm={onConfirm}
-                    onComplete={onComplete}
-                    onCancel={onCancel}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            {appointments.map((item) => {
+              const { appointment } = item;
+              return (
+                <TableRow key={appointment.id}>
+                  <TableCell className="max-w-58 pl-5"><PatientCell appointment={item} /></TableCell>
+                  <TableCell>
+                    <p className="font-medium text-foreground">{formatAppointmentDate(appointment.date)}</p>
+                    <p className="text-xs text-muted-foreground">{formatAppointmentTime(appointment.startTime)} · {getAppointmentDurationMinutes(appointment.startTime, appointment.endTime)} min</p>
+                  </TableCell>
+                  <TableCell className="max-w-64"><p className="truncate font-medium text-foreground">{appointment.reason?.trim() || "No reason provided"}</p></TableCell>
+                  <TableCell><StatusBadge status={appointment.status.toLowerCase()} tone={statusTones[appointment.status]} /></TableCell>
+                  <TableCell className="pr-5 text-right"><AppointmentActions appointment={item} onView={onView} onConfirm={onConfirm} onComplete={onComplete} onCancel={onCancel} /></TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
 
       <div className="divide-y xl:hidden">
-        {appointments.map((appointment) => (
-          <div key={appointment.id} className="space-y-3 px-5 py-4">
-            <div className="flex items-start justify-between gap-3">
-              <PatientCell appointment={appointment} />
-              <div className="flex shrink-0 items-center gap-2">
-                <StatusBadge
-                  status={appointment.status}
-                  tone={statusTones[appointment.status]}
-                />
-                <AppointmentActions
-                  appointment={appointment}
-                  onView={onView}
-                  onConfirm={onConfirm}
-                  onComplete={onComplete}
-                  onCancel={onCancel}
-                />
+        {appointments.map((item) => {
+          const { appointment } = item;
+          return (
+            <div key={appointment.id} className="space-y-3 px-5 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <PatientCell appointment={item} />
+                <div className="flex shrink-0 items-center gap-2">
+                  <StatusBadge status={appointment.status.toLowerCase()} tone={statusTones[appointment.status]} />
+                  <AppointmentActions appointment={item} onView={onView} onConfirm={onConfirm} onComplete={onComplete} onCancel={onCancel} />
+                </div>
               </div>
+              <p className="text-sm text-foreground">{appointment.reason?.trim() || "No reason provided"}</p>
+              <p className="text-xs text-muted-foreground">{formatAppointmentDate(appointment.date)} · {formatAppointmentTime(appointment.startTime)} · {getAppointmentDurationMinutes(appointment.startTime, appointment.endTime)} min</p>
             </div>
-            <p className="text-sm text-foreground">{appointment.reason}</p>
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span>
-                {formatAppointmentDate(appointment.date)} ·{" "}
-                {formatAppointmentTime(appointment.time)} ·{" "}
-                {appointment.visitType ?? "Visit type not specified"}
-              </span>
-              <span className="font-semibold text-foreground">
-                {appointment.feePkr === null
-                  ? "Fee not recorded"
-                  : formatAppointmentFee(appointment.feePkr)}
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </>
   );

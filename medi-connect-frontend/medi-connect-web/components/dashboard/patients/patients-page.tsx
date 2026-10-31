@@ -14,7 +14,7 @@ import { PAGINATION_PAGE_SIZE } from "@/constants/pagination";
 import { useDoctorPatients } from "@/hooks/apis/patients/use-patients";
 import { getApiErrorMessage } from "@/lib/api-error";
 import { getFilteredPatients, getPatientMetrics } from "@/lib/patient-list";
-import type { PatientFilters as PatientFilterValues, PatientRecord } from "@/types/patient";
+import type { ApiDoctorPatient, PatientFilters as PatientFilterValues } from "@/types/patient";
 
 const initialFilters: PatientFilterValues = { search: "", gender: "all", ageGroup: "all", sort: "recent" };
 
@@ -23,7 +23,7 @@ export function PatientsPage() {
   const patients = patientsQuery.data ?? [];
   const [filters, setFilters] = useState(initialFilters);
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<PatientRecord | null>(null);
+  const [selected, setSelected] = useState<ApiDoctorPatient | null>(null);
   const filtered = getFilteredPatients(patients, filters);
   const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / PAGINATION_PAGE_SIZE)));
   const visible = filtered.slice((currentPage - 1) * PAGINATION_PAGE_SIZE, currentPage * PAGINATION_PAGE_SIZE);

@@ -2,101 +2,64 @@ import type {
   ApiDoctorPatient,
   PatientFilters,
   PatientMetricsData,
-  PatientRecord,
 } from "@/types/patient";
+import { getPatientAge } from "@/lib/appointment-format";
 
-function normalizeGender(value: string | null): string | null {
-  if (!value) return null;
-  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-}
-
-function calculateAge(dateOfBirth?: string | null): number | null {
-  if (!dateOfBirth) return null;
-  const birthDate = new Date(dateOfBirth);
-  if (Number.isNaN(birthDate.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  if (
-    today.getMonth() < birthDate.getMonth() ||
-    (today.getMonth() === birthDate.getMonth() &&
-      today.getDate() < birthDate.getDate())
-  )
-    age -= 1;
-  return age >= 0 ? age : null;
-}
-
-export function mapDoctorPatientFromApi(item: ApiDoctorPatient): PatientRecord {
-  return {
-    id: item.patient.id,
-    name: item.patient.name,
-    age: calculateAge(item.patient.dateOfBirth),
-    gender: normalizeGender(item.patient.gender ?? null),
-    email: item.patient.email,
-    phone: item.patient.phone ?? null,
-    profileImage: item.patient.profileImage ?? null,
-    latestReason:
-      item.appointmentSummary.latest.reason?.trim() || "No reason provided",
-    latestAppointmentDate: item.appointmentSummary.latest.date,
-    latestAppointmentStatus:
-      item.appointmentSummary.latest.status.toLowerCase() as PatientRecord["latestAppointmentStatus"],
-    appointmentCount: item.appointmentSummary.total,
-    upcomingAppointmentCount: item.appointmentSummary.upcoming,
-    completedAppointmentCount: item.appointmentSummary.completed,
-  };
-}
-
-function matchesAge(patient: PatientRecord, group: PatientFilters["ageGroup"]) {
+function matchesAge(patient: ApiDoctorPatient, group: PatientFilters["ageGroup"]) {
   if (group === "all") return true;
-  if (patient.age === null) return false;
-  if (group === "under-18") return patient.age < 18;
-  if (group === "18-39") return patient.age <= 39;
-  if (group === "40-59") return patient.age <= 59;
-  return patient.age >= 60;
+  const age = getPatientAge(patient.patient.dateOfBirth);
+  if (age === null) return false;
+  if (group === "under-18") return age < 18;
+  if (group === "18-39") return age <= 39;
+  if (group === "40-59") return age <= 59;
+  return age >= 60;
 }
 
 export function getFilteredPatients(
-  patients: readonly PatientRecord[],
+  patients: readonly ApiDoctorPatient[],
   filters: PatientFilters,
-): PatientRecord[] {
+): ApiDoctorPatient[] {
   const query = filters.search.trim().toLowerCase();
   return patients
     .filter((patient) => {
       const values = [
-        patient.name,
-        patient.id,
-        patient.email ?? "",
-        patient.latestReason,
+        patient.patient.name,
+        patient.patient.id,
+        patient.patient.email ?? "",
+        patient.appointmentSummary.latest.reason ?? "",
       ];
       return (
         (!query ||
           values.some((value) => value.toLowerCase().includes(query))) &&
-        (filters.gender === "all" || patient.gender === filters.gender) &&
+        (filters.gender === "all" ||
+          patient.patient.gender === filters.gender) &&
         matchesAge(patient, filters.ageGroup)
       );
     })
     .sort((a, b) =>
       filters.sort === "name"
-        ? a.name.localeCompare(b.name)
-        : b.latestAppointmentDate.localeCompare(a.latestAppointmentDate) ||
-          a.name.localeCompare(b.name),
+        ? a.patient.name.localeCompare(b.patient.name)
+        : b.appointmentSummary.latest.date.localeCompare(
+            a.appointmentSummary.latest.date,
+          ) || a.patient.name.localeCompare(b.patient.name),
     );
 }
 
 export function getPatientMetrics(
-  patients: readonly PatientRecord[],
+  patients: readonly ApiDoctorPatient[],
 ): PatientMetricsData {
   return {
     total: patients.length,
     appointments: patients.reduce(
-      (total, patient) => total + patient.appointmentCount,
+      (total, patient) => total + patient.appointmentSummary.total,
       0,
     ),
     upcoming: patients.reduce(
-      (total, patient) => total + patient.upcomingAppointmentCount,
+      (total, patient) => total + patient.appointmentSummary.upcoming,
       0,
     ),
     completed: patients.reduce(
-      (total, patient) => total + patient.completedAppointmentCount,
+      (total, patient) => total + patient.appointmentSummary.completed,
       0,
     ),
   };

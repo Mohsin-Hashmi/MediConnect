@@ -22,8 +22,9 @@ export function AppointmentMetrics({ appointments }: AppointmentMetricsProps) {
       label: "Upcoming",
       value: appointments.filter(
         (item) =>
-          item.date >= today &&
-          (item.status === "confirmed" || item.status === "pending"),
+          item.appointment.date.slice(0, 10) >= today &&
+          (item.appointment.status === "CONFIRMED" ||
+            item.appointment.status === "PENDING"),
       ).length,
       note: "Confirmed or awaiting review",
       icon: CalendarClock,
@@ -31,14 +32,18 @@ export function AppointmentMetrics({ appointments }: AppointmentMetricsProps) {
     },
     {
       label: "Completed",
-      value: appointments.filter((item) => item.status === "completed").length,
+      value: appointments.filter(
+        (item) => item.appointment.status === "COMPLETED",
+      ).length,
       note: "Finished consultations",
       icon: CircleCheckBig,
       iconClass: "bg-emerald-50 text-emerald-700",
     },
     {
       label: "Pending requests",
-      value: appointments.filter((item) => item.status === "pending").length,
+      value: appointments.filter(
+        (item) => item.appointment.status === "PENDING",
+      ).length,
       note: "Need your review",
       icon: Clock3,
       iconClass: "bg-amber-50 text-amber-700",

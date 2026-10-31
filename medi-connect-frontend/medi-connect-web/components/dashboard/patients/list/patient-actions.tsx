@@ -21,7 +21,7 @@ export function PatientActions({ patient, onView }: PatientActionsProps) {
             variant="outline"
             size="icon"
             className="size-9"
-            aria-label={`Actions for ${patient.name}`}
+            aria-label={`Actions for ${patient.patient.name}`}
           />
         }
       >

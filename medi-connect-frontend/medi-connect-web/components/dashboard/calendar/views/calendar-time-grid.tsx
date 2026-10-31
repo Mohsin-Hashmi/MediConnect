@@ -58,7 +58,9 @@ export function CalendarTimeGrid({
           </div>
           {days.map((day) => {
             const date = calendarDateKey(day);
-            const dayAppointments = appointments.filter((item) => item.date === date);
+            const dayAppointments = appointments.filter(
+              (item) => item.appointment.date.slice(0, 10) === date,
+            );
             const dayBlocks = blocks.filter((block) => block.date === date);
             return (
               <div key={date} className="relative border-r border-slate-100 bg-white">
@@ -84,10 +86,16 @@ export function CalendarTimeGrid({
                 })}
                 {dayAppointments.map((appointment) => (
                   <div
-                    key={appointment.id}
+                    key={appointment.appointment.id}
                     style={{
-                      top: getCalendarPosition(appointment.time),
-                      height: Math.max(36, (appointment.durationMinutes / 60) * CALENDAR_HOUR_HEIGHT),
+                      top: getCalendarPosition(appointment.appointment.startTime),
+                      height: Math.max(
+                        36,
+                        ((timeToMinutes(appointment.appointment.endTime) -
+                          timeToMinutes(appointment.appointment.startTime)) /
+                          60) *
+                          CALENDAR_HOUR_HEIGHT,
+                      ),
                     }}
                     className="absolute inset-x-1 z-20"
                   >

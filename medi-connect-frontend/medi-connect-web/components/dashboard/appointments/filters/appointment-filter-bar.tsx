@@ -13,7 +13,7 @@ import {
 import type {
   AppointmentFilterBarProps,
   AppointmentSortOrder,
-  AppointmentStatus,
+  ApiAppointmentStatus,
 } from "@/types/appointment";
 
 export function AppointmentFilterBar({
@@ -41,14 +41,14 @@ export function AppointmentFilterBar({
       <Select
         items={{
           all: "All statuses",
-          confirmed: "Confirmed",
-          pending: "Pending",
-          completed: "Completed",
-          cancelled: "Cancelled",
+          CONFIRMED: "Confirmed",
+          PENDING: "Pending",
+          COMPLETED: "Completed",
+          CANCELLED: "Cancelled",
         }}
         value={filters.status}
         onValueChange={(value) =>
-          onChange({ status: (value ?? "all") as "all" | AppointmentStatus })
+          onChange({ status: (value ?? "all") as "all" | ApiAppointmentStatus })
         }
       >
         <SelectTrigger
@@ -59,10 +59,10 @@ export function AppointmentFilterBar({
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false}>
           <SelectItem value="all">All statuses</SelectItem>
-          <SelectItem value="confirmed">Confirmed</SelectItem>
-          <SelectItem value="pending">Pending</SelectItem>
-          <SelectItem value="completed">Completed</SelectItem>
-          <SelectItem value="cancelled">Cancelled</SelectItem>
+          <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+          <SelectItem value="PENDING">Pending</SelectItem>
+          <SelectItem value="COMPLETED">Completed</SelectItem>
+          <SelectItem value="CANCELLED">Cancelled</SelectItem>
         </SelectContent>
       </Select>
       <Select

@@ -1,12 +1,11 @@
-// Shared appointment values
-export type AppointmentStatus =
-  | "confirmed"
-  | "pending"
-  | "completed"
-  | "cancelled";
+import type { AvailabilityRecord } from "@/types/availability";
 
-export type ApiAppointmentStatus = Uppercase<AppointmentStatus>;
-export type AppointmentVisitType = "Video" | "In-person";
+// Shared appointment values
+export type ApiAppointmentStatus =
+  | "CONFIRMED"
+  | "PENDING"
+  | "COMPLETED"
+  | "CANCELLED";
 export type AppointmentAction = "confirm" | "complete" | "cancel";
 
 // Backend API contracts
@@ -24,6 +23,7 @@ export interface ApiAppointment {
   cancellationReason?: string | null;
   cancelledBy?: "patient" | "doctor" | null;
   cancelledAt?: string | null;
+  availability: AvailabilityRecord | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,40 +67,18 @@ export interface CancelAppointmentPayload {
   cancellationReason: string;
 }
 
-// Frontend view models and filters
-export interface AppointmentRecord {
-  id: string;
-  patientId: string;
-  patientName: string;
-  patientAge: number | null;
-  patientEmail: string | null;
-  patientPhone: string | null;
-  patientProfileImage: string | null;
-  reason: string;
-  notes: string | null;
-  date: string;
-  time: string;
-  endTime: string;
-  durationMinutes: number;
-  visitType: AppointmentVisitType | null;
-  status: AppointmentStatus;
-  feePkr: number | null;
-  cancellationReason: string | null;
-  avatarTone: "blue" | "teal" | "amber" | "violet";
-}
-
 export type AppointmentSortOrder = "schedule" | "oldest" | "newest";
 
 export interface AppointmentFilters {
   search: string;
   date: string;
-  status: "all" | AppointmentStatus;
+  status: "all" | ApiAppointmentStatus;
   sort: AppointmentSortOrder;
 }
 
 // Component props
 export interface AppointmentPageHeaderProps {
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
 }
 
 export interface AppointmentScheduleHeaderProps {
@@ -120,40 +98,40 @@ export interface AppointmentDateFilterProps {
 }
 
 export interface AppointmentDetailsDialogProps {
-  appointment: AppointmentRecord | null;
+  appointment: DoctorAppointmentApiItem | null;
   onClose: () => void;
 }
 
 export interface AppointmentListProps {
-  appointments: AppointmentRecord[];
-  onView: (appointment: AppointmentRecord) => void;
+  appointments: DoctorAppointmentApiItem[];
+  onView: (appointment: DoctorAppointmentApiItem) => void;
   onResetFilters?: () => void;
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
-  onConfirm?: (appointment: AppointmentRecord) => void;
-  onComplete?: (appointment: AppointmentRecord) => void;
-  onCancel?: (appointment: AppointmentRecord) => void;
+  onConfirm?: (appointment: DoctorAppointmentApiItem) => void;
+  onComplete?: (appointment: DoctorAppointmentApiItem) => void;
+  onCancel?: (appointment: DoctorAppointmentApiItem) => void;
 }
 
 export interface AppointmentMetricsProps {
-  appointments: AppointmentRecord[];
+  appointments: DoctorAppointmentApiItem[];
 }
 
 export interface AppointmentPatientCellProps {
-  appointment: AppointmentRecord;
+  appointment: DoctorAppointmentApiItem;
 }
 
 export interface AppointmentActionsProps {
-  appointment: AppointmentRecord;
-  onView: (appointment: AppointmentRecord) => void;
-  onConfirm?: (appointment: AppointmentRecord) => void;
-  onComplete?: (appointment: AppointmentRecord) => void;
-  onCancel?: (appointment: AppointmentRecord) => void;
+  appointment: DoctorAppointmentApiItem;
+  onView: (appointment: DoctorAppointmentApiItem) => void;
+  onConfirm?: (appointment: DoctorAppointmentApiItem) => void;
+  onComplete?: (appointment: DoctorAppointmentApiItem) => void;
+  onCancel?: (appointment: DoctorAppointmentApiItem) => void;
 }
 
 export interface CancelAppointmentDialogProps {
-  appointment: AppointmentRecord | null;
+  appointment: DoctorAppointmentApiItem | null;
   isPending: boolean;
   onClose: () => void;
   onConfirm: (payload: CancelAppointmentPayload) => void;

@@ -1,8 +1,9 @@
 import type {
+  DoctorAppointmentApiItem,
   AppointmentFilters,
-  AppointmentRecord,
   AppointmentSortOrder,
 } from "@/types/appointment";
+import { getAppointmentDateKey } from "@/lib/appointment-format";
 
 function getLocalDateKey(date: Date): string {
   const year = date.getFullYear();
@@ -17,19 +18,21 @@ function getScheduleGroup(date: string, today: string): number {
 }
 
 function compareAppointments(
-  first: AppointmentRecord,
-  second: AppointmentRecord,
+  first: DoctorAppointmentApiItem,
+  second: DoctorAppointmentApiItem,
   sort: AppointmentSortOrder,
   today: string,
 ): number {
-  const firstDateTime = `${first.date}T${first.time}`;
-  const secondDateTime = `${second.date}T${second.time}`;
+  const firstDate = getAppointmentDateKey(first.appointment.date);
+  const secondDate = getAppointmentDateKey(second.appointment.date);
+  const firstDateTime = `${firstDate}T${first.appointment.startTime}`;
+  const secondDateTime = `${secondDate}T${second.appointment.startTime}`;
 
   if (sort === "oldest") return firstDateTime.localeCompare(secondDateTime);
   if (sort === "newest") return secondDateTime.localeCompare(firstDateTime);
 
-  const firstGroup = getScheduleGroup(first.date, today);
-  const secondGroup = getScheduleGroup(second.date, today);
+  const firstGroup = getScheduleGroup(firstDate, today);
+  const secondGroup = getScheduleGroup(secondDate, today);
   const groupDifference = firstGroup - secondGroup;
   if (groupDifference !== 0) return groupDifference;
 
@@ -39,37 +42,38 @@ function compareAppointments(
 }
 
 function matchesSearch(
-  appointment: AppointmentRecord,
+  item: DoctorAppointmentApiItem,
   query: string,
 ): boolean {
   if (!query) return true;
 
   return [
-    appointment.patientName,
-    appointment.patientId,
-    appointment.id,
-    appointment.reason,
+    item.patient?.name ?? "",
+    item.appointment.patientId,
+    item.appointment.id,
+    item.appointment.reason ?? "",
   ].some((value) => value.toLowerCase().includes(query));
 }
 
 function matchesFilters(
-  appointment: AppointmentRecord,
+  item: DoctorAppointmentApiItem,
   filters: AppointmentFilters,
   query: string,
 ): boolean {
   return (
-    matchesSearch(appointment, query) &&
-    (!filters.date || appointment.date === filters.date) &&
-    (filters.status === "all" || appointment.status === filters.status)
+    matchesSearch(item, query) &&
+    (!filters.date ||
+      getAppointmentDateKey(item.appointment.date) === filters.date) &&
+    (filters.status === "all" || item.appointment.status === filters.status)
   );
 }
 
 /** Filters and orders appointments without mutating the API-backed list. */
 export function getFilteredAppointments(
-  appointments: readonly AppointmentRecord[],
+  appointments: readonly DoctorAppointmentApiItem[],
   filters: AppointmentFilters,
   referenceDate = new Date(),
-): AppointmentRecord[] {
+): DoctorAppointmentApiItem[] {
   const query = filters.search.trim().toLowerCase();
   const today = getLocalDateKey(referenceDate);
 

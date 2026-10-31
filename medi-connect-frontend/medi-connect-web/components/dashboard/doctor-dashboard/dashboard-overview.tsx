@@ -17,7 +17,7 @@ export function DashboardOverview() {
   const appointments = appointmentsQuery.data ?? [];
   const today = new Date().toISOString().slice(0, 10);
   const todayAppointments = appointments.filter(
-    (appointment) => appointment.date === today,
+    (appointment) => appointment.appointment.date.slice(0, 10) === today,
   );
   const nextAppointment = getNextAppointment(appointments);
   const error = appointmentsQuery.isError

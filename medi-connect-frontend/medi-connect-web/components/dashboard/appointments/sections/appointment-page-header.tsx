@@ -2,7 +2,6 @@ import { DashboardPageHeader } from "@/components/common/dashboard-page-header";
 import { PdfExportButton } from "@/components/common/pdf-export-button";
 import {
   formatAppointmentDate,
-  formatAppointmentFee,
   formatAppointmentTime,
 } from "@/lib/appointment-format";
 import type { AppointmentPageHeaderProps } from "@/types/appointment";
@@ -20,14 +19,12 @@ export function AppointmentPageHeader({
           subtitle={`${appointments.length} appointments | Filters currently applied`}
           filename="mediconnect-appointments-schedule.pdf"
           label="Export schedule"
-          headers={["Date & time", "Patient", "Reason", "Visit type", "Status", "Fee"]}
+          headers={["Date & time", "Patient", "Reason", "Status"]}
           rows={appointments.map((item) => [
-            `${formatAppointmentDate(item.date)} ${formatAppointmentTime(item.time)}`,
-            item.patientName,
-            item.reason,
-            item.visitType ?? "Not specified",
-            item.status,
-            item.feePkr === null ? "Not recorded" : formatAppointmentFee(item.feePkr),
+            `${formatAppointmentDate(item.appointment.date)} ${formatAppointmentTime(item.appointment.startTime)}`,
+            item.patient?.name ?? "Patient unavailable",
+            item.appointment.reason?.trim() || "No reason provided",
+            item.appointment.status,
           ])}
           className="h-10 gap-2 px-4 text-sm"
         />
