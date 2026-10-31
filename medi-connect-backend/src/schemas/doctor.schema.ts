@@ -25,6 +25,12 @@ export const createDoctorSchema = z.object({
     .trim()
     .min(2, "Specialization must be at least 2 characters long")
     .max(100, "Specialization must not exceed 100 characters"),
+  subspecialty: z
+    .string()
+    .trim()
+    .max(100, "Subspecialty must not exceed 100 characters")
+    .optional()
+    .nullable(),
   qualification: z
     .array(qualificationSchema)
     .min(1, "At least one qualification is required"),
@@ -38,6 +44,12 @@ export const createDoctorSchema = z.object({
     .trim()
     .min(3, "License number must be at least 3 characters long")
     .max(80, "License number must not exceed 80 characters"),
+  licensingAuthority: z
+    .string()
+    .trim()
+    .max(150, "Licensing authority must not exceed 150 characters")
+    .optional()
+    .nullable(),
   experience: z.coerce
     .number()
     .min(0, "Experience cannot be negative")
@@ -54,7 +66,17 @@ export const createDoctorSchema = z.object({
     .optional()
     .nullable(),
   bio: z.string().trim().max(1000, "Bio must not exceed 1000 characters").optional().nullable(),
-  isVerified: z.boolean().optional().default(false),
+  languages: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1, "Language must not be empty")
+        .max(50, "Language must not exceed 50 characters"),
+    )
+    .max(10, "A maximum of 10 languages is allowed")
+    .optional()
+    .default([]),
 });
 
 export const updateDoctorSchema = z.object({
@@ -64,6 +86,12 @@ export const updateDoctorSchema = z.object({
     .min(2, "Specialization must be at least 2 characters long")
     .max(100, "Specialization must not exceed 100 characters")
     .optional(),
+  subspecialty: z
+    .string()
+    .trim()
+    .max(100, "Subspecialty must not exceed 100 characters")
+    .optional()
+    .nullable(),
   qualification: z
     .array(qualificationSchema)
     .min(1, "At least one qualification is required")
@@ -74,6 +102,13 @@ export const updateDoctorSchema = z.object({
     .min(3, "License number must be at least 3 characters long")
     .max(80, "License number must not exceed 80 characters")
     .optional(),
+  licensingAuthority: z
+    .string()
+    .trim()
+    .max(150, "Licensing authority must not exceed 150 characters")
+    .optional()
+    .nullable(),
+  profilePicture: z.string().trim().optional().nullable(),
   experience: z.coerce
     .number()
     .min(0, "Experience cannot be negative")
@@ -91,7 +126,16 @@ export const updateDoctorSchema = z.object({
     .optional()
     .nullable(),
   bio: z.string().trim().max(1000, "Bio must not exceed 1000 characters").optional().nullable(),
-  isVerified: z.boolean().optional(),
+  languages: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1, "Language must not be empty")
+        .max(50, "Language must not exceed 50 characters"),
+    )
+    .max(10, "A maximum of 10 languages is allowed")
+    .optional(),
 });
 
 export type CreateDoctorInput = z.infer<typeof createDoctorSchema>;

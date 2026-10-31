@@ -7,6 +7,7 @@ import { createDoctorSchema } from "../schemas/doctor.schema.js";
 import {
   createDoctorProfile,
   deleteDoctorProfile,
+  getCurrentDoctorProfile,
   getAllDoctors,
   getDoctorById,
   updateDoctorProfile,
@@ -23,6 +24,7 @@ doctorRouter.post(
   validateSchema(createDoctorSchema),
   createDoctorProfile
 );
+doctorRouter.get("/me", authMiddleware, getCurrentDoctorProfile);
 doctorRouter.get("/:doctorId/availability",authMiddleware, verifyPatientRole, getDoctorAvailability);
 doctorRouter.get("/:doctorId", getDoctorById);
 doctorRouter.delete("/me", authMiddleware, deleteDoctorProfile);

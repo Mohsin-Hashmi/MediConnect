@@ -48,6 +48,7 @@ const userSchema = new Schema<IUserDocument>(
     gender: {
       type: String,
       trim: true,
+      enum: ["Female", "Male", "Other"],
       default: null,
     },
     address: {

@@ -72,14 +72,17 @@ export const createDoctorProfile = async (
   const doctor = await DoctorModel.create({
     userId: authenticatedUserId,
     specialization: payload.specialization,
+    subspecialty: payload.subspecialty ?? null,
     qualification: payload.qualification,
     profilePicture: payload.profilePicture ?? null,
     licenseNumber: payload.licenseNumber,
+    licensingAuthority: payload.licensingAuthority ?? null,
     experience: payload.experience,
     hospitalName: payload.hospitalName ?? null,
     consultationFee: payload.consultationFee ?? null,
     bio: payload.bio ?? null,
-    isVerified: payload.isVerified ?? false,
+    languages: payload.languages ?? [],
+    isVerified: false,
   });
 
   if (user.role !== "doctor") {
@@ -108,6 +111,37 @@ export const getDoctorById = async (doctorId: string) => {
   return {
     doctor: formatDoctor(doctor),
     user: user ? formatDoctorUser(user) : null,
+  };
+};
+
+/**
+ * - Finds the doctor profile owned by the authenticated user.
+ * - Includes the linked user summary required by the profile workspace.
+ */
+export const getCurrentDoctorProfile = async (
+  authenticatedUserId: string | undefined,
+) => {
+  if (!authenticatedUserId) {
+    throw new ServiceError("UNAUTHENTICATED", "User is not authenticated");
+  }
+
+  const doctor = await DoctorModel.findOne({ userId: authenticatedUserId });
+
+  if (!doctor) {
+    throw new ServiceError("NOT_FOUND", "Doctor profile not found");
+  }
+
+  const user = await UserModel.findById(authenticatedUserId).select(
+    "_id name email role phone profileImage",
+  );
+
+  if (!user) {
+    throw new ServiceError("NOT_FOUND", "Doctor account not found");
+  }
+
+  return {
+    doctor: formatDoctor(doctor),
+    user: formatDoctorUser(user),
   };
 };
 
@@ -228,9 +262,33 @@ export const updateDoctorProfile = async (
     }
   }
 
+  const licenseNumberChanged =
+    payload.licenseNumber !== undefined &&
+    payload.licenseNumber !== doctor.licenseNumber;
+  const licensingAuthorityChanged =
+    payload.licensingAuthority !== undefined &&
+    payload.licensingAuthority !== (doctor.licensingAuthority ?? null);
+  const qualificationsChanged =
+    payload.qualification !== undefined &&
+    JSON.stringify(payload.qualification) !==
+      JSON.stringify(
+        doctor.qualification.map(({ degree, institute, year }) => ({
+          degree,
+          institute,
+          year,
+        })),
+      );
+  const credentialsChanged =
+    licenseNumberChanged ||
+    licensingAuthorityChanged ||
+    qualificationsChanged;
+  const updateData = credentialsChanged
+    ? { ...payload, isVerified: false }
+    : payload;
+
   const updatedDoctor = await DoctorModel.findByIdAndUpdate(
     doctor._id,
-    { $set: payload },
+    { $set: updateData },
     { new: true, runValidators: true },
   );
 

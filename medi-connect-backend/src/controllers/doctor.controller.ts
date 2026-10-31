@@ -7,6 +7,7 @@ import type {
 import {
   createDoctorProfile as createDoctorProfileService,
   deleteDoctorProfile as deleteDoctorProfileService,
+  getCurrentDoctorProfile as getCurrentDoctorProfileService,
   getAllDoctors as getAllDoctorsService,
   getDoctorById as getDoctorByIdService,
   updateDoctorProfile as updateDoctorProfileService,
@@ -66,6 +67,24 @@ const parseDoctorListOptions = (query: Request["query"]) => {
   }
 
   return options;
+};
+
+/**
+ * - Reads the authenticated user ID.
+ * - Sends the doctor profile owned by that user with its account summary.
+ */
+export const getCurrentDoctorProfile = async (req: Request, res: Response) => {
+  try {
+    const data = await getCurrentDoctorProfileService(req.user?.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Current doctor profile retrieved successfully",
+      data,
+    });
+  } catch (error) {
+    sendControllerError(res, error, "Get current doctor profile failed:");
+  }
 };
 
 /**

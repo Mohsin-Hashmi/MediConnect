@@ -48,6 +48,12 @@ const doctorSchema = new Schema<IDoctorDocument>(
       trim: true,
       maxlength: 100,
     },
+    subspecialty: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      default: null,
+    },
     qualification: {
       type: [qualificationSchema],
       required: true,
@@ -64,6 +70,12 @@ const doctorSchema = new Schema<IDoctorDocument>(
       unique: true,
       trim: true,
       maxlength: 80,
+    },
+    licensingAuthority: {
+      type: String,
+      trim: true,
+      maxlength: 150,
+      default: null,
     },
     experience: {
       type: Number,
@@ -85,6 +97,16 @@ const doctorSchema = new Schema<IDoctorDocument>(
       type: String,
       trim: true,
       default: null,
+    },
+    languages: {
+      type: [
+        {
+          type: String,
+          trim: true,
+          maxlength: 50,
+        },
+      ],
+      default: [],
     },
     isVerified: {
       type: Boolean,

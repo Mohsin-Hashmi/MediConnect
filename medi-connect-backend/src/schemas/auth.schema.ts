@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { UserRole } from "../models/auth.model.js";
 
+const genderSchema = z.enum(["Female", "Male", "Other"]);
+
 export const registerSchema = z.object({
   name: z
     .string()
@@ -20,7 +22,7 @@ export const registerSchema = z.object({
   phone: z.string().trim().max(20, "Phone number must not exceed 20 characters").optional(),
   profileImage: z.string().trim().url("Profile image must be a valid URL").optional().or(z.literal("")),
   dateOfBirth: z.coerce.date().optional(),
-  gender: z.string().trim().max(20, "Gender must not exceed 20 characters").optional(),
+  gender: genderSchema.optional(),
   address: z.string().trim().max(255, "Address must not exceed 255 characters").optional(),
   role: z.enum(UserRole, "Role must be either patient or doctor"),
 });
@@ -39,6 +41,12 @@ export const refreshTokenSchema = z.object({
 });
 
 export const profileUpdateSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters long")
+    .max(80, "Name must not exceed 80 characters")
+    .optional(),
   phone: z.string().trim().max(20, "Phone number must not exceed 20 characters").optional().nullable(),
   profileImage: z
     .union([
@@ -49,7 +57,7 @@ export const profileUpdateSchema = z.object({
     .nullable()
     .transform((value) => (value === "" ? null : value)),
   dateOfBirth: z.coerce.date().optional().nullable(),
-  gender: z.string().trim().max(20, "Gender must not exceed 20 characters").optional().nullable(),
+  gender: genderSchema.optional().nullable(),
   address: z.string().trim().max(255, "Address must not exceed 255 characters").optional().nullable(),
 });
 
