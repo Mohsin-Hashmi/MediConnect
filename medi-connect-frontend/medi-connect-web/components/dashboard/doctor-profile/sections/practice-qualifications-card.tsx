@@ -14,6 +14,8 @@ import type { DoctorProfileFormSectionProps } from "@/types/doctor-profile";
 export function PracticeQualificationsCard({
   formik,
 }: DoctorProfileFormSectionProps) {
+  const { doctor } = formik.values;
+
   return (
     <Card id="practice-qualifications" className="scroll-mt-24 gap-0 py-0 shadow-sm ring-slate-200/90">
       <CardHeader className="border-b px-5 py-5 sm:px-6">
@@ -26,25 +28,25 @@ export function PracticeQualificationsCard({
         <div className="grid gap-5 sm:grid-cols-2">
           <ProfileField
             id="hospital-name"
-            name="hospitalName"
+            name="doctor.hospitalName"
             label="Primary hospital or clinic"
-            value={formik.values.hospitalName}
+            value={doctor.hospitalName ?? ""}
             icon={Building2}
             required
             className="sm:col-span-2"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.hospitalName
-                ? formik.errors.hospitalName
+              formik.touched.doctor?.hospitalName
+                ? formik.errors.doctor?.hospitalName
                 : undefined
             }
           />
           <ProfileField
             id="experience-years"
-            name="experienceYears"
+            name="doctor.experience"
             label="Clinical experience"
-            value={formik.values.experienceYears}
+            value={doctor.experience}
             type="number"
             icon={CalendarCheck2}
             min={0}
@@ -53,16 +55,16 @@ export function PracticeQualificationsCard({
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.experienceYears
-                ? formik.errors.experienceYears
+              formik.touched.doctor?.experience
+                ? formik.errors.doctor?.experience
                 : undefined
             }
           />
           <ProfileField
             id="consultation-fee"
-            name="consultationFee"
+            name="doctor.consultationFee"
             label="Standard consultation fee (PKR)"
-            value={formik.values.consultationFee}
+            value={doctor.consultationFee ?? ""}
             type="number"
             icon={WalletCards}
             min={1}
@@ -70,8 +72,8 @@ export function PracticeQualificationsCard({
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={
-              formik.touched.consultationFee
-                ? formik.errors.consultationFee
+              formik.touched.doctor?.consultationFee
+                ? formik.errors.doctor?.consultationFee
                 : undefined
             }
           />
@@ -83,15 +85,19 @@ export function PracticeQualificationsCard({
             <p className="font-semibold">Education & credentials</p>
           </div>
           <div className="space-y-3">
-            {formik.values.qualifications.map((qualification) => (
-              <div key={qualification.id} className="flex flex-col gap-2 rounded-xl border bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+            {doctor.qualification.length > 0 ? doctor.qualification.map((qualification, index) => (
+              <div key={`${qualification.degree}-${qualification.institute}-${qualification.year}-${index}`} className="flex flex-col gap-2 rounded-xl border bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="font-semibold">{qualification.degree}</p>
                   <p className="mt-0.5 text-sm text-muted-foreground">{qualification.institute}</p>
                 </div>
                 <Badge variant="outline" className="bg-white">Completed {qualification.year}</Badge>
               </div>
-            ))}
+            )) : (
+              <p className="rounded-xl border bg-slate-50/70 p-4 text-sm text-muted-foreground">
+                No qualifications have been added.
+              </p>
+            )}
           </div>
         </div>
 
@@ -101,9 +107,11 @@ export function PracticeQualificationsCard({
             <p className="font-semibold">Languages spoken</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {formik.values.languages.map((language) => (
+            {doctor.languages.length > 0 ? doctor.languages.map((language) => (
               <Badge key={language} variant="secondary" className="h-7 px-3">{language}</Badge>
-            ))}
+            )) : (
+              <p className="text-sm text-muted-foreground">No languages have been added.</p>
+            )}
           </div>
         </div>
       </CardContent>

@@ -14,7 +14,7 @@ This file applies to this Next.js application (`medi-connect-frontend/medi-conne
 
 ## Purpose and current reality
 
-MediConnect is a healthcare scheduling frontend with account access, doctor onboarding, and a doctor portal. The portal currently has a dashboard overview, API-backed appointments, a calendar, a read-only patient directory derived from assigned appointments, and API-backed dated availability management. Doctor profile, reviews, earnings, messages, notifications, and settings currently provide clearly bounded interface previews. Patients own their accounts and appointment creation; doctors can view connected patients, manage their bookable availability, and perform only supported appointment status actions.
+MediConnect is a healthcare scheduling frontend with account access, doctor onboarding, and a doctor portal. The portal currently has a dashboard overview, API-backed appointments, a calendar, a read-only patient directory derived from assigned appointments, API-backed dated availability management, and API-backed doctor profile management. Reviews, earnings, messages, notifications, and settings currently provide clearly bounded interface previews. Patients own their accounts and appointment creation; doctors can view connected patients, manage their bookable availability and profile, and perform only supported appointment status actions.
 
 ## Stack and commands
 
@@ -36,6 +36,13 @@ MediConnect is a healthcare scheduling frontend with account access, doctor onbo
 - Reuse the existing Formik/Yup/Sonner patterns for new forms and validation. Keep mock fixtures out of production API hooks. Use the `@/` import alias and preserve the project's existing naming conventions.
 - Appointments, Calendar, and Dashboard reuse the doctor appointment query through `hooks/apis/appointments/`. The read-only Patients directory uses its doctor-scoped query in `hooks/apis/patients/`. Patients create bookings; the doctor portal may only view, confirm, complete, or cancel assigned appointments. Availability mutations live in `hooks/apis/availability/`.
 - Keep date and time handling consistent with the existing `YYYY-MM-DD` and `HH:mm` appointment fields. Account for timezone and overlapping/blocked slots when changing scheduling behavior.
+
+## API integration gate
+
+- Before connecting any frontend module to an API, inspect and document the authoritative backend model, validation schema, route, authentication and role rules, request payload, response envelope, nullability, enums, and error behavior against the frontend types, form schema, and UI fields.
+- Classify every required field and operation as compatible, transformable, missing, or conflicting. Resolve missing or conflicting contracts deliberately before replacing mock data; do not hide contract gaps with frontend-only defaults, unsafe casts, invented response shapes, or parallel fields with unclear ownership.
+- Confirm the read, create, update, and delete ownership required by the product workflow. Run the relevant frontend and backend validation commands after integration, and keep preview-only behavior clearly identified until the complete contract is verified.
+- Once a backend contract is confirmed, frontend API types, form paths, state properties, and integration variables must use the authoritative backend field names and nesting. Do not introduce aliases such as `specialty` for `specialization`, `biography` for `bio`, or `qualifications` for `qualification`. Keep derived display-only values local and clearly named; add a mapping layer only when an external contract cannot be changed or represented directly.
 
 ## Strict boundaries
 

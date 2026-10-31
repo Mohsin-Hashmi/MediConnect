@@ -9,6 +9,8 @@ import type {
 } from "@/types/settings";
 
 export function SettingsNavigation({ items }: SettingsNavigationProps) {
+
+
   useEffect(() => {
     const sectionId = window.location.hash.slice(1) as SettingsSectionId;
 

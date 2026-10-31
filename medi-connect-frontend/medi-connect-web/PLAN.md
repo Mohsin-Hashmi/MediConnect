@@ -1,6 +1,6 @@
 # MediConnect frontend plan
 
-Updated: 2026-10-29. This is a working scope document, not a claim that the entire product is implemented. `AGENTS.md` contains the coding rules and boundaries.
+Updated: 2026-10-31. This is a working scope document, not a claim that the entire product is implemented. `AGENTS.md` contains the coding rules and boundaries.
 
 ## Product shape
 
@@ -17,7 +17,7 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Calendar | Day/week/month views and appointment details backed by the same TanStack Query appointment cache as Appointments. Blocked-time data is not displayed until an authoritative API is connected. |
 | Patients | Read-only doctor-scoped API directory of patients connected through assigned appointments, with metrics, search/filter/sort, 10-row pagination, details, and PDF export. Patient account creation and profile management stay in the patient flow. |
 | Availability | Doctor-scoped API list/create/update/delete for dated bookable windows, with Formik/Yup validation, status, slot capacity, loading/error/empty states, and confirmation before deletion. |
-| Doctor profile | Responsive profile-management UI built with isolated mock data; API persistence and public-profile preview are not connected yet. |
+| Doctor profile | Authenticated account and professional profile data loaded from the backend, with validated account/professional updates, authoritative verification state, loading/error handling, and patient-preview rendering. Replacement image upload and a separate public-profile route are not connected yet. |
 | Reviews | Responsive patient-feedback preview with isolated mock data, rating metrics and distribution, filters, pagination, PDF export, and non-persisting reply controls; the reviews API is not connected yet. |
 | Earnings | Responsive financial reporting preview with isolated mock data, revenue metrics, chart, filters, pagination, and PDF export; payout and settlement APIs are not connected. |
 | Messages | Responsive messaging workspace preview with isolated mock conversations, searchable All/Unread inbox views, appointment context, accessible message history, and non-sending composer controls; REST history and Socket.IO are not connected yet. |

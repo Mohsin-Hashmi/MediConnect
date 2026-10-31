@@ -8,7 +8,7 @@ import {
 
 import { ChecklistItem } from "@/components/common/checklist-item";
 import { IconText } from "@/components/common/icon-text";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,9 +16,36 @@ import {
   ProgressLabel,
   ProgressValue,
 } from "@/components/ui/progress";
-import type { DoctorProfileSectionProps } from "@/types/doctor-profile";
+import type { DoctorProfileSummaryProps } from "@/types/doctor-profile";
 
-export function ProfileSummary({ profile }: DoctorProfileSectionProps) {
+export function ProfileSummary({ profile }: DoctorProfileSummaryProps) {
+  const { user, doctor } = profile;
+  const normalizedName = user.name.replace(/^dr\.?\s+/i, "").trim();
+  const displayName = `Dr. ${normalizedName}`;
+  const initials =
+    normalizedName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((name) => name.charAt(0).toUpperCase())
+      .join("") || "DR";
+  const completionRequirements = [
+    user.name,
+    user.email,
+    doctor.specialization,
+    doctor.bio,
+    doctor.licenseNumber,
+    doctor.hospitalName,
+    Number(doctor.consultationFee) > 0,
+    doctor.qualification.length > 0,
+    doctor.profilePicture,
+  ];
+  const profileCompletion = Math.round(
+    (completionRequirements.filter(Boolean).length /
+      completionRequirements.length) *
+      100,
+  );
+
   return (
     <aside className="grid w-full min-w-0 content-start gap-5 self-start">
       <Card className="w-full gap-0 py-0 shadow-sm ring-slate-200/90">
@@ -31,36 +58,51 @@ export function ProfileSummary({ profile }: DoctorProfileSectionProps) {
         <CardContent className="px-5 py-5">
           <div className="flex items-start gap-3">
             <Avatar className="size-14 bg-primary/10">
+              {doctor.profilePicture ? (
+                <AvatarImage
+                  src={doctor.profilePicture}
+                  alt={`${displayName} profile`}
+                />
+              ) : null}
               <AvatarFallback className="bg-primary/10 font-semibold text-primary">
-                {profile.initials}
+                {initials}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <p className="font-semibold">{profile.displayName}</p>
-                {profile.isVerified ? (
+                <p className="font-semibold">{displayName}</p>
+                {doctor.isVerified ? (
                   <BadgeCheck className="size-4 fill-primary text-white" />
                 ) : null}
               </div>
-              <p className="mt-0.5 text-sm text-primary">{profile.specialty}</p>
+              <p className="mt-0.5 text-sm text-primary">
+                {doctor.specialization}
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {profile.experienceYears} years of clinical experience
+                {doctor.experience} years of clinical experience
               </p>
             </div>
           </div>
           <div className="my-4 h-px bg-border" />
           <div className="space-y-3 text-sm">
-            <IconText icon={Building2} text={profile.hospitalName} />
+            <IconText
+              icon={Building2}
+              text={doctor.hospitalName || "Practice location not added"}
+            />
             <IconText
               icon={MapPin}
               text="Practice location available when booking"
             />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Badge variant="secondary">
-              PKR {profile.consultationFee.toLocaleString()}
-            </Badge>
-            <Badge variant="outline">{profile.subspecialty}</Badge>
+            {Number(doctor.consultationFee) > 0 ? (
+              <Badge variant="secondary">
+                PKR {Number(doctor.consultationFee).toLocaleString()}
+              </Badge>
+            ) : null}
+            {doctor.subspecialty ? (
+              <Badge variant="outline">{doctor.subspecialty}</Badge>
+            ) : null}
           </div>
         </CardContent>
       </Card>
@@ -70,16 +112,33 @@ export function ProfileSummary({ profile }: DoctorProfileSectionProps) {
           <CardTitle>Profile readiness</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 px-5 py-5">
-          <Progress value={profile.profileCompletion}>
+          <Progress value={profileCompletion}>
             <ProgressLabel>Profile completion</ProgressLabel>
             <ProgressValue>
-              {() => `${profile.profileCompletion}%`}
+              {() => `${profileCompletion}%`}
             </ProgressValue>
           </Progress>
           <div className="space-y-2.5">
-            <ChecklistItem label="Identity details complete" />
-            <ChecklistItem label="License information added" />
-            <ChecklistItem label="Practice details added" />
+            <ChecklistItem
+              label="Identity details complete"
+              status={
+                user.name && user.email
+                  ? "complete"
+                  : "incomplete"
+              }
+            />
+            <ChecklistItem
+              label="License information added"
+              status={doctor.licenseNumber ? "complete" : "incomplete"}
+            />
+            <ChecklistItem
+              label="Practice details added"
+              status={
+                doctor.hospitalName && Number(doctor.consultationFee) > 0
+                  ? "complete"
+                  : "incomplete"
+              }
+            />
           </div>
           <div className="flex gap-2 rounded-lg bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 ring-1 ring-amber-200">
             <Lightbulb className="mt-0.5 size-4 shrink-0" />

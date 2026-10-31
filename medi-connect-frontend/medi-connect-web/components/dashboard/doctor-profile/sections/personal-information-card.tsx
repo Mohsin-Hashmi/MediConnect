@@ -1,7 +1,7 @@
 import { Camera, CircleCheckBig } from "lucide-react";
 
 import { ProfileField } from "@/components/common/profile-field";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +22,18 @@ import {
 import type { DoctorProfileFormSectionProps } from "@/types/doctor-profile";
 
 export function PersonalInformationCard({
-  profile,
   formik,
 }: DoctorProfileFormSectionProps) {
+  const { user, doctor } = formik.values;
+  const initials =
+    user.name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((name) => name.charAt(0).toUpperCase())
+      .join("") || "DR";
+
   return (
     <Card
       id="personal-information"
@@ -38,7 +47,7 @@ export function PersonalInformationCard({
               Keep your identity and contact details accurate.
             </CardDescription>
           </div>
-          {profile.isVerified ? (
+          {doctor.isVerified ? (
             <Badge className="bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
               <CircleCheckBig className="size-3.5" />
               Identity verified
@@ -49,17 +58,24 @@ export function PersonalInformationCard({
       <CardContent className="space-y-6 px-5 py-5 sm:px-6">
         <div className="flex flex-col gap-4 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center">
           <Avatar className="size-20 bg-primary/10 text-primary">
+            {doctor.profilePicture ? (
+              <AvatarImage
+                src={doctor.profilePicture}
+                alt={`${user.name} profile`}
+              />
+            ) : null}
             <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">
-              {profile.initials}
+              {initials}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="font-semibold">Profile photo</p>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Use a clear, professional headshot. JPG, PNG, or WebP up to 5 MB.
+              The current professional headshot is loaded from your doctor profile.
+              Uploading a replacement requires the media storage API.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button type="button" variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm" disabled>
                 <Camera className="size-4" />
                 Change photo
               </Button>
@@ -68,6 +84,10 @@ export function PersonalInformationCard({
                 variant="ghost"
                 size="sm"
                 className="text-muted-foreground"
+                disabled={!doctor.profilePicture}
+                onClick={() =>
+                  void formik.setFieldValue("doctor.profilePicture", null)
+                }
               >
                 Remove
               </Button>
@@ -77,61 +97,49 @@ export function PersonalInformationCard({
 
         <div className="grid gap-5 sm:grid-cols-2">
           <ProfileField
-            id="first-name"
-            name="firstName"
-            label="First name"
-            value={formik.values.firstName}
+            id="name"
+            name="user.name"
+            label="Full name"
+            value={user.name}
             required
-            autoComplete="given-name"
+            autoComplete="name"
+            className="sm:col-span-2"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={
-              formik.touched.firstName ? formik.errors.firstName : undefined
-            }
-          />
-          <ProfileField
-            id="last-name"
-            name="lastName"
-            label="Last name"
-            value={formik.values.lastName}
-            required
-            autoComplete="family-name"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.lastName ? formik.errors.lastName : undefined
-            }
+            error={formik.touched.user?.name ? formik.errors.user?.name : undefined}
           />
           <ProfileField
             id="email"
-            name="email"
+            name="user.email"
             label="Work email"
-            value={formik.values.email}
+            value={user.email}
             type="email"
             required
+            readOnly
             autoComplete="email"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.email ? formik.errors.email : undefined}
+            error={formik.touched.user?.email ? formik.errors.user?.email : undefined}
+            inputClassName="bg-slate-50 text-muted-foreground"
           />
           <ProfileField
             id="phone"
-            name="phone"
+            name="user.phone"
             label="Phone number"
-            value={formik.values.phone}
+            value={user.phone ?? ""}
             type="tel"
             autoComplete="tel"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.phone ? formik.errors.phone : undefined}
+            error={formik.touched.user?.phone ? formik.errors.user?.phone : undefined}
           />
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="gender">Gender</Label>
             <Select
-              value={formik.values.gender}
+              value={user.gender}
               onValueChange={(value) => {
-                void formik.setFieldValue("gender", value);
-                void formik.setFieldTouched("gender", true, false);
+                void formik.setFieldValue("user.gender", value);
+                void formik.setFieldTouched("user.gender", true, false);
               }}
             >
               <SelectTrigger
@@ -139,10 +147,10 @@ export function PersonalInformationCard({
                 size="lg"
                 className="w-full bg-white data-[size=lg]:h-11 data-[size=lg]:px-2.5"
                 aria-invalid={Boolean(
-                  formik.touched.gender && formik.errors.gender,
+                  formik.touched.user?.gender && formik.errors.user?.gender,
                 )}
-              >
-                <SelectValue />
+            >
+              <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent
                 align="start"
@@ -160,9 +168,9 @@ export function PersonalInformationCard({
                 </SelectItem>
               </SelectContent>
             </Select>
-            {formik.touched.gender && formik.errors.gender ? (
+            {formik.touched.user?.gender && formik.errors.user?.gender ? (
               <p className="text-xs text-destructive">
-                {formik.errors.gender}
+                {formik.errors.user.gender}
               </p>
             ) : null}
           </div>
