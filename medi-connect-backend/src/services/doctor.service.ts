@@ -13,7 +13,6 @@ import { ServiceError } from "../utils/service-error.util.js";
 const escapeRegex = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-
 export type DoctorListOptions = {
   specialization?: string;
   experience?: number;
@@ -132,7 +131,7 @@ export const getCurrentDoctorProfile = async (
   }
 
   const user = await UserModel.findById(authenticatedUserId).select(
-    "_id name email role phone profileImage",
+    "_id name email role phone profileImage gender",
   );
 
   if (!user) {
@@ -279,9 +278,7 @@ export const updateDoctorProfile = async (
         })),
       );
   const credentialsChanged =
-    licenseNumberChanged ||
-    licensingAuthorityChanged ||
-    qualificationsChanged;
+    licenseNumberChanged || licensingAuthorityChanged || qualificationsChanged;
   const updateData = credentialsChanged
     ? { ...payload, isVerified: false }
     : payload;
