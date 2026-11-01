@@ -27,6 +27,7 @@ MediConnect is a healthcare scheduling frontend with account access, doctor onbo
 
 ## Code map and architecture rules
 
+- Keep implementation clean, scalable, secure, modular, readable, and aligned with established industrial practices. Prefer explicit contracts and focused components over duplication, oversized files, hidden side effects, or unnecessary abstraction.
 - `app/`: routes and route layouts. Keep page files thin; the dashboard layout owns the shared sidebar and topbar.
 - `components/ui/`: installed shadcn primitives. Compose these before adding new UI dependencies or recreating a primitive. Keep feature-specific styling in feature components; do not casually rewrite generated primitives.
 - `components/auth/`, `components/onboarding/`, and `components/dashboard/<feature>/`: feature UI. Keep each feature's entry component at its feature root, then group implementation details into focused subfolders such as `dialogs/`, `filters/`, `list/`, `sections/`, `views/`, `layout/`, or `shared/` as appropriate. Do not add a subfolder for a single component without a clear feature boundary. Give each component one responsibility and avoid oversized page components. Put only genuinely cross-feature UI in `components/common/`.
@@ -34,7 +35,7 @@ MediConnect is a healthcare scheduling frontend with account access, doctor onbo
 - `hooks/onboarding/`: onboarding form state and flow. `context/`: cross-feature React contexts. `providers/`: other application-level providers.
 - `types/`: shared TypeScript types and component prop interfaces. `schemas/`: Yup validation schemas. `constants/`: reusable static options and keys. `data/mock/`: clearly labeled demo fixtures. `lib/`: pure formatting, filtering, scheduling, and storage utilities.
 - Reuse the existing Formik/Yup/Sonner patterns for new forms and validation. Keep mock fixtures out of production API hooks. Use the `@/` import alias and preserve the project's existing naming conventions.
-- Appointments, Calendar, and Dashboard reuse the doctor appointment query through `hooks/apis/appointments/`. The read-only Patients directory uses its doctor-scoped query in `hooks/apis/patients/`. Patients create bookings; the doctor portal may only view, confirm, complete, or cancel assigned appointments. Availability mutations live in `hooks/apis/availability/`.
+- Appointments, Calendar, and Dashboard reuse the doctor appointment query through `hooks/apis/appointments/`. The read-only Patients directory uses its doctor-scoped query in `hooks/apis/patients/`. Reviews use the doctor-scoped query and reply mutation in `hooks/apis/reviews/`. Patients create bookings and reviews; the doctor portal may only view, confirm, complete, or cancel assigned appointments and reply to its own reviews. Availability mutations live in `hooks/apis/availability/`.
 - Keep date and time handling consistent with the existing `YYYY-MM-DD` and `HH:mm` appointment fields. Account for timezone and overlapping/blocked slots when changing scheduling behavior.
 
 ## API integration gate

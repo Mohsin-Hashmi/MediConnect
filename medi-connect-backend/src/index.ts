@@ -10,6 +10,7 @@ import { availabilityRouter } from "./routes/availability.route.js";
 import { doctorRouter } from "./routes/doctor.route.js";
 import { profileRouter } from "./routes/profile.route.js";
 import { patientRouter } from "./routes/patient.route.js";
+import { reviewRouter } from "./routes/review.route.js";
 import { connectToDatabase } from "./config/db-connection.js";
 
 const PORT = process.env.PORT || 7000;
@@ -35,6 +36,7 @@ app.use("/api/doctors", doctorRouter);
 app.use("/api/availability", availabilityRouter);
 app.use("/api/appointments", appointmentRouter);
 app.use("/api/patients", patientRouter);
+app.use("/api/reviews", reviewRouter);
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Hello, World How are you? I am fine");

@@ -18,7 +18,7 @@ export function ReviewFilterBar({
   hasFilters,
 }: ReviewFilterBarProps) {
   return (
-    <div className="grid gap-3 border-b px-5 py-4 md:grid-cols-2 xl:grid-cols-[minmax(16rem,1fr)_11rem_12rem_12rem_11rem_auto]">
+    <div className="grid gap-3 border-b px-5 py-4 md:grid-cols-2 xl:grid-cols-[minmax(16rem,1fr)_11rem_12rem_11rem_auto]">
       <div className="relative md:col-span-2 xl:col-span-1">
         <Search
           className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500"
@@ -64,32 +64,6 @@ export function ReviewFilterBar({
               {rating} {rating === 1 ? "star" : "stars"}
             </SelectItem>
           ))}
-        </SelectContent>
-      </Select>
-      <Select
-        items={{
-          all: "All S",
-          "in-person": "In-person",
-          video: "Video",
-        }}
-        value={filters.consultationType}
-        onValueChange={(value) =>
-          onChange({
-            consultationType: (value ??
-              "all") as ReviewFilters["consultationType"],
-          })
-        }
-      >
-        <SelectTrigger
-          aria-label="Filter by consultation type"
-          className="w-full bg-white px-2.5 text-sm data-[size=default]:h-10"
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All consultations</SelectItem>
-          <SelectItem value="in-person">In-person</SelectItem>
-          <SelectItem value="video">Video</SelectItem>
         </SelectContent>
       </Select>
       <Select

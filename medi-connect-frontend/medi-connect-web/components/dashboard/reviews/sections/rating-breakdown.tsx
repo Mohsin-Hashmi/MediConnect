@@ -15,7 +15,7 @@ export function RatingBreakdown({
           <div>
             <CardTitle className="font-semibold">Rating breakdown</CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">
-              Distribution across all feedback in this preview.
+              Distribution across all submitted patient feedback.
             </p>
           </div>
           <span className="text-sm text-muted-foreground">

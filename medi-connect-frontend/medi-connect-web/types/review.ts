@@ -1,29 +1,45 @@
+import type { ApiAppointmentStatus } from "@/types/appointment";
+
 export type ReviewRating = 1 | 2 | 3 | 4 | 5;
-export type ReviewConsultationType = "in-person" | "video";
 export type ReviewReplyStatus = "all" | "replied" | "unanswered";
 export type ReviewSortOrder = "newest" | "oldest" | "highest" | "lowest";
 
-export interface DoctorReview {
+export interface Review {
   id: string;
-  patientLabel: string;
+  appointmentId: string;
+  patientId: string;
+  doctorId: string;
   rating: ReviewRating;
   comment: string;
-  submittedAt: string;
-  consultationDate: string;
-  consultationType: ReviewConsultationType;
-  service: string;
   tags: string[];
-  verifiedPatient: boolean;
-  doctorReply?: {
+  doctorReply: {
     message: string;
     repliedAt: string;
-  };
+  } | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DoctorReviewItem {
+  review: Review;
+  patient: {
+    id: string;
+    name: string;
+    profileImage: string | null;
+  } | null;
+  appointment: {
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    status: ApiAppointmentStatus;
+    reason: string | null;
+  } | null;
 }
 
 export interface ReviewFilters {
   search: string;
   rating: "all" | ReviewRating;
-  consultationType: "all" | ReviewConsultationType;
   replyStatus: ReviewReplyStatus;
   sort: ReviewSortOrder;
 }
@@ -41,8 +57,51 @@ export interface RatingDistributionItem {
   percentage: number;
 }
 
+export interface DoctorReviewsData {
+  reviews: DoctorReviewItem[];
+  summary: ReviewMetricsData & {
+    ratingDistribution: RatingDistributionItem[];
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface DoctorReviewsResponse {
+  success: true;
+  message: string;
+  data: DoctorReviewsData;
+}
+
+export interface DoctorReviewsQuery {
+  page: number;
+  limit: number;
+  search?: string;
+  rating?: ReviewRating;
+  replyStatus?: Exclude<ReviewReplyStatus, "all">;
+  sort: ReviewSortOrder;
+}
+
+export interface ReplyToReviewPayload {
+  reviewId: string;
+  message: string;
+}
+
+export interface ReviewMutationResponse {
+  success: true;
+  message: string;
+  data: { review: Review };
+}
+
+export interface ReviewReplyFormValues {
+  message: string;
+}
+
 export interface ReviewsPageHeaderProps {
-  reviews: readonly DoctorReview[];
+  reviews: readonly DoctorReviewItem[];
 }
 
 export interface ReviewMetricsProps {
@@ -62,14 +121,24 @@ export interface ReviewFilterBarProps {
 }
 
 export interface ReviewListProps {
-  reviews: readonly DoctorReview[];
-  onReply: (review: DoctorReview) => void;
+  reviews: readonly DoctorReviewItem[];
+  onReply: (review: DoctorReviewItem) => void;
   onResetFilters?: () => void;
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
 export interface ReviewCardProps {
-  review: DoctorReview;
-  onReply: (review: DoctorReview) => void;
+  item: DoctorReviewItem;
+  onReply: (review: DoctorReviewItem) => void;
+}
+
+export interface ReviewReplyDialogProps {
+  review: DoctorReviewItem | null;
+  isPending: boolean;
+  onClose: () => void;
+  onSubmit: (values: ReviewReplyFormValues) => void;
 }
 
 export interface StarRatingProps {

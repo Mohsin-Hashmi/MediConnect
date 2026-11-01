@@ -18,7 +18,7 @@ MediConnect aims to help patients find care and help doctors manage onboarding, 
 | Patients | Read-only doctor-scoped API directory of patients connected through assigned appointments, with metrics, search/filter/sort, 10-row pagination, details, and PDF export. Patient account creation and profile management stay in the patient flow. |
 | Availability | Doctor-scoped API list/create/update/delete for dated bookable windows, with Formik/Yup validation, status, slot capacity, loading/error/empty states, and confirmation before deletion. |
 | Doctor profile | Authenticated account and professional profile data loaded from the backend, with validated account/professional updates, authoritative verification state, loading/error handling, and patient-preview rendering. Replacement image upload and a separate public-profile route are not connected yet. |
-| Reviews | Responsive patient-feedback preview with isolated mock data, rating metrics and distribution, filters, pagination, PDF export, and non-persisting reply controls; the reviews API is not connected yet. |
+| Reviews | Doctor-scoped API reviews with server-side search/filter/sort/pagination, rating metrics and distribution, PDF export, and persisted doctor replies. Reviews are created only by patients from completed appointments; the patient review UI is not built yet. |
 | Earnings | Responsive financial reporting preview with isolated mock data, revenue metrics, chart, filters, pagination, and PDF export; payout and settlement APIs are not connected. |
 | Messages | Responsive messaging workspace preview with isolated mock conversations, searchable All/Unread inbox views, appointment context, accessible message history, and non-sending composer controls; REST history and Socket.IO are not connected yet. |
 | Notifications | Responsive activity-center preview with isolated mock events, summary metrics, filters, date-grouped rows, pagination, related-module links, and non-persisting read/remove controls; notification APIs and real-time delivery are not connected yet. |
@@ -37,7 +37,7 @@ Patients own appointment creation through the patient-only backend booking endpo
 ## Current scope and non-goals
 
 - Current development is frontend-first and can use clearly labeled mock data for unfinished modules.
-- Appointment reads, doctor status actions, dated availability, and the appointment-derived read-only patient directory are integrated. Payment, telemedicine, messaging, and notification UI must not be treated as integrated merely because controls or routes exist.
+- Appointment reads, doctor status actions, dated availability, the appointment-derived read-only patient directory, and the doctor reviews workspace are integrated. Payment, telemedicine, messaging, and notification UI must not be treated as integrated merely because controls or routes exist.
 - Do not treat browser session storage as a secure health-record store or as multi-device persistence.
 - Do not make regulatory, security, or verification promises in product copy without confirmed implementation and review.
 - Do not build all sidebar modules at once or expand the patient experience without a specific approved design and workflow.

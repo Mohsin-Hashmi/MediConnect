@@ -12,22 +12,22 @@ export function ReviewsPageHeader({ reviews }: ReviewsPageHeaderProps) {
       actions={
         <PdfExportButton
           title="MediConnect patient reviews"
-          subtitle={`${reviews.length} filtered reviews from the current preview`}
+          subtitle={`${reviews.length} reviews from the current page`}
           filename="mediconnect-patient-reviews"
           label="Export reviews"
           headers={[
             "Patient",
             "Rating",
-            "Consultation",
+            "Appointment reason",
             "Submitted",
             "Feedback",
           ]}
           rows={reviews.map((review) => [
-            review.patientLabel,
-            `${review.rating} / 5`,
-            `${review.service} (${review.consultationType})`,
-            format(new Date(review.submittedAt), "d MMM yyyy"),
-            review.comment,
+            review.patient?.name ?? "Patient unavailable",
+            `${review.review.rating} / 5`,
+            review.appointment?.reason ?? "No reason provided",
+            format(new Date(review.review.createdAt), "d MMM yyyy"),
+            review.review.comment,
           ])}
         />
       }
