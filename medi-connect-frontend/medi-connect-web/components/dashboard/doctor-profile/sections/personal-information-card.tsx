@@ -71,8 +71,8 @@ export function PersonalInformationCard({
           <div className="min-w-0 flex-1">
             <p className="font-semibold">Profile photo</p>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              The current professional headshot is loaded from your doctor profile.
-              Uploading a replacement requires the media storage API.
+              The current professional headshot is loaded from your doctor
+              profile. Uploading a replacement requires the media storage API.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button type="button" variant="outline" size="sm" disabled>
@@ -106,7 +106,9 @@ export function PersonalInformationCard({
             className="sm:col-span-2"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.user?.name ? formik.errors.user?.name : undefined}
+            error={
+              formik.touched.user?.name ? formik.errors.user?.name : undefined
+            }
           />
           <ProfileField
             id="email"
@@ -119,7 +121,9 @@ export function PersonalInformationCard({
             autoComplete="email"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.user?.email ? formik.errors.user?.email : undefined}
+            error={
+              formik.touched.user?.email ? formik.errors.user?.email : undefined
+            }
             inputClassName="bg-slate-50 text-muted-foreground"
           />
           <ProfileField
@@ -131,7 +135,9 @@ export function PersonalInformationCard({
             autoComplete="tel"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.user?.phone ? formik.errors.user?.phone : undefined}
+            error={
+              formik.touched.user?.phone ? formik.errors.user?.phone : undefined
+            }
           />
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="gender">Gender</Label>
@@ -149,8 +155,8 @@ export function PersonalInformationCard({
                 aria-invalid={Boolean(
                   formik.touched.user?.gender && formik.errors.user?.gender,
                 )}
-            >
-              <SelectValue placeholder="Select gender" />
+              >
+                <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent
                 align="start"

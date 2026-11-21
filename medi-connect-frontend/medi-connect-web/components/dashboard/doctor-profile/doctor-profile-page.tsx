@@ -53,9 +53,7 @@ function DoctorProfileForm({ profile }: DoctorProfileFormProps) {
                 : Number(doctor.consultationFee),
             bio: doctor.bio?.trim() || null,
             languages: [
-              ...new Set(
-                doctor.languages.map((language) => language.trim()),
-              ),
+              ...new Set(doctor.languages.map((language) => language.trim())),
             ].filter(Boolean),
           },
         });

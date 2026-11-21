@@ -53,7 +53,7 @@ export function CancelAppointmentDialog({
       onOpenChange={(open) => !open && closeDialog()}
     >
       <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-md">
-        <form onSubmit={formik.handleSubmit}>
+        <form onSubmit={formik.handleSubmit} >
           <div className="space-y-5 p-6">
             <DialogHeader>
               <span className="flex size-11 items-center justify-center rounded-xl bg-red-50 text-destructive ring-1 ring-red-100">
@@ -82,7 +82,9 @@ export function CancelAppointmentDialog({
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 aria-invalid={Boolean(error)}
-                aria-describedby={error ? "cancellation-reason-error" : undefined}
+                aria-describedby={
+                  error ? "cancellation-reason-error" : undefined
+                }
                 className="min-h-28 resize-none"
               />
               <div className="flex items-start justify-between gap-3 text-xs">

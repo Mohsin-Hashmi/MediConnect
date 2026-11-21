@@ -37,7 +37,9 @@ export const generateAccessToken = (user: TokenUser) => {
     tokenType: "access",
   };
 
-  return jwt.sign(payload, getJwtSecret(), { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
+  return jwt.sign(payload, getJwtSecret(), {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+  });
 };
 
 // Generate Refresh Token
@@ -49,7 +51,9 @@ export const generateRefreshToken = (user: TokenUser) => {
     tokenType: "refresh",
   };
 
-  return jwt.sign(payload, getJwtSecret(), { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+  return jwt.sign(payload, getJwtSecret(), {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+  });
 };
 
 // Generate Auth Tokens (Access + Refresh)
@@ -61,7 +65,10 @@ export const generateAuthTokens = (user: TokenUser) => ({
 // Verify Refresh Token
 export const verifyRefreshToken = (refreshToken: string) => {
   try {
-    const payload = jwt.verify(refreshToken, getJwtSecret()) as AuthTokenPayload;
+    const payload = jwt.verify(
+      refreshToken,
+      getJwtSecret(),
+    ) as AuthTokenPayload;
 
     if (payload.tokenType !== "refresh") {
       return null;
