@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { Info, RotateCcw, Save, Settings2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { ConfirmActionDialog } from "@/components/common/confirm-action-dialog";
@@ -22,10 +24,15 @@ import {
   SETTINGS_INITIAL_VALUES,
 } from "@/data/mock/settings";
 import { settingsSchema } from "@/schemas/settings.schema";
+import { useLogout } from "@/hooks/apis/auth/use-auth";
+import { clearAccessToken } from "@/lib/auth-storage";
+import type { ApiErrorResponse } from "@/types/auth";
 import type { SettingsFormValues } from "@/types/settings";
 
 export function SettingsPage() {
+  const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const logoutMutation = useLogout();
   const formik = useFormik<SettingsFormValues>({
     initialValues: SETTINGS_INITIAL_VALUES,
     validationSchema: settingsSchema,
@@ -47,6 +54,22 @@ export function SettingsPage() {
     toast.info(
       "Account deletion remains unavailable until linked scheduling data is handled safely.",
     );
+  }
+
+  async function handleSignOut() {
+    try {
+      const response = await logoutMutation.mutateAsync();
+
+      clearAccessToken();
+      toast.success(response.message || "Signed out successfully.");
+      router.replace("/login");
+    } catch (error) {
+      const message = isAxiosError<ApiErrorResponse>(error)
+        ? (error.response?.data.message ?? "Unable to sign out. Please try again.")
+        : "Unable to sign out. Please try again.";
+
+      toast.error(message);
+    }
   }
 
   return (
@@ -86,6 +109,8 @@ export function SettingsPage() {
             <AccountSecuritySettings
               account={SETTINGS_ACCOUNT_FIXTURE}
               onPreviewAction={showPreviewAction}
+              onSignOut={() => void handleSignOut()}
+              isSigningOut={logoutMutation.isPending}
             />
             <NotificationSettings
               formik={formik}

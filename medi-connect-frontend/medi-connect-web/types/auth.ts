@@ -48,6 +48,11 @@ export interface AuthResponse {
   };
 }
 
+export interface LogoutResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface ApiErrorResponse {
   success: false;
   message: string;

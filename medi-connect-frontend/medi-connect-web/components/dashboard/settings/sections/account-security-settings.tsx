@@ -21,11 +21,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import type { AccountSecuritySettingsProps } from "@/types/settings";
 
 export function AccountSecuritySettings({
   account,
   onPreviewAction,
+  onSignOut,
+  isSigningOut,
 }: AccountSecuritySettingsProps) {
   return (
     <Card
@@ -150,10 +153,15 @@ export function AccountSecuritySettings({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onPreviewAction("Signing out")}
+                onClick={onSignOut}
+                disabled={isSigningOut}
               >
-                <LogOut className="size-4" aria-hidden="true" />
-                Sign out
+                {isSigningOut ? (
+                  <Spinner aria-label="Signing out" />
+                ) : (
+                  <LogOut className="size-4" aria-hidden="true" />
+                )}
+                {isSigningOut ? "Signing out" : "Sign out"}
               </Button>
             </div>
           </div>

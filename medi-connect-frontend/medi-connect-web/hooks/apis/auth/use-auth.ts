@@ -8,6 +8,7 @@ import type {
   ApiErrorResponse,
   AuthResponse,
   LoginPayload,
+  LogoutResponse,
   RegisterPayload,
 } from "@/types/auth";
 
@@ -36,6 +37,17 @@ export function useRegister() {
         "/auth/register",
         payload,
       );
+      return response.data;
+    },
+  });
+}
+
+export function useLogout() {
+  return useMutation<LogoutResponse, AxiosError<ApiErrorResponse>, void>({
+    mutationKey: ["auth", "logout"],
+    mutationFn: async () => {
+      const response = await AXIOS.post<LogoutResponse>("/auth/logout");
+
       return response.data;
     },
   });

@@ -57,6 +57,8 @@ export interface SettingsSectionProps {
 export interface AccountSecuritySettingsProps {
   account: SettingsAccountSummary;
   onPreviewAction: (message: string) => void;
+  onSignOut: () => void;
+  isSigningOut: boolean;
 }
 
 export interface AccountManagementSettingsProps {
