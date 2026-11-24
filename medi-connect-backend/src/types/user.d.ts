@@ -5,6 +5,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
+  authVersion: number;
   role: UserRoleName;
   phone?: string;
   profileImage?: string;

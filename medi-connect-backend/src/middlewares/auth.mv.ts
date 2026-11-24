@@ -35,12 +35,22 @@ export const authMiddleware = async (
     }
 
     const { userId } = tokenPayload;
-    const user = await UserModel.findById(userId).select("_id name email role");
+    const user = await UserModel.findById(userId).select(
+      "_id name email role authVersion",
+    );
 
     if (!user) {
       res.status(401).json({
         success: false,
         message: "User is not authorized",
+      });
+      return;
+    }
+
+    if (tokenPayload.authVersion !== user.authVersion) {
+      res.status(401).json({
+        success: false,
+        message: "Your session has expired. Please sign in again.",
       });
       return;
     }

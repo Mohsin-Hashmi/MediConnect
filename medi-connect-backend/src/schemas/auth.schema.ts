@@ -40,6 +40,19 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, "Refresh token is required"),
 });
 
+export const requestPasswordChangeVerificationSchema = z.object({}).strict();
+
+export const changePasswordSchema = z.object({
+  verificationCode: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, "Verification code must contain exactly 6 digits"),
+  newPassword: z
+    .string()
+    .min(8, "New password must be at least 8 characters long")
+    .max(72, "New password must not exceed 72 characters"),
+});
+
 export const profileUpdateSchema = z.object({
   name: z
     .string()
@@ -64,4 +77,5 @@ export const profileUpdateSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

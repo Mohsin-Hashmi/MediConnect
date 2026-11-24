@@ -31,6 +31,12 @@ const userSchema = new Schema<IUserDocument>(
       required: true,
       minlength: 6,
     },
+    authVersion: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
     phone: {
       type: String,
       trim: true,

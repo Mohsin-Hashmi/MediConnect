@@ -1,14 +1,17 @@
 import type { Request, Response } from "express";
 
 import type {
+  ChangePasswordInput,
   LoginInput,
   RegisterInput,
 } from "../schemas/auth.schema.js";
 import {
+  changePassword as changePasswordService,
   loginUser as loginUserService,
   logoutUser as logoutUserService,
   refreshAccessToken as refreshAccessTokenService,
   registerUser as registerUserService,
+  requestPasswordChangeVerification as requestPasswordChangeVerificationService,
 } from "../services/auth.service.js";
 import { sendControllerError } from "../utils/http-response.util.js";
 
@@ -110,5 +113,49 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     });
   } catch (error) {
     sendControllerError(res, error, "Refresh token request failed:");
+  }
+};
+
+/**
+ * - Sends a six-digit verification code to the authenticated user's email.
+ * - Code is valid for 10 minutes with a 60-second resend cooldown.
+ */
+export const requestPasswordChangeVerification = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    await requestPasswordChangeVerificationService(req.user?.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Verification code sent to your email",
+    });
+  } catch (error) {
+    sendControllerError(
+      res,
+      error,
+      "Password change verification request failed:",
+    );
+  }
+};
+
+/**
+ * - Verifies the code and changes the authenticated user's password.
+ * - Invalidates all existing sessions by incrementing authVersion.
+ */
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    await changePasswordService(
+      req.user?.id,
+      req.body as ChangePasswordInput,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    sendControllerError(res, error, "Password change request failed:");
   }
 };

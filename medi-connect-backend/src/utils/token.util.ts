@@ -7,6 +7,7 @@ type TokenUser = {
   id: string;
   email: string;
   role: UserRoleName;
+  authVersion: number;
 };
 
 export type AuthTokenPayload = UserTokenPayload & {
@@ -34,6 +35,7 @@ export const generateAccessToken = (user: TokenUser) => {
     userId: user.id,
     email: user.email,
     role: user.role,
+    authVersion: user.authVersion,
     tokenType: "access",
   };
 
@@ -48,6 +50,7 @@ export const generateRefreshToken = (user: TokenUser) => {
     userId: user.id,
     email: user.email,
     role: user.role,
+    authVersion: user.authVersion,
     tokenType: "refresh",
   };
 
